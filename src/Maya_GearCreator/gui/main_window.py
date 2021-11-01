@@ -224,6 +224,8 @@ class GearChainWidget(QtWidgets.QWidget):
     def populate(self):
         self.modifiableName.set(self.gearChain.name,
                                 self.gearChain.setName)
+        self.slider.setValue(self.gearChain.tWidth
+            * self.T_WIDTH_SLIDER_FACTOR)
         self.slider.setMinimum(self.gearChain.calculateMinTWidth()
             * self.T_WIDTH_SLIDER_FACTOR)
         self.slider.setMaximum(self.gearChain.calculateMaxTWidth()

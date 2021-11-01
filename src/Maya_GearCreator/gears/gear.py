@@ -69,6 +69,9 @@ class Gear():
         self.circleConstraints = []
         self.parentConstraints = []
 
+        self.basePos = None
+        self.currentPos = None
+
         self.lockTransform(True)
 
     # HANDLING NAME -----------------------------------------------------------
@@ -217,8 +220,14 @@ class Gear():
         # 2 lock the rest of the chain.
         self.lockChain(*[g for g in self.neighbours if g != rootGear])
         pm.setAttr(self.name + ".translate", lock=False)
-
         # 3 TODO: SHOW / HIDE CONSTRAINT CIRCLE.
+        # TODO 4 !!!!!!!
+        # MEMORIZE BASE POS.
+        # self.basePos = .... get transform.
+        # ds move along -> calculer la soustraction.
+        lol = self.gearTransform.getTransform().translate.get()
+        self.basePos = lol[2]
+        self.currentPos = self.basePos
 
     def desactivateMoveMode(self):
         if not self.moveMode: return
@@ -233,7 +242,13 @@ class Gear():
         # calculate radius + Tlen / 2 -> perimeter: max distance
 
     def moveAlong(self, distance):
-        pm.move(self.gearTransform, [0, 0, distance], os=True, r=True, wd=True)
+        newZ = distance - self.currentPos
+        print(newZ)
+        if distance < self.currentPos:
+            newZ = - newZ
+        pm.move(self.gearTransform, [0, 0, newZ],
+                os=True, r=True, wd=True)
+        # save current pos -> if new is lower -> move difference in negative.
         pass
 
     # CONSTRAINTS -------------------------------------------------------------
@@ -290,6 +305,8 @@ class Gear():
                 gear.lockChain(*newNeighboursGear, lock=lock)
             else:
                 gear.lockChain(*newNeighboursGear, lock=lock)
+
+    # SHADER ------------------------------------------------------------------
 
     def setTmpShader(self, sg):
         self.shader_bk = self._getCurrentShader()

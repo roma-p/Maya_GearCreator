@@ -36,6 +36,7 @@ class GearChain():
 
     # TODO : CANCELLED WHEN CHANGING RADIUS OF A GEAR....
     def changeTWidth(self, tWidth):
+        self.tWidth = tWidth
         for g in self.gearList:
             g.changeTWidth(tWidth)
 
@@ -50,7 +51,7 @@ class GearChain():
         self.gearList.append(g)
         return g
 
-    # TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    # TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     def calculateMinTWidth(self):
         return 0.1
