@@ -6,14 +6,14 @@ import pymel.core as pm
 from maya import OpenMayaUI as omui
 from maya import OpenMaya as om
 #
-from Qt import QtWidgets, QtCore
-import Qt
+from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
+from Maya_GearCreator import Qt
 #
-from gearCreator.src.gui import base_widgets
+from Maya_GearCreator.gui import base_widgets
 importlib.reload(base_widgets)
-from gearCreator.src import gear_network
+from Maya_GearCreator import gear_network
 importlib.reload(gear_network)
-from gearCreator.src.gui import gear_window
+from Maya_GearCreator.gui import gear_window
 importlib.reload(gear_window)
 
 log = logging.getLogger("GearCreatorUI")
@@ -26,15 +26,15 @@ log.setLevel(logging.DEBUG)
 binding_version = Qt.__binding_version__
 if binding_version == "PySide":
     from shiboken import wrapInstance
-    from Qt.QtCore import Signal 
+    from Maya_GearCreator.Qt.QtCore import Signal 
     log.debug("Using PySide with shiboken")
 elif binding_version.startswith("PyQt"):
     from sip import wrapinstance as wrapInstance
-    from Qt.QtCore import pyqtSignal as Signal
+    from Maya_GearCreator.Qt.QtCore import pyqtSignal as Signal
     log.debug("Using PyQt with sip")
 else:
     from shiboken2 import wrapInstance
-    from Qt.QtCore import Signal 
+    from Maya_GearCreator.Qt.QtCore import Signal 
     log.debug("Using PySide2 with shiboken")
 
 # HELPERS ---------------------------------------------------------------------

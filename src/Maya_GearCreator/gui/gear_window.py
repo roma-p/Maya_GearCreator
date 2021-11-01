@@ -3,12 +3,12 @@ import importlib
 from functools import partial
 #
 import pymel.core as pm
-from Qt import QtWidgets, QtCore
+from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
 #
-from gearCreator.src.gui import base_widgets
+from Maya_GearCreator.gui import base_widgets
 importlib.reload(base_widgets)
 
-from gearCreator.src.misc import color_shader
+from Maya_GearCreator.misc import color_shader
 importlib.reload(color_shader)
 
 log = logging.getLogger("gearWidget")

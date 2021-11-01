@@ -1,7 +1,7 @@
 import importlib
 import logging
 
-from gears import gear
+from Maya_GearCreator.gears import gear
 importlib.reload(gear)
 
 log = logging.getLogger(__name__)

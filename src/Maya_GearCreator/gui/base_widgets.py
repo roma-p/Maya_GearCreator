@@ -1,5 +1,5 @@
 import logging
-from Qt import QtWidgets, QtCore, QtGui
+from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
