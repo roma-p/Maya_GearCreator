@@ -1,6 +1,11 @@
 import sys, os, math
 import importlib
 import pymel.core as pm
+import logging
+
+logging.basicConfig()
+log = logging.getLogger("GearCreatorUI")
+log.setLevel(logging.DEBUG)
 
 PATH = "path/to/src/"
 
