@@ -1,5 +1,6 @@
 import logging
 from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
+from functools import partial
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -68,11 +69,19 @@ class ModifiableName(QtWidgets.QWidget):
 
 class MoveAlongWidget(QtWidgets.QWidget):
 
+    # TODO : NO FIX STEP NUMBER! CALCULATED BASED ON NEIGHBOURS TEETH NUMBER 
+    STEP_NUMBER = 100
+
     def __init__(self, gearToMove, gearToMoveAlong, color):
         super(MoveAlongWidget, self).__init__()
         self.gearToMove = gearToMove
         self.gearToMoveAlong = gearToMoveAlong
+
         self.color = color
+        self.ratio = None
+        self.previousPos = None
+        self.previousCursorVal = None
+
         self.buildUI()
         self.populate()
 
@@ -95,10 +104,32 @@ class MoveAlongWidget(QtWidgets.QWidget):
         layout.addWidget(self.slider)
 
     def populate(self):
-        self.slider.setMaximum(self.gearToMoveAlong.calculateMoveAlong())
+
+        stepNumber = self.gearToMoveAlong.tNumber
+        max_distance = self.gearToMoveAlong.calculateMoveAlong()  # FIXME! NO REASON FOR THAT *2
+        self.ratio = max_distance / stepNumber
+        self.slider.setMaximum(stepNumber)
+        self.previousPos = self._getGearPos()
+        self.previousCursorVal = 0
+        self.slider.setValue(0)
+
         self.slider.sliderPressed.connect(
             lambda: self.gearToMove.activateMoveMode(self.gearToMoveAlong))
         self.slider.sliderReleased.connect(
             lambda: self.gearToMove.desactivateMoveMode())
-        self.slider.valueChanged.connect(
-            lambda value: self.gearToMove.moveAlong(value))
+        self.slider.valueChanged.connect(self._moveAlong)
+
+    def _moveAlong(self, cursorVal):
+        distance = (cursorVal - self.previousCursorVal) * self.ratio
+        self.previousCursorVal = cursorVal
+        self.gearToMove.moveAlong(distance)
+
+        #distance = (cursorVal * self.ratio) - self.previousPos
+        #self.gearToMove.moveAlong(distance)
+        #self.previousPos = self._getGearPos()
+        #if cursorVal - self.previousCursorVal < 0:
+        #    distance = - distance
+
+    def _getGearPos(self):
+        posVector = self.gearToMove.gearTransform.getTransform().translate.get()
+        return posVector[2]  # NB : to change whern allowing multiple orientation.

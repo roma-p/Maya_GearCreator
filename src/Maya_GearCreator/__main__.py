@@ -10,10 +10,7 @@ def addToPyPath(path):
     if not os.path.exists(path):
         return False
     if path not in sys.path:
-        print("pas deja la")
         sys.path.append(path)
-    else:
-        print('déja laaa')
     return True
 
 # def registerPlugin(): pass

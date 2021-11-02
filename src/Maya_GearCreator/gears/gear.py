@@ -107,6 +107,14 @@ class Gear():
         if not self.gearChain:
             self._tWidth = tWidth
 
+    @property
+    def tNumber(self):
+        return self.gearConstructor.subdivisionsAxis.get() / 2
+
+    @tNumber.setter
+    def tNumber(self, val):
+        pass
+
     # CALCULUS ----------------------------------------------------------------
 
     def calculateTNumber(tWidth, radius):
@@ -160,15 +168,16 @@ class Gear():
                 log.error("minimal teeth number is {}, input is {}.".format(
                     minTeethNumber, tNumber))
                 status = False
-
-            spans, sideFaces = Gear.getTeethInfo(tNumber)
-            pm.polyPipe(self.gearConstructor, edit=True, 
-                        subdivisionsAxis=spans)
-            faceNames = ["f[{}]".format(face) for face in sideFaces]
-            pm.setAttr("{}.inputComponents".format(self.teethExtrude),
-                len(faceNames),
-                *faceNames,
-                type="componentList")
+            else:
+                spans, sideFaces = Gear.getTeethInfo(tNumber)
+                pm.polyPipe(self.gearConstructor, edit=True,
+                            subdivisionsAxis=spans)
+                faceNames = ["f[{}]".format(face) for face in sideFaces]
+                pm.setAttr(
+                    "{}.inputComponents".format(self.teethExtrude),
+                    len(faceNames),
+                    *faceNames,
+                    type="componentList")
         if tLen:
             adjustedRadius = self.calculateAdjustedRadius()
             if adjustedRadius < 0.01:
@@ -241,7 +250,7 @@ class Gear():
         return perimeter
         # calculate radius + Tlen / 2 -> perimeter: max distance
 
-    def moveAlong(self, distance):
+    def moveAlong_Slider(self, distance):
         newZ = distance - self.currentPos
         print(newZ)
         if distance < self.currentPos:
@@ -249,8 +258,12 @@ class Gear():
         pm.move(self.gearTransform, [0, 0, newZ],
                 os=True, r=True, wd=True)
         # save current pos -> if new is lower -> move difference in negative.
-        pass
+        # EN FAIT NON. RETENIR LA VALEUR DU SLIDER + LA VALEUR DE LA POS. 
+        # LA VALEUR DU SLIDER SERT AU SIGNE, LA VALEUR DE LA POS A LA DISTANCE.
 
+    def moveAlong(self, distance):
+        pm.move(self.gearTransform, [0, 0, distance],
+                os=True, r=True, wd=True)
     # CONSTRAINTS -------------------------------------------------------------
 
     @transform
@@ -271,8 +284,10 @@ class Gear():
                                   self.gearTransform),
             pm.aimConstraint(neighbourGear.gearTransform, self.gearTransform)
         ]
+        self.constraintsCircles[neighbourGear][0].visibility.set(True)
 
     def desactivateCircleConstraint(self, neighbourGear):
+        self.constraintsCircles[neighbourGear][0].visibility.set(False)
         for constraint in self.circleConstraints:
             pm.delete(constraint)
         self.circleConstraints = []

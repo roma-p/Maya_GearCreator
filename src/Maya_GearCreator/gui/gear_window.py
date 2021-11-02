@@ -89,7 +89,7 @@ class GearWidget(QtWidgets.QWidget):
             neighbour.setTmpShader(sg)
             widget = base_widgets.MoveAlongWidget(self.gear, neighbour,
                                                   colorRGB)
-            self.layout.addWidget(widget, i, 0)
+            self.layout.addWidget(widget, i, 0,)
             i = i + 1
 
     def changeRadiusCallback(value, gearWidget=None):
