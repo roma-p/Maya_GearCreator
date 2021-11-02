@@ -1,5 +1,6 @@
 import importlib
 import logging
+import pymel.core as pm
 
 from Maya_GearCreator import gear_chain
 importlib.reload(gear_chain)
@@ -13,10 +14,14 @@ class GearNetwork():
     gearNetworkIdx = 0
 
     def __init__(self, name=None):
-        self.name = name or self.genAutoName()
+        name = name or self.genAutoName()
         self.gearDict = {}
         self.chainList = []
         self.multiChainGear = {}
+        self.group = pm.group(em=True, name=name)
+        self.name = name
+
+    # HANDLING NAME -----------------------------------------------------------
 
     def genAutoName(cls):
         name = "{}{}".format(cls.DEFAULT_PREFIX, cls.gearNetworkIdx)
@@ -27,9 +32,18 @@ class GearNetwork():
     def setName(self, name):
         self.name = name
 
+    @property
+    def name(self):
+        return str(self.group)
+
+    @name.setter
+    def name(self, name):
+        pm.rename(self.group, name)
+
     def addChain(self, tWidth=0.3):
         chain = gear_chain.GearChain(self, tWidth)
         self.chainList.append(chain)
+        pm.parent(chain.group, self.name)
         return chain
 
     def addGear(self, radius, gearChain,

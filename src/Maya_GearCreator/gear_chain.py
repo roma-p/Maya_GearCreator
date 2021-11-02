@@ -1,5 +1,6 @@
 import importlib
 import logging
+import pymel.core as pm
 
 from Maya_GearCreator.gears import gear
 importlib.reload(gear)
@@ -14,10 +15,12 @@ class GearChain():
     gearChainIdx = 0
 
     def __init__(self, gearNetwork, tWidth=0.3):
-        self.name = self.genAutoName()
+        name = self.genAutoName()
         self.tWidth = tWidth
         self.gearList = []
         self.gearNetwork = gearNetwork
+        self.group = pm.group(em=True, name=name)
+        self.name = name
 
     def __del__(self): pass
         # if more than one neigbour: impossible I guess. 
@@ -25,10 +28,20 @@ class GearChain():
         # delete circle
         # delete constraints. 
 
+    # HANDLING NAME -----------------------------------------------------------
+
     def genAutoName(cls):
         name = "{}{}".format(cls.DEFAULT_PREFIX, cls.gearChainIdx)
         cls.gearChainIdx += 1
         return name
+
+    @property
+    def name(self):
+        return str(self.group)
+
+    @name.setter
+    def name(self, name):
+        pm.rename(self.group, name)
 
     # Redondant but used as signal callback for UI
     def setName(self, name):
@@ -49,6 +62,7 @@ class GearChain():
                       linkedGear=linkedGear,
                       gearChain=self)
         self.gearList.append(g)
+        pm.parent(g.gearTransform, self.name)
         return g
 
     # TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

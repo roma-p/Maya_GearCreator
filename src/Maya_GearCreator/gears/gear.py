@@ -276,6 +276,7 @@ class Gear():
         circle[0].visibility.set(False)
         self.constraintsCircles[neighbourGear] = circle
         pm.parentConstraint(neighbourGear.gearTransform, circle[0])
+        pm.parent(circle[0], self.nmae)
 
     @transform
     def activateCircleConstraint(self, neighbourGear):
