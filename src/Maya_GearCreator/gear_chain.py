@@ -2,8 +2,13 @@ import importlib
 import logging
 import pymel.core as pm
 
+from Maya_GearCreator.gears import gear_basic
 from Maya_GearCreator.gears import gear
+from Maya_GearCreator import consts
+
+importlib.reload(gear_basic)
 importlib.reload(gear)
+importlib.reload(consts)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -16,11 +21,17 @@ class GearChain():
 
     def __init__(self, gearNetwork, tWidth=0.3):
         name = self.genAutoName()
-        self.tWidth = tWidth
         self.gearList = []
         self.gearNetwork = gearNetwork
         self.group = pm.group(em=True, name=name)
         self.name = name
+
+        self.group.addAttr(
+            "tWidth", 
+            keyable=True,
+            attributeType="float")
+        self.tWidth = tWidth
+
 
     def __del__(self): pass
         # if more than one neigbour: impossible I guess. 
@@ -47,22 +58,42 @@ class GearChain():
     def setName(self, name):
         self.name = name
 
-    # TODO : CANCELLED WHEN CHANGING RADIUS OF A GEAR....
+    # Twidth ------------------------------------------------------------------
+
+    @property
+    def tWidth(self):
+        return self.group.tWidth.get()
+
+    @tWidth.setter
+    def tWidth(self, tWidth):
+        self.group.tWidth.set(tWidth)
+
+    # TODO : CANCELLED WHEN CHANGING RADIUS OF A GEAR.... HEIN? 
     def changeTWidth(self, tWidth):
         self.tWidth = tWidth
         for g in self.gearList:
             g.changeTWidth(tWidth)
 
-    def addGear(self, radius, tLen=None, linkedGear=None, name=None):
+    # -------------------------------------------------------------------------
+
+    def addGear(
+            self, name=None,
+            radius=consts.DEFAULT_RADIUS, 
+            gearOffset=consts.DEFAULT_GEAR_OFFESET,
+            linkedGear=None):
+
         if self.gearList and not linkedGear:
             log.error("gearChain not empty, so new gear has to be connected.")
             return
-        g = gear.Gear(name=name, radius=radius,
-                      tWidth=self.tWidth, tLen=tLen,
-                      linkedGear=linkedGear,
-                      gearChain=self)
+        g = gear_basic.GearBasic(
+            name=name, 
+            radius=radius,
+            tWidth=self.tWidth,
+            gearOffset=gearOffset,
+            linkedGear=linkedGear,
+            gearChain=self)#
         self.gearList.append(g)
-        pm.parent(g.gearTransform, self.name)
+        pm.parent(g.objTransform, self.name)
         return g
 
     # TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

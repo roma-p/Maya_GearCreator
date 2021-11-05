@@ -3,7 +3,10 @@ import logging
 import pymel.core as pm
 
 from Maya_GearCreator import gear_chain
+from Maya_GearCreator import consts
+
 importlib.reload(gear_chain)
+importlib.reload(consts)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -46,11 +49,16 @@ class GearNetwork():
         pm.parent(chain.group, self.name)
         return chain
 
-    def addGear(self, radius, gearChain,
-                tLen=None, linkedGear=None,
-                name=None):
-        gear = gearChain.addGear(radius, tLen, linkedGear, name)
-        self.gearDict[gear.gearTransform] = (gear, gearChain)
+    def addGear(
+            self, 
+            gearChain,
+            name=None,
+            radius=consts.DEFAULT_RADIUS,
+            gearOffset=consts.DEFAULT_GEAR_OFFESET,
+            linkedGear=None):
+
+        gear = gearChain.addGear(name, radius, gearOffset, linkedGear)
+        self.gearDict[gear.objTransform] = (gear, gearChain)
         return gear
 
     def getGearFromTransform(self, transform):

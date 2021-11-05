@@ -105,7 +105,7 @@ class MoveAlongWidget(QtWidgets.QWidget):
 
     def populate(self):
 
-        stepNumber = self.gearToMoveAlong.tNumber
+        stepNumber = self.gearToMoveAlong.sides
         max_distance = self.gearToMoveAlong.calculateMoveAlong()  # FIXME! NO REASON FOR THAT *2
         self.ratio = max_distance / stepNumber
         self.slider.setMaximum(stepNumber)
@@ -126,5 +126,4 @@ class MoveAlongWidget(QtWidgets.QWidget):
         self.gearToMove.moveAlong(distance)
 
     def _getGearPos(self):
-        pos = self.gearToMove.gearTransform.getTransform().translate.get()
-        return pos[2]  # NB : to change whern allowing multiple orientation.
+        return self.gearToMove.translate[2]  # NB : to change whern allowing multiple orientation.

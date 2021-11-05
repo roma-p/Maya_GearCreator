@@ -6,10 +6,12 @@ import pymel.core as pm
 from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
 #
 from Maya_GearCreator.gui import base_widgets
-importlib.reload(base_widgets)
-
 from Maya_GearCreator.misc import color_shader
+from Maya_GearCreator import consts
+
+importlib.reload(base_widgets)
 importlib.reload(color_shader)
+importlib.reload(consts)
 
 log = logging.getLogger("gearWidget")
 log.setLevel(logging.DEBUG)
@@ -21,8 +23,6 @@ log.setLevel(logging.DEBUG)
 class GearWidget(QtWidgets.QWidget):
 
     RADIUS_SLIDER_FACTOR = 10
-    DEFAULT_RADIUS = 1
-    DEFAULT_TLEN = 0.3
 
     colorAutoShader = color_shader.ColorAutoShader()
 
@@ -71,7 +71,7 @@ class GearWidget(QtWidgets.QWidget):
         try : self.resizeSlider.valueChanged.disconnect()
         except Exception: pass
         sliderVal = GearWidget.convertRadiusToSlider(
-            self.gear.gearConstructor.radius.get())
+            self.gear.radius)
         self.resizeSlider.setValue(sliderVal)
         self.resizeMode.setChecked(False)
 
@@ -84,7 +84,7 @@ class GearWidget(QtWidgets.QWidget):
 
         # Calculation of max Radius shall be done at populate since radius could change.
         i = 3
-        for neighbour in self.gear.neighbours:
+        for neighbour in self.gear.listNeigbours():
             colorName, colorRGB, sg = next(self.colorAutoShader)
             neighbour.setTmpShader(sg)
             widget = base_widgets.MoveAlongWidget(self.gear, neighbour,
@@ -104,10 +104,11 @@ class GearWidget(QtWidgets.QWidget):
         gearNetwork = gearChain.gearNetwork
 
         gear = gearNetwork.addGear(
-            radius=GearWidget.DEFAULT_RADIUS,
-            gearChain=gearChain,
-            tLen=GearWidget.DEFAULT_TLEN,
+            gearChain, 
+            radius=consts.DEFAULT_RADIUS, 
+            gearOffset=consts.DEFAULT_GEAR_OFFESET, 
             linkedGear=gear)
 
+
         pm.select(clear=True)
-        pm.select(gear.gearTransform)
+        pm.select(gear.objTransform)

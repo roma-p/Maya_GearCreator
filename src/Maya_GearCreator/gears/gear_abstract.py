@@ -40,7 +40,7 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
             name=None,
             radius=consts.DEFAULT_RADIUS,
             tWidth=consts.DEFAULT_TWIDTH,
-            gearOffset=consts.DEFAULT_TLEN,
+            gearOffset=consts.DEFAULT_GEAR_OFFESET,
             linkedGear=None,
             gearChain=None):
 
@@ -50,6 +50,8 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
             GearAbstract,
             name)
 
+        self.shader_bk = None
+        
         # ADJUSTING SHAPE -----------------------------------------------------
         self.radius = radius - gearOffset
         self.gearOffset = gearOffset
@@ -64,7 +66,6 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
             self.addNeighbour(linkedGear)
             self.adjustGearToCircleConstraint(linkedGear)
 
-        self.shader_bk = None
         self.gearChain = gearChain
         self.tWidth = tWidth
 
@@ -227,8 +228,8 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
 
     def lockChain(self, *neighboursGear, lock=True):
         func = {
-            True: Gear.activateParentConstraint,
-            False: Gear.desactivateParentConstraint
+            True: GearAbstract.activateParentConstraint,
+            False: GearAbstract.desactivateParentConstraint
         }
         for g in neighboursGear: g.lockTransform(not lock)
         func[lock](self, *neighboursGear)

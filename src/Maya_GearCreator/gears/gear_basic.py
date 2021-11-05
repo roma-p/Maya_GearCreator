@@ -20,7 +20,7 @@ class GearBasic(gear_abstract.GearAbstract):
             self, name=None,
             radius=consts.DEFAULT_RADIUS,
             tWidth=consts.DEFAULT_TWIDTH,
-            gearOffset=consts.DEFAULT_TLEN,
+            gearOffset=consts.DEFAULT_GEAR_OFFESET,
             linkedGear=None,
             gearChain=None):
 

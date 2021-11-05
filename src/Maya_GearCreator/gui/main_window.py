@@ -9,12 +9,15 @@ from maya import OpenMaya as om
 from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
 from Maya_GearCreator import Qt
 #
-from Maya_GearCreator.gui import base_widgets
-importlib.reload(base_widgets)
 from Maya_GearCreator import gear_network
-importlib.reload(gear_network)
+from Maya_GearCreator.gui import base_widgets
 from Maya_GearCreator.gui import gear_window
+from Maya_GearCreator import consts
+
+importlib.reload(gear_network)
+importlib.reload(base_widgets)
 importlib.reload(gear_window)
+importlib.reload(consts)
 
 log = logging.getLogger("GearCreatorUI")
 log.setLevel(logging.DEBUG)
@@ -127,7 +130,7 @@ class GearCreatorUI(QtWidgets.QWidget):
 
         # -- setting original shader for colored gears --
         if args[0].previousGear:
-            for n in args[0].previousGear.neighbours:
+            for n in args[0].previousGear.listNeigbours():
                 n.restorShader()
         selected = pm.selected()
         if len(selected) == 1:
@@ -140,9 +143,9 @@ class GearCreatorUI(QtWidgets.QWidget):
         # -- if no gear selected. --
         args[0].displayGear(False)
 
-    def getGearFromTransform(self, gearTransform):
+    def getGearFromTransform(self, objTransform):
         for network in self.gearNetworkDict.keys():
-            gear = network.getGearFromTransform(gearTransform)
+            gear = network.getGearFromTransform(objTransform)
             if gear: return gear
         return None
 
@@ -156,17 +159,19 @@ class GearCreatorUI(QtWidgets.QWidget):
         gearNetwork = gear_network.GearNetwork()
         gearChain = gearNetwork.addChain()
 
+
         gear = gearNetwork.addGear(
-            radius=gear_window.GearWidget.DEFAULT_RADIUS,
-            gearChain=gearChain,
-            tLen=gear_window.GearWidget.DEFAULT_TLEN,
+            gearChain, 
+            radius=consts.DEFAULT_RADIUS, 
+            gearOffset=consts.DEFAULT_GEAR_OFFESET, 
             linkedGear=None)
+
         gearNetworkWidget = GearNetworkWidget(gearNetwork)
         args[0].gearNetworkDict[gearNetwork] = gearNetworkWidget
         args[0].scrollLayout.addWidget(gearNetworkWidget)
 
         pm.select(clear=True)
-        pm.select(gear.gearTransform)
+        pm.select(gear.objTransform)
 
 class GearNetworkWidget(QtWidgets.QWidget):
 

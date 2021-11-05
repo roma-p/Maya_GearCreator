@@ -32,8 +32,8 @@ class ConnectionsManager():
                     keyable=True,
                     attributeType="bool")
 
-        pm.connectAttr(self._formatConnection(objDescriptorA),
-                       self._formatConnection(objDescriptorB))
+        pm.connectAttr(self._formatConnection(objDescriptorB), 
+                       self._formatConnection(objDescriptorA))
         return True
 
     def disconnect(self, objDescriptorA, objDescriptorB):
@@ -46,6 +46,7 @@ class ConnectionsManager():
         return objDescriptorB in connections
 
     def listConnections(self, objDescriptor):
+        if not self._checkNeighbourExists(objDescriptor): return []
         connected_constr = pm.listConnections(
             self._formatConnection(objDescriptor))
         return [self.const2Descriptor[c] for c in connected_constr]
@@ -54,3 +55,5 @@ class ConnectionsManager():
         return "{}.{}".format(str(objDescriptor.objConstructor),
                               self.connection_name)
 
+    def _checkNeighbourExists(self, objDescriptor):
+        return objDescriptor.objConstructor.hasAttr(self.connection_name)

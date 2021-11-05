@@ -14,7 +14,6 @@ PATH = "path/to/src/"
 
 DEBUG_PATH = "D:/dev/Maya_GearCreator/src/"
 
-
 def addToPyPath(path):
     if not os.path.exists(path):
         return False
@@ -40,20 +39,20 @@ if __name__ == "__main__":
 
     # 1 / USING THE API -------------------------------------------------------
 
-    gearNetwork = gear_network.GearNetwork()
-    gearChain0 = gearNetwork.addChain(tWidth=0.3)
-    gear0 = gearNetwork.addGear(3, gearChain0, tLen=0.5)
-    gear1 = gearNetwork.addGear(2.5, gearChain0, tLen=0.5, linkedGear=gear0)
-    gear1.activateMoveMode(gear0)
-    print("aaaaaaaaaaaaa")
-    #print(gear0.gearTransform.__dict__.keys())
-    print("aaaaaaaaaaaaa")
-    #print(gear0.gearConstructor.__dict__.keys())
-    #print(gear0.gearConstructor.__dict__)
-    #print(gear0.gearConstructor.__dict__["__apiobjects__"])
-    #print(pm.listAttr("gear0"))
-    print(gear0.gearConstructor)
-    print(pm.listAttr(gear0.gearConstructor))
+    #   gearNetwork = gear_network.GearNetwork()
+    #   gearChain0 = gearNetwork.addChain(tWidth=0.3)
+    #   gear0 = gearNetwork.addGear(gearChain0, radius=0.3, gearOffset=0.5)
+    #   gear1 = gearNetwork.addGear(gearChain0, radius=2.5, gearOffset=0.5, linkedGear=gear0)
+    #   gear1.activateMoveMode(gear0)
+    #   print("aaaaaaaaaaaaa")
+    #   #print(gear0.gearTransform.__dict__.keys())
+    #   print("aaaaaaaaaaaaa")
+    #   #print(gear0.gearConstructor.__dict__.keys())
+    #   #print(gear0.gearConstructor.__dict__)
+    #   #print(gear0.gearConstructor.__dict__["__apiobjects__"])
+    #   #print(pm.listAttr("gear0"))
+    #   print(gear0.gearConstructor)
+    #   print(pm.listAttr(gear0.gearConstructor))
     
 
     # pm.move(gear1.gearTransform, [0,0,6], os=True, r=True, wd=True)
