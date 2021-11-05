@@ -10,6 +10,7 @@ log.setLevel(logging.DEBUG)
 # IF TRANSFORM WITH THIS NAME ALREADY EXISTS SAME.
 # HOOVER.
 
+# TODO ! RATHER THAN SAvE BUTTON : ENTER SIGNAL !!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 class ModifiableName(QtWidgets.QWidget):
 
@@ -127,3 +128,112 @@ class MoveAlongWidget(QtWidgets.QWidget):
 
     def _getGearPos(self):
         return self.gearToMove.translate[2]  # NB : to change whern allowing multiple orientation.
+
+class EnhancedSlider(QtWidgets.QWidget):
+
+    SLIDER_STEP = 1
+
+    def __init__(
+            self, label,
+            min, max, step, 
+            getter, setter,
+            numberEditMax=None):
+
+        super(EnhancedSlider, self).__init__()
+
+        self.min = min
+        self.max = max
+
+        step_number = (max - min) / step
+
+        self.ratio = EnhancedSlider.SLIDER_STEP / step_number
+        self.sliderMin = 0
+        self.sliderMax = (max - min) * self.ratio
+        self.numberEditMax = numberEditMax
+
+        self.label = label
+        self.getter = getter
+        self.setter = setter
+
+        self.val_bk = None
+
+        self.buildUI()
+        self.populate()
+
+
+    def buildUI(self):
+        self.layout = QtWidgets.QGridLayout(self)
+        
+        labelW = QtWidgets.QLabel(self.label)
+        self.layout.addWidget(labelW, 0, 0)
+        
+        self.slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
+        self.layout.addWidget(self.slider, 0, 1)
+        
+        # TODO : MAYBE A PUSHBUTTON HIDING NUMBER EDIT RAHTER THAN MODIFIABLE NAME.
+
+        self.numberEdit = QtWidgets.QLineEdit()
+        self.layout.addWidget(self.numberEdit, 0, 2)
+
+    def populate(self):
+        currentVal = self.getter()
+        self.val_bk = currentVal
+        self.numberEdit.setText(self._convToNumberEdit(currentVal))
+        self.slider.setValue(self._convToSlider(currentVal))
+
+        self.numberEdit.returnPressed.connect(
+            lambda: self._callback_numberEdit())
+        self.slider.valueChanged.connect(
+            lambda value : self._callback_slider(value))
+
+    def  _callback_numberEdit(self):
+        value = self.numberEdit.text()
+        try:
+            value = float(value)
+        except ValueError:
+            self.numberEdit.setText(self._convToNumberEdit(currentVal))
+            return
+
+        if self.numberEditMax: 
+            if value > self.numberEditMax:
+                value = self.numberEditMax
+
+        slider_val = self._convToSlider(value)
+        if slider_val > self.sliderMax: 
+            slider_val = self.sliderMax
+
+        self.slider.setValue(slider_val)
+        self.setter(value)
+        self.val_bk = value
+
+    def _callback_slider(self, slider_value):
+        value = self._convFromSlider(slider_value)
+        self.numberEdit.setText(self._convToNumberEdit(value))
+        self.setter(value)
+        self.val_bk = value
+
+    def _convToSlider(self, val):
+        return (val - self.min) * self.ratio
+
+    def _convFromSlider(self, val):
+        return round(((val * self.ratio) + self.min), 2)
+
+    def _convToNumberEdit(self, val):
+        return str(round(val, 2))
+
+class GearSlider(EnhancedSlider):
+
+    def __init__(
+            self, gear, 
+            attributeName, 
+            min, max, step, 
+            numberEditMax=None):
+
+        def getter(): return getattr(gear, attributeName)
+        def setter(value): setattr(gear, attributeName, value)
+
+        super(GearSlider, self).__init__(
+            attributeName, 
+            min, max, step, 
+            getter, setter, 
+            numberEditMax)

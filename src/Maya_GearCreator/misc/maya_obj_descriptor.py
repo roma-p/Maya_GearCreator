@@ -37,6 +37,16 @@ class MayaObjDescriptor():
         for attrName in MayaObjDescriptor.TRANSFORM_PRP_WHITE_LIST:
             self._createProperty("objTransform", attrName, _class)
 
+    def __eq__(self, another):
+        if not hasattr(another, "objTransform") \
+                or hasattr(another, "objConstructor"):
+            return False
+        return (self.objTransform == another.objTransform) \
+                and (self.objConstructor == another.objConstructor)
+
+    def __hash__(self):
+        return hash(self.objTransform)
+
     def _createProperty(self, mayaObjAttrName, attrName, _class):
         if hasattr(_class, attrName): return    
         _class = _class or MayaObjDescriptor

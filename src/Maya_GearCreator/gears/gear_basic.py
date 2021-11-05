@@ -16,6 +16,26 @@ log.setLevel(logging.DEBUG)
 
 class GearBasic(gear_abstract.GearAbstract):
 
+
+    # TODO : IHM DESCRIPTOR OBJECT
+    # categorie -> type of button (check / slider / button)
+    # -> min / max / step / max of other input (if none: max)
+
+
+    GUI_ATTRIBUTES = {
+        "base": {
+            "internalRadius" : (0, 5, 0.1, 15),
+            "height" : (0, 5, 0.1, 15), 
+            "heightDivisions": (1, 10, 1, None)
+        }, 
+        "teeth": {
+            "gearSpacing": (0, 1, 0.01, None),
+            "gearOffset": (0, 1, 0.05, None), # <- to change ! shall update radius!!
+            "gearTip": (0, 1, 0.05, None),
+            "gearMiddle": (0, 1, 0.05, None)        
+        }
+    }
+
     def __init__(
             self, name=None,
             radius=consts.DEFAULT_RADIUS,

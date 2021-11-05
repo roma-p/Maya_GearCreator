@@ -41,23 +41,27 @@ TODO LIST:
 * resize:
     - bug du reset contraintes (peut être un signal pas disconnect ou un leak).
     - resize neigbours fix.
-*! Refacto en utilisant le gear primitive.
-*! Save des données:
-    - faire le mengge ds les duplications: uniquement sur les transform et contruct si necessaire.
-    - faire un générateur de propriété pr les attr du contructor.
-    - Trouver comment sauver les
-        - neighbours
-        - données des chaines / network.
 * gestion de la géométrie:
     - controler par chaine
     - override partiel possible par gear.
 *!! multi forme. -> différentes formes de gear possibles
 *!! multi chain.
 
+* change radius: 
+    - si un voisin seuelement, c' le gear actuel qui se décale, pas les voisins....
+      (plus sympa à l'utilisation).
+* Change teeth:
+    -automatically adjust neighbours? 
+    - some of gearSpacing of two neighbours = 1 ? 
 prio list:
     - bug parent constraint
     - bug resize neighbour
     - nettoyage des duplicat d'information
     - refacto en utilisant le gear primitive
     (debug le deplacement)
+
+!!
+* calculate min/max for ihm either from fix values or from function... 
+* recalculated at every populate.
+
 """
