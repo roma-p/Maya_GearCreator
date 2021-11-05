@@ -29,3 +29,35 @@ if __name__ == "__main__":
     log.setLevel(logging.DEBUG)
 
     ui = main_window.GearCreatorUI(dock=False)
+
+
+"""
+TODO LIST:
+* deplacement:
+    - corriger la translation: trouver les bon chiffres
+    - se demerder pour la rotation aussi
+* init:
+    - placer le gear au bon endroit (attendre refacto ac gear).
+* resize:
+    - bug du reset contraintes (peut être un signal pas disconnect ou un leak).
+    - resize neigbours fix.
+*! Refacto en utilisant le gear primitive.
+*! Save des données:
+    - faire le mengge ds les duplications: uniquement sur les transform et contruct si necessaire.
+    - faire un générateur de propriété pr les attr du contructor.
+    - Trouver comment sauver les
+        - neighbours
+        - données des chaines / network.
+* gestion de la géométrie:
+    - controler par chaine
+    - override partiel possible par gear.
+*!! multi forme. -> différentes formes de gear possibles
+*!! multi chain.
+
+prio list:
+    - bug parent constraint
+    - bug resize neighbour
+    - nettoyage des duplicat d'information
+    - refacto en utilisant le gear primitive
+    (debug le deplacement)
+"""

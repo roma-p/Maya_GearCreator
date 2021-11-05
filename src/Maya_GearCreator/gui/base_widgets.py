@@ -119,17 +119,12 @@ class MoveAlongWidget(QtWidgets.QWidget):
             lambda: self.gearToMove.desactivateMoveMode())
         self.slider.valueChanged.connect(self._moveAlong)
 
+    # FIXME!
     def _moveAlong(self, cursorVal):
         distance = (cursorVal - self.previousCursorVal) * self.ratio
         self.previousCursorVal = cursorVal
         self.gearToMove.moveAlong(distance)
 
-        #distance = (cursorVal * self.ratio) - self.previousPos
-        #self.gearToMove.moveAlong(distance)
-        #self.previousPos = self._getGearPos()
-        #if cursorVal - self.previousCursorVal < 0:
-        #    distance = - distance
-
     def _getGearPos(self):
-        posVector = self.gearToMove.gearTransform.getTransform().translate.get()
-        return posVector[2]  # NB : to change whern allowing multiple orientation.
+        pos = self.gearToMove.gearTransform.getTransform().translate.get()
+        return pos[2]  # NB : to change whern allowing multiple orientation.
