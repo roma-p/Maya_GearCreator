@@ -162,5 +162,3 @@ class GearSubSectionWidget(QtWidgets.QWidget):
         self.setParent(None)
         self.setVisible(False)
         self.deleteLater()
-
-
