@@ -26,7 +26,6 @@ importlib.reload(gear_networks_window)
 log = logging.getLogger("GearCreatorUI")
 log.setLevel(logging.DEBUG)
 
-
 # RESOLVING IMPORT ------------------------------------------------------------
 
 # importing wrapInstance, Signal
@@ -121,14 +120,6 @@ class GearCreatorUI(QtWidgets.QWidget):
         self.gearNetworksWidget.setVisible(True)
 
         self.gearNetworkDict = {}
-
-        #self.scrollWidget = QtWidgets.QWidget()
-        #self.scrollLayout = QtWidgets.QVBoxLayout(self.scrollWidget)
-        #self.scrollArea = QtWidgets.QScrollArea()
-        #self.scrollArea.setWidgetResizable(True)
-        #self.scrollArea.setWidget(self.scrollWidget)
-        #self.layout.addWidget(self.scrollArea, 1, 0, 1, 3)
-
 
         self.buildUI()
         self.populate()

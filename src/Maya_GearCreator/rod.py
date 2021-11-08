@@ -30,17 +30,13 @@ class Rod(maya_obj_descriptor.MayaObjDescriptor):
 
         rod_shape, rode_construct = pm.polyCylinder()
 
-        print("ouiiiii")
         super(Rod, self).__init__(rod_shape, rode_construct, Rod, name)
 
         self.radius = radius
         self.height = height
 
-        print("ouiiiii")
         if linkedGear: self.translate = linkedGear.translate
-        print("ouiiiii")
         if gearNetwork: self.gearNetwork = gearNetwork
-        print("ouiiiii")
 
         #lock transform.
 

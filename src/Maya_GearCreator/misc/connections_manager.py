@@ -18,20 +18,16 @@ class ConnectionsManager():
 
     def connect(self, objDescriptorA, objDescriptorB):
         for obj in (objDescriptorA, objDescriptorB):
-            if not issubclass(type(obj),
-                              maya_obj_descriptor.MayaObjDescriptor):
-                return False
-            
+            # if not issubclass(type(obj),
+                              # maya_obj_descriptor.MayaObjDescriptor):
+                # return False
             constructor = obj.objConstructor
-            
             self.const2Descriptor[constructor] = obj
-            
             if not constructor.hasAttr(self.connection_name):
                 constructor.addAttr(
                     self.connection_name, 
                     keyable=True,
                     attributeType="bool")
-
         pm.connectAttr(self._formatConnection(objDescriptorB), 
                        self._formatConnection(objDescriptorA))
         return True

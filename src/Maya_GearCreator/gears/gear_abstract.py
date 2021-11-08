@@ -63,16 +63,16 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
         self.circleConstraints = []
         self.parentConstraints = []
 
-        if linkedGear and linkedRod:
-            log.error("wtf?")
-            return
-
         if linkedGear:
             self.addNeighbour(linkedGear)
             self.adjustGearToCircleConstraint(linkedGear)
 
         if linkedRod:
             self.translate = linkedRod.translate
+
+        print("yyytttttt")
+        print(self.listNeigbours())
+        print("yyytttttt")
 
         self.gearChain = gearChain
         self.tWidth = tWidth
