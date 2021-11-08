@@ -73,7 +73,8 @@ class GearChainWidget(QtWidgets.QWidget):
         self.modifiableName = base_widgets.ModifiableName("", None)
         self.layout.addWidget(self.modifiableName, 0, 0, 1, 2)
 
-        # ADD : SET SOLO.
+        # TODO : ADD SET SOLO.
+        # TODO : chnge slider with EnhancedSlider
 
         self.slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self.slider.setMinimum(0)
@@ -81,7 +82,17 @@ class GearChainWidget(QtWidgets.QWidget):
         self.slider.valueChanged.connect(
             lambda value: self.gearChain.changeTWidth(
                 value / self.T_WIDTH_SLIDER_FACTOR))
-        self.layout.addWidget(self.slider, 1, 1,)
+        self.layout.addWidget(self.slider, 1, 1)
+
+        def _getHeight(): return self.gearChain.height
+        def _setHeight(val): self.gearChain.changeHeight(val)
+
+        self.heightslider = base_widgets.EnhancedSlider(
+            "height", 0, 1, 0.05,
+            getter=_getHeight,
+            setter=_setHeight)
+        self.layout.addWidget(self.heightslider, 2, 1) 
+        self.heightslider.setVisible(False)
 
     def populate(self):
         self.modifiableName.set(self.gearChain.name,
@@ -92,3 +103,12 @@ class GearChainWidget(QtWidgets.QWidget):
             * self.T_WIDTH_SLIDER_FACTOR)
         self.slider.setMaximum(self.gearChain.calculateMaxTWidth()
             * self.T_WIDTH_SLIDER_FACTOR)
+
+        if self.gearChain.rodList : show = True
+        else : show = False
+
+        self.heightslider.setVisible(show)
+        if show:
+            _min, _max = self.gearChain.calculateMinMaxHeight()
+            self.heightslider.changeMinMaxStep(min=_min, max=_max)
+            self.heightslider.populate()

@@ -16,7 +16,6 @@ log.setLevel(logging.DEBUG)
 class GearChain():
 
     DEFAULT_PREFIX = "gearChain"
-    DEFAULT_TWIDTH = 0.3
     gearChainIdx = 0
 
     def __init__(self, gearNetwork, tWidth=0.3):
@@ -26,11 +25,20 @@ class GearChain():
         self.group = pm.group(em=True, name=name)
         self.name = name
 
+        self.rodList = []
+
         self.group.addAttr(
             "tWidth", 
             keyable=True,
             attributeType="float")
+
+        self.group.addAttr(
+            "height", 
+            keyable=True,
+            attributeType="float")
+
         self.tWidth = tWidth
+        self.height = 0 # TODO: to be a vector when multiple gear orientation allowed 
 
 
     def __del__(self): pass
@@ -73,6 +81,27 @@ class GearChain():
         self.tWidth = tWidth
         for g in self.gearList:
             g.changeTWidth(tWidth)
+    @tWidth.setter
+    def tWidth(self, tWidth):
+        self.group.tWidth.set(tWidth)
+
+    # Height -------------------------------------------------------------------
+
+    @property
+    def height(self):
+        return self.group.height.get()
+
+    @height.setter
+    def height(self, height):
+        self.group.height.set(height)
+
+    def changeHeight(self, height):
+        if not self.rodList : return
+        _min, _max = self.calculateMinMaxHeight()
+        if height < _min or height > _max: return
+        for gear in self.gearList: 
+            gear.changeHeight(height)
+        self.height = height
 
     # -------------------------------------------------------------------------
 
@@ -105,3 +134,19 @@ class GearChain():
 
     def calculateMaxTWidth(self):
         return 0.8
+
+    def calculateMinMaxHeight(self):
+        _min = None
+        _max = None
+        for rod in self.rodList : 
+            pos = rod.translate[1] # TODO : Depends on orientation. !!!!!!!!!
+            _tmp = rod.height / 2
+            
+            _tmp_min = pos - _tmp
+            _tmp_max = pos + _tmp        
+            
+            if not _min or _tmp_min > _min : 
+                _min = _tmp_min
+            if not _max or _tmp_max < _max : 
+                _max = _tmp_max
+        return _min, _max

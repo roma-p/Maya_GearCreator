@@ -143,13 +143,14 @@ class EnhancedSlider(QtWidgets.QWidget):
 
         self.min = min
         self.max = max
+        self.step = step
 
-        step_number = (max - min) / step
-
-        self.ratio = EnhancedSlider.SLIDER_STEP / step_number
+        self.ratio = 0
         self.sliderMin = 0
-        self.sliderMax = (max - min) * self.ratio
+        self.sliderMax = 0
         self.numberEditMax = numberEditMax
+
+        self._calculateData()
 
         self.label = label
         self.getter = getter
@@ -179,12 +180,31 @@ class EnhancedSlider(QtWidgets.QWidget):
         currentVal = self.getter()
         self.val_bk = currentVal
         self.numberEdit.setText(self._convToNumberEdit(currentVal))
+
+        self.slider.setMinimum(self.sliderMin)
+        self.slider.setMaximum(self.sliderMax)
+
         self.slider.setValue(self._convToSlider(currentVal))
 
         self.numberEdit.returnPressed.connect(
             lambda: self._callback_numberEdit())
         self.slider.valueChanged.connect(
             lambda value : self._callback_slider(value))
+
+    def changeMinMaxStep(self, min=None, max=None, step=None):
+        if min is not None: self.min = min
+        if max is not None: self.max = max
+        if step is not None: self.step = step
+        self._calculateData()
+
+    # TODO : BUG HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    def _calculateData(self):
+
+        step_number = (self.max - self.min) / self.step
+
+        self.ratio = EnhancedSlider.SLIDER_STEP / step_number
+        self.sliderMin = 0
+        self.sliderMax = (self.max - self.min) / self.ratio
 
     def  _callback_numberEdit(self):
         value = self.numberEdit.text()

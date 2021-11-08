@@ -89,6 +89,7 @@ class GearNetwork():
         self.gearDict[gear.objTransform] = (gear, gearChain)
         self.rodToChains[rod].add(gear.gearChain)
         self.rodManager.connect(rod, gear)
+        gearChain.rodList.append(rod)
         return rod
 
     def getGearFromTransform(self, transform):
@@ -107,6 +108,7 @@ class GearNetwork():
                 gearNetwork=self)
             self.rodToChains[r] = {gear.gearChain}
             self.rodDict[r.objTransform] = r
+            gear.gearChain.rodList.append(r)
             self.rodManager.connect(r, gear)
             pm.parent(r.name, self.rodsGroup)
             return r

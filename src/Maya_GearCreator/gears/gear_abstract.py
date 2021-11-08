@@ -4,17 +4,17 @@ import collections
 import pymel.core as pm
 import importlib
 
-from Maya_GearCreator.misc import maya_obj_descriptor
-from Maya_GearCreator.misc import connections_manager
-from Maya_GearCreator.misc import circle_descriptor
-from Maya_GearCreator import gear_chain
 from Maya_GearCreator import consts
+from Maya_GearCreator import gear_chain
+from Maya_GearCreator.misc import circle_descriptor
+from Maya_GearCreator.misc import connections_manager
+from Maya_GearCreator.misc import maya_obj_descriptor
 
-importlib.reload(maya_obj_descriptor)
-importlib.reload(connections_manager)
-importlib.reload(circle_descriptor)
-importlib.reload(gear_chain)
 importlib.reload(consts)
+importlib.reload(gear_chain)
+importlib.reload(circle_descriptor)
+importlib.reload(connections_manager)
+importlib.reload(maya_obj_descriptor)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -189,6 +189,12 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
         pm.move(self.objTransform, [0, 0, distance],
                 os=True, r=True, wd=True)
 
+    @transform
+    def changeHeight(self, height):
+        #self.translate[1] = height 
+        x, y, z = self.translate
+        self.translate = (x, height, z) # TODO : to change when multiple orientaion.
+
     # CONSTRAINTS -------------------------------------------------------------
 
     @transform
@@ -245,8 +251,6 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
             newNeighboursGear= [g for g in gear.listNeigbours() if g != self]
             if newNeighboursGear:
                 gear.lockChain(*newNeighboursGear, lock=lock)
-#            else:
-#                gear.lockChain(*newNeighboursGear, lock=lock)
 
     # SHADER ------------------------------------------------------------------
 
