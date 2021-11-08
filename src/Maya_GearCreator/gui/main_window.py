@@ -12,11 +12,13 @@ from Maya_GearCreator import Qt
 from Maya_GearCreator import gear_network
 from Maya_GearCreator.gui import base_widgets
 from Maya_GearCreator.gui import gear_window
+from Maya_GearCreator.gui import rod_window
 from Maya_GearCreator import consts
 
 importlib.reload(gear_network)
 importlib.reload(base_widgets)
 importlib.reload(gear_window)
+importlib.reload(rod_window)
 importlib.reload(consts)
 
 log = logging.getLogger("GearCreatorUI")
@@ -94,10 +96,17 @@ class GearCreatorUI(QtWidgets.QWidget):
 
         super(GearCreatorUI, self).__init__(parent)
 
-        self.gearWidget = gear_window.GearWidget()
         self.layout = QtWidgets.QGridLayout(self)
+        
+        # hidden gear widget.
+        self.gearWidget = gear_window.GearWidget()
         self.layout.addWidget(self.gearWidget, 1, 0)
         self.gearWidget.setVisible(False)
+
+        # hidden rod widget
+        self.rodWidget = rod_window.RodWidget()
+        self.layout.addWidget(self.rodWidget, 1, 0)
+        self.rodWidget.setVisible(False)
 
         self.newGearNetwork = QtWidgets.QPushButton("new gear network")
         self.layout.addWidget(self.newGearNetwork, 0, 0)
@@ -137,16 +146,30 @@ class GearCreatorUI(QtWidgets.QWidget):
             gear = args[0].getGearFromTransform(selected[0])
             # -- if gear selected. --
             if gear:
+                args[0].displayRod(False)
                 args[0].displayGear(True, gear)
+                args[0].previousGear = gear
+                return
+            rod = args[0].getRodFromTransform(selected[0])
+            if rod : 
+                args[0].displayGear(False)
+                args[0].displayRod(True, rod)
                 args[0].previousGear = gear
                 return
         # -- if no gear selected. --
         args[0].displayGear(False)
+        args[0].displayRod(False)
 
     def getGearFromTransform(self, objTransform):
         for network in self.gearNetworkDict.keys():
             gear = network.getGearFromTransform(objTransform)
             if gear: return gear
+        return None
+
+    def getRodFromTransform(self, objTransform):
+        for network in self.gearNetworkDict.keys():
+            rod = network.getRodFromTransform(objTransform)
+            if rod: return rod
         return None
 
     def displayGear(self, bool, gear=None):
@@ -155,10 +178,15 @@ class GearCreatorUI(QtWidgets.QWidget):
         self.gearWidget.setVisible(bool)
         self.scrollArea.setVisible(not bool)
 
+    def displayRod(self, bool, rod=None):
+        if bool:
+            self.rodWidget.populate(rod)
+        self.rodWidget.setVisible(bool)
+        self.scrollArea.setVisible(not bool)
+
     def addGearNetwork(*args):
         gearNetwork = gear_network.GearNetwork()
         gearChain = gearNetwork.addChain()
-
 
         gear = gearNetwork.addGear(
             gearChain, 

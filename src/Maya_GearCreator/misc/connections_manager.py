@@ -37,11 +37,11 @@ class ConnectionsManager():
         return True
 
     def disconnect(self, objDescriptorA, objDescriptorB):
-        if not self.hasConnection(objDescriptorA, objDescriptorB): return
+        if not self.isConnected(objDescriptorA, objDescriptorB): return
         pm.disconnectAttr(self._formatConnection(objDescriptorA),
                        self._formatConnection(objDescriptorB))
 
-    def hasConnection(self, objDescriptorA, objDescriptorB):
+    def isConnected(self, objDescriptorA, objDescriptorB):
         connections = self.listConnections(objDescriptorA)
         return objDescriptorB in connections
 
@@ -57,3 +57,7 @@ class ConnectionsManager():
 
     def _checkNeighbourExists(self, objDescriptor):
         return objDescriptor.objConstructor.hasAttr(self.connection_name)
+
+    def hasConnection(self, objDescriptor):
+        if self.listConnections(objDescriptor): return True
+        else: return False

@@ -16,11 +16,9 @@ log.setLevel(logging.DEBUG)
 
 class GearBasic(gear_abstract.GearAbstract):
 
-
     # TODO : IHM DESCRIPTOR OBJECT
     # categorie -> type of button (check / slider / button)
     # -> min / max / step / max of other input (if none: max)
-
 
     GUI_ATTRIBUTES = {
         "base": {
@@ -42,7 +40,8 @@ class GearBasic(gear_abstract.GearAbstract):
             tWidth=consts.DEFAULT_TWIDTH,
             gearOffset=consts.DEFAULT_GEAR_OFFESET,
             linkedGear=None,
-            gearChain=None):
+            gearChain=None, 
+            linkedRod=None):
 
         gear_shape, gear_construct = GearBasic.instantiateGear()
 
@@ -50,7 +49,8 @@ class GearBasic(gear_abstract.GearAbstract):
             gear_shape, gear_construct,
             name, radius, 
             tWidth, gearOffset, 
-            linkedGear, gearChain)
+            linkedGear, gearChain, 
+            linkedRod)
 
     def changeRadius(self, radius, resizeNeighbour=False):
         adjustedRadius = self.calculateAdjustedRadius(radius)

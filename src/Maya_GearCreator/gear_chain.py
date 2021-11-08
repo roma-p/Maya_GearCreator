@@ -80,7 +80,8 @@ class GearChain():
             self, name=None,
             radius=consts.DEFAULT_RADIUS, 
             gearOffset=consts.DEFAULT_GEAR_OFFESET,
-            linkedGear=None):
+            linkedGear=None, 
+            linkedRod=None):
 
         if self.gearList and not linkedGear:
             log.error("gearChain not empty, so new gear has to be connected.")
@@ -91,6 +92,7 @@ class GearChain():
             tWidth=self.tWidth,
             gearOffset=gearOffset,
             linkedGear=linkedGear,
+            linkedRod=linkedRod,
             gearChain=self)#
         self.gearList.append(g)
         pm.parent(g.objTransform, self.name)

@@ -63,5 +63,6 @@ prio list:
 !!
 * calculate min/max for ihm either from fix values or from function... 
 * recalculated at every populate.
+* gearOffset property and internal radius to ovveride.
 
 """

@@ -55,8 +55,11 @@ class GearWidget(QtWidgets.QWidget):
         self.resizeMode = QtWidgets.QCheckBox("resize neighbours")
         self.layout.addWidget(self.resizeMode, 1, 2)
 
-        self.addGear = QtWidgets.QPushButton("Add Gear")
-        self.layout.addWidget(self.addGear, 2, 0)
+        self.addGearBtn = QtWidgets.QPushButton("Add Gear")
+        self.layout.addWidget(self.addGearBtn, 2, 0)
+
+        self.addRodBtn = QtWidgets.QPushButton("Add Rod")
+        self.layout.addWidget(self.addRodBtn, 2, 1)
 
     def populate(self, gear):
 
@@ -79,9 +82,15 @@ class GearWidget(QtWidgets.QWidget):
         self.resizeSlider.valueChanged.connect(
             partial(GearWidget.changeRadiusCallback, gearWidget=self))
 
-        try : self.addGear.clicked.disconnect()
+        try : self.addGearBtn.clicked.disconnect()
         except Exception: pass
-        self.addGear.clicked.connect(partial(GearWidget.addGear, self))
+        # self.addGearBtn.clicked.connect(partial(GearWidget.addGear, self))
+        self.addGearBtn.clicked.connect(lambda: self.addGear())
+
+        try : self.addRodBtn.clicked.disconnect()
+        except Exception: pass
+        # self.addGearBtn.clicked.connect(partial(GearWidget.addGear, self))
+        self.addRodBtn.clicked.connect(lambda: self.addRod())
 
         # Calculation of max Radius shall be done at populate since radius could change.
         i = 3
@@ -118,6 +127,16 @@ class GearWidget(QtWidgets.QWidget):
 
         pm.select(clear=True)
         pm.select(gear.objTransform)
+
+    def addRod(gearWidget=None):
+
+        gear = gearWidget.gear
+        gearChain = gear.gearChain
+        gearNetwork = gearChain.gearNetwork
+
+        rod = gearNetwork.addRod(gear)
+        pm.select(clear=True)
+        pm.select(rod.objTransform)
 
 
 class GearSubSectionWidget(QtWidgets.QWidget):

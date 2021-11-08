@@ -31,7 +31,7 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
 
     gearIdx = 0
     DEFAULT_PREFIX = "gear"
-    connectManager = connections_manager.ConnectionsManager("neighbour")
+    neighManager = connections_manager.ConnectionsManager("neighbour")
 
     def __init__(
             self, 
@@ -42,7 +42,8 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
             tWidth=consts.DEFAULT_TWIDTH,
             gearOffset=consts.DEFAULT_GEAR_OFFESET,
             linkedGear=None,
-            gearChain=None):
+            gearChain=None, 
+            linkedRod=None):
 
         super(GearAbstract, self).__init__(
             gear_shape,
@@ -62,9 +63,16 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
         self.circleConstraints = []
         self.parentConstraints = []
 
+        if linkedGear and linkedRod:
+            log.error("wtf?")
+            return
+
         if linkedGear:
             self.addNeighbour(linkedGear)
             self.adjustGearToCircleConstraint(linkedGear)
+
+        if linkedRod:
+            self.translate = linkedRod.translate
 
         self.gearChain = gearChain
         self.tWidth = tWidth
@@ -112,17 +120,17 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
 
     # MANAGE NEIGHBOURS -------------------------------------------------------
     def listNeigbours(self): 
-        return GearAbstract.connectManager.listConnections(self)
+        return GearAbstract.neighManager.listConnections(self)
 
-    def hasConnection(self):
-        return GearAbstract.connectManager.hasConnection(self)
+    def isConnected(self, gear):
+        return GearAbstract.neighManager.isConnected(self, gear)
 
     # TODO : del circles. 
     def delNeighbour(self, gear):
-        GearAbstract.connectManager.disconnect(self, gear)
+        GearAbstract.neighManager.disconnect(self, gear)
     
     def addNeighbour(self, gear): 
-        GearAbstract.connectManager.connect(self, gear)
+        GearAbstract.neighManager.connect(self, gear)
         self.initCircleConstraint(gear)
         gear.initCircleConstraint(self)
 
