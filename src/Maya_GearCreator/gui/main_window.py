@@ -13,6 +13,7 @@ from Maya_GearCreator import gear_network
 from Maya_GearCreator.gui import base_widgets
 from Maya_GearCreator.gui import gear_window
 from Maya_GearCreator.gui import rod_window
+from Maya_GearCreator.gui import gear_networks_window
 from Maya_GearCreator import consts
 
 importlib.reload(gear_network)
@@ -20,6 +21,7 @@ importlib.reload(base_widgets)
 importlib.reload(gear_window)
 importlib.reload(rod_window)
 importlib.reload(consts)
+importlib.reload(gear_networks_window)
 
 log = logging.getLogger("GearCreatorUI")
 log.setLevel(logging.DEBUG)
@@ -98,6 +100,11 @@ class GearCreatorUI(QtWidgets.QWidget):
 
         self.layout = QtWidgets.QGridLayout(self)
         
+        self.newGearNetwork = QtWidgets.QPushButton("new gear network")
+        self.layout.addWidget(self.newGearNetwork, 0, 0)
+        self.newGearNetwork.clicked.connect(
+            partial(GearCreatorUI.addGearNetwork, self))
+        
         # hidden gear widget.
         self.gearWidget = gear_window.GearWidget()
         self.layout.addWidget(self.gearWidget, 1, 0)
@@ -108,19 +115,20 @@ class GearCreatorUI(QtWidgets.QWidget):
         self.layout.addWidget(self.rodWidget, 1, 0)
         self.rodWidget.setVisible(False)
 
-        self.newGearNetwork = QtWidgets.QPushButton("new gear network")
-        self.layout.addWidget(self.newGearNetwork, 0, 0)
-        self.newGearNetwork.clicked.connect(
-            partial(GearCreatorUI.addGearNetwork, self))
+        # visible (default) rod gearNetworksWidget
+        self.gearNetworksWidget = gear_networks_window.GearNetworksWidget()
+        self.layout.addWidget(self.gearNetworksWidget, 1, 0)
+        self.gearNetworksWidget.setVisible(True)
 
         self.gearNetworkDict = {}
 
-        self.scrollWidget = QtWidgets.QWidget()
-        self.scrollLayout = QtWidgets.QVBoxLayout(self.scrollWidget)
-        self.scrollArea = QtWidgets.QScrollArea()
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setWidget(self.scrollWidget)
-        self.layout.addWidget(self.scrollArea, 1, 0, 1, 3)
+        #self.scrollWidget = QtWidgets.QWidget()
+        #self.scrollLayout = QtWidgets.QVBoxLayout(self.scrollWidget)
+        #self.scrollArea = QtWidgets.QScrollArea()
+        #self.scrollArea.setWidgetResizable(True)
+        #self.scrollArea.setWidget(self.scrollWidget)
+        #self.layout.addWidget(self.scrollArea, 1, 0, 1, 3)
+
 
         self.buildUI()
         self.populate()
@@ -146,19 +154,16 @@ class GearCreatorUI(QtWidgets.QWidget):
             gear = args[0].getGearFromTransform(selected[0])
             # -- if gear selected. --
             if gear:
-                args[0].displayRod(False)
                 args[0].displayGear(True, gear)
                 args[0].previousGear = gear
                 return
             rod = args[0].getRodFromTransform(selected[0])
             if rod : 
-                args[0].displayGear(False)
                 args[0].displayRod(True, rod)
                 args[0].previousGear = gear
                 return
         # -- if no gear selected. --
-        args[0].displayGear(False)
-        args[0].displayRod(False)
+        args[0].displayGN(True)
 
     def getGearFromTransform(self, objTransform):
         for network in self.gearNetworkDict.keys():
@@ -176,13 +181,22 @@ class GearCreatorUI(QtWidgets.QWidget):
         if bool:
             self.gearWidget.populate(gear)
         self.gearWidget.setVisible(bool)
-        self.scrollArea.setVisible(not bool)
+        self.gearNetworksWidget.setVisible(not bool)
+        self.rodWidget.setVisible(not bool)
 
     def displayRod(self, bool, rod=None):
         if bool:
             self.rodWidget.populate(rod)
         self.rodWidget.setVisible(bool)
-        self.scrollArea.setVisible(not bool)
+        self.gearNetworksWidget.setVisible(not bool)
+        self.gearWidget.setVisible(not bool)
+
+    def displayGN(self, bool):
+        if bool: 
+            self.gearNetworksWidget.populate()
+        self.rodWidget.setVisible(not bool)
+        self.gearWidget.setVisible(not bool)
+        self.gearNetworksWidget.setVisible(bool)
 
     def addGearNetwork(*args):
         gearNetwork = gear_network.GearNetwork()
@@ -194,72 +208,8 @@ class GearCreatorUI(QtWidgets.QWidget):
             gearOffset=consts.DEFAULT_GEAR_OFFESET, 
             linkedGear=None)
 
-        gearNetworkWidget = GearNetworkWidget(gearNetwork)
-        args[0].gearNetworkDict[gearNetwork] = gearNetworkWidget
-        args[0].scrollLayout.addWidget(gearNetworkWidget)
+        args[0].gearNetworksWidget.addGearNetwork(gearNetwork)
+        args[0].gearNetworkDict[gearNetwork] = "bijour"
 
         pm.select(clear=True)
         pm.select(gear.objTransform)
-
-class GearNetworkWidget(QtWidgets.QWidget):
-
-    def __init__(self, gearNetwork):
-        super(GearNetworkWidget, self).__init__()
-        self.gearNetwork = gearNetwork
-        self.gearChainDict = {}
-        self.buildUI()
-        self.populate()
-
-    def buildUI(self):
-
-        self.layout = QtWidgets.QVBoxLayout(self)
-        self.modifiableName = base_widgets.ModifiableName("", None)
-        self.layout.addWidget(self.modifiableName)
-
-    def populate(self):
-
-        self.modifiableName.set(self.gearNetwork.name,
-                                self.gearNetwork.setName)
-
-        for gearChain in self.gearNetwork.chainList:
-            if gearChain not in self.gearChainDict.keys():
-                widget = GearChainWidget(gearChain)
-                self.layout.addWidget(widget)
-                self.gearChainDict[gearChain] = widget
-            self.gearChainDict[gearChain].populate()
-
-class GearChainWidget(QtWidgets.QWidget):
-
-    T_WIDTH_SLIDER_FACTOR = 100
-
-    def __init__(self, gearChain):
-        super(GearChainWidget, self).__init__()
-        self.gearChain = gearChain
-        self.buildUI()
-        self.populate()
-
-    def buildUI(self):
-        self.layout = QtWidgets.QGridLayout(self)
-
-        self.modifiableName = base_widgets.ModifiableName("", None)
-        self.layout.addWidget(self.modifiableName, 0, 0, 1, 2)
-
-        # ADD : SET SOLO.
-
-        self.slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
-        self.slider.setMinimum(0)
-        self.slider.setMaximum(1)
-        self.slider.valueChanged.connect(
-            lambda value: self.gearChain.changeTWidth(
-                value / self.T_WIDTH_SLIDER_FACTOR))
-        self.layout.addWidget(self.slider, 1, 1,)
-
-    def populate(self):
-        self.modifiableName.set(self.gearChain.name,
-                                self.gearChain.setName)
-        self.slider.setValue(self.gearChain.tWidth
-            * self.T_WIDTH_SLIDER_FACTOR)
-        self.slider.setMinimum(self.gearChain.calculateMinTWidth()
-            * self.T_WIDTH_SLIDER_FACTOR)
-        self.slider.setMaximum(self.gearChain.calculateMaxTWidth()
-            * self.T_WIDTH_SLIDER_FACTOR)
