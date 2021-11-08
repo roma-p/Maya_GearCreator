@@ -61,6 +61,7 @@ class GearBasic(gear_abstract.GearAbstract):
             pass 
             # TODO : NOT IMPLEMENTED.
         else: 
+            move_self = len(self.listNeigbours()) == 1
             for neighbour in self.listNeigbours():
                 toLock = [n for n in neighbour.listNeigbours() if n!= self]
                 neighbour.lockChain(*toLock, lock=True)
@@ -68,5 +69,11 @@ class GearBasic(gear_abstract.GearAbstract):
                     self,neighbour)
                 neighbour.constraintsCircles[self].radius = new_radius
                 self.constraintsCircles[neighbour].radius = new_radius
-                neighbour.adjustGearToCircleConstraint(self)
+
+                # if only one neighbour, more handy to move current gear.
+                # if multiple neighbours, not possible.
+                if move_self : 
+                    self.adjustGearToCircleConstraint(neighbour)
+                else: 
+                    neighbour.adjustGearToCircleConstraint(self)
                 neighbour.lockChain(*toLock, lock=False)
