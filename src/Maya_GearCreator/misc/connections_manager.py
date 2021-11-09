@@ -1,5 +1,4 @@
 import logging
-import collections
 import pymel.core as pm
 import importlib
 
@@ -19,23 +18,23 @@ class ConnectionsManager():
     def connect(self, objDescriptorA, objDescriptorB):
         for obj in (objDescriptorA, objDescriptorB):
             # if not issubclass(type(obj),
-                              # maya_obj_descriptor.MayaObjDescriptor):
+                    # maya_obj_descriptor.MayaObjDescriptor):
                 # return False
             constructor = obj.objConstructor
             self.const2Descriptor[constructor] = obj
             if not constructor.hasAttr(self.connection_name):
                 constructor.addAttr(
-                    self.connection_name, 
+                    self.connection_name,
                     keyable=True,
                     attributeType="bool")
-        pm.connectAttr(self._formatConnection(objDescriptorB), 
+        pm.connectAttr(self._formatConnection(objDescriptorB),
                        self._formatConnection(objDescriptorA))
         return True
 
     def disconnect(self, objDescriptorA, objDescriptorB):
         if not self.isConnected(objDescriptorA, objDescriptorB): return
         pm.disconnectAttr(self._formatConnection(objDescriptorA),
-                       self._formatConnection(objDescriptorB))
+                          self._formatConnection(objDescriptorB))
 
     def isConnected(self, objDescriptorA, objDescriptorB):
         connections = self.listConnections(objDescriptorA)

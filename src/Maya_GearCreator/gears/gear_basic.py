@@ -1,7 +1,4 @@
-import math
 import logging
-import collections
-import pymel.core as pm
 import importlib
 
 from Maya_GearCreator.gears import gear_abstract
@@ -22,10 +19,10 @@ class GearBasic(gear_abstract.GearAbstract):
 
     GUI_ATTRIBUTES = {
         "base": {
-            "internalRadius" : (0, 5, 0.1, 15),
-            "height" : (0, 5, 0.1, 15), 
+            "internalRadius": (0, 5, 0.1, 15),
+            "height": (0, 5, 0.1, 15), 
             "heightDivisions": (1, 10, 1, None)
-        }, 
+        },
         "teeth": {
             "gearSpacing": (0, 1, 0.01, None),
             "gearOffset": (0, 1, 0.05, None), # <- to change ! shall update radius!!
@@ -40,16 +37,16 @@ class GearBasic(gear_abstract.GearAbstract):
             tWidth=consts.DEFAULT_TWIDTH,
             gearOffset=consts.DEFAULT_GEAR_OFFESET,
             linkedGear=None,
-            gearChain=None, 
+            gearChain=None,
             linkedRod=None):
 
         gear_shape, gear_construct = GearBasic.instantiateGear()
 
         super(GearBasic, self).__init__(
             gear_shape, gear_construct,
-            name, radius, 
-            tWidth, gearOffset, 
-            linkedGear, gearChain, 
+            name, radius,
+            tWidth, gearOffset,
+            linkedGear, gearChain,
             linkedRod)
 
     def changeRadius(self, radius, resizeNeighbour=False):
@@ -57,23 +54,23 @@ class GearBasic(gear_abstract.GearAbstract):
         self.radius = adjustedRadius
         self.sides = GearBasic.calculateTNumber(self.tWidth, adjustedRadius)
 
-        if resizeNeighbour: 
-            pass 
+        if resizeNeighbour:
+            pass
             # TODO : NOT IMPLEMENTED.
-        else: 
+        else:
             move_self = len(self.listNeigbours()) == 1
             for neighbour in self.listNeigbours():
-                toLock = [n for n in neighbour.listNeigbours() if n!= self]
+                toLock = [n for n in neighbour.listNeigbours() if n != self]
                 neighbour.lockChain(*toLock, lock=True)
                 new_radius = GearBasic.calculateConstraintRadius(
-                    self,neighbour)
+                    self, neighbour)
                 neighbour.constraintsCircles[self].radius = new_radius
                 self.constraintsCircles[neighbour].radius = new_radius
 
                 # if only one neighbour, more handy to move current gear.
                 # if multiple neighbours, not possible.
-                if move_self : 
+                if move_self:
                     self.adjustGearToCircleConstraint(neighbour)
-                else: 
+                else:
                     neighbour.adjustGearToCircleConstraint(self)
                 neighbour.lockChain(*toLock, lock=False)

@@ -1,6 +1,5 @@
 import logging
 from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
-from functools import partial
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -70,7 +69,7 @@ class ModifiableName(QtWidgets.QWidget):
 
 class MoveAlongWidget(QtWidgets.QWidget):
 
-    # TODO : NO FIX STEP NUMBER! CALCULATED BASED ON NEIGHBOURS TEETH NUMBER 
+    # TODO : NO FIX STEP NUMBER! CALCULATED BASED ON NEIGHBOURS TEETH NUMBER
     STEP_NUMBER = 100
 
     def __init__(self, gearToMove, gearToMoveAlong, color):
@@ -107,7 +106,8 @@ class MoveAlongWidget(QtWidgets.QWidget):
     def populate(self):
 
         stepNumber = self.gearToMoveAlong.sides
-        max_distance = self.gearToMoveAlong.calculateMoveAlong()  # FIXME! NO REASON FOR THAT *2
+        max_distance = self.gearToMoveAlong.calculateMoveAlong()
+        # FIXME! NO REASON FOR THAT *2
         self.ratio = max_distance / stepNumber
         self.slider.setMaximum(stepNumber)
         self.previousPos = self._getGearPos()
@@ -127,7 +127,8 @@ class MoveAlongWidget(QtWidgets.QWidget):
         self.gearToMove.moveAlong(distance)
 
     def _getGearPos(self):
-        return self.gearToMove.translate[2]  # NB : to change whern allowing multiple orientation.
+        return self.gearToMove.translate[2]
+        # NB : to change whern allowing multiple orientation.
 
 class EnhancedSlider(QtWidgets.QWidget):
 
@@ -135,7 +136,7 @@ class EnhancedSlider(QtWidgets.QWidget):
 
     def __init__(
             self, label,
-            min, max, step, 
+            min, max, step,
             getter, setter,
             numberEditMax=None):
 
@@ -161,16 +162,14 @@ class EnhancedSlider(QtWidgets.QWidget):
         self.buildUI()
         self.populate()
 
-
     def buildUI(self):
         self.layout = QtWidgets.QGridLayout(self)
-        
+
         labelW = QtWidgets.QLabel(self.label)
         self.layout.addWidget(labelW, 0, 0)
-        
+
         self.slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self.layout.addWidget(self.slider, 0, 1)
-        
         # TODO : MAYBE A PUSHBUTTON HIDING NUMBER EDIT RAHTER THAN MODIFIABLE NAME.
 
         self.numberEdit = QtWidgets.QLineEdit()
@@ -189,7 +188,7 @@ class EnhancedSlider(QtWidgets.QWidget):
         self.numberEdit.returnPressed.connect(
             lambda: self._callback_numberEdit())
         self.slider.valueChanged.connect(
-            lambda value : self._callback_slider(value))
+            lambda value: self._callback_slider(value))
 
     def changeMinMaxStep(self, min=None, max=None, step=None):
         if min is not None: self.min = min
@@ -206,20 +205,20 @@ class EnhancedSlider(QtWidgets.QWidget):
         self.sliderMin = 0
         self.sliderMax = (self.max - self.min) / self.ratio
 
-    def  _callback_numberEdit(self):
+    def _callback_numberEdit(self):
         value = self.numberEdit.text()
         try:
             value = float(value)
         except ValueError:
-            self.numberEdit.setText(self._convToNumberEdit(currentVal))
+            self.numberEdit.setText(self._convToNumberEdit(value))
             return
 
-        if self.numberEditMax: 
+        if self.numberEditMax:
             if value > self.numberEditMax:
                 value = self.numberEditMax
 
         slider_val = self._convToSlider(value)
-        if slider_val > self.sliderMax: 
+        if slider_val > self.sliderMax:
             slider_val = self.sliderMax
 
         self.slider.setValue(slider_val)
@@ -244,16 +243,16 @@ class EnhancedSlider(QtWidgets.QWidget):
 class GearSlider(EnhancedSlider):
 
     def __init__(
-            self, gear, 
-            attributeName, 
-            min, max, step, 
+            self, gear,
+            attributeName,
+            min, max, step,
             numberEditMax=None):
 
         def getter(): return getattr(gear, attributeName)
         def setter(value): setattr(gear, attributeName, value)
 
         super(GearSlider, self).__init__(
-            attributeName, 
-            min, max, step, 
-            getter, setter, 
+            attributeName,
+            min, max, step,
+            getter, setter,
             numberEditMax)

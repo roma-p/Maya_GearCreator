@@ -33,7 +33,7 @@ class GearChain():
             attributeType="float")
 
         self.group.addAttr(
-            "height", 
+            "height",
             keyable=True,
             attributeType="float")
 
@@ -81,11 +81,12 @@ class GearChain():
         self.tWidth = tWidth
         for g in self.gearList:
             g.changeTWidth(tWidth)
+
     @tWidth.setter
     def tWidth(self, tWidth):
         self.group.tWidth.set(tWidth)
 
-    # Height -------------------------------------------------------------------
+    # Height ------------------------------------------------------------------
 
     @property
     def height(self):
@@ -96,7 +97,7 @@ class GearChain():
         self.group.height.set(height)
 
     def changeHeight(self, height):
-        if not self.rodList : return
+        if not self.rodList: return
         _min, _max = self.calculateMinMaxHeight()
         if height < _min or height > _max: return
         for gear in self.gearList: 
@@ -107,9 +108,9 @@ class GearChain():
 
     def addGear(
             self, name=None,
-            radius=consts.DEFAULT_RADIUS, 
+            radius=consts.DEFAULT_RADIUS,
             gearOffset=consts.DEFAULT_GEAR_OFFESET,
-            linkedGear=None, 
+            linkedGear=None,
             linkedRod=None):
 
         if self.gearList and not linkedGear:
@@ -122,7 +123,7 @@ class GearChain():
             gearOffset=gearOffset,
             linkedGear=linkedGear,
             linkedRod=linkedRod,
-            gearChain=self)#
+            gearChain=self)
         self.gearList.append(g)
         pm.parent(g.objTransform, self.name)
         return g
@@ -138,6 +139,7 @@ class GearChain():
     def calculateMinMaxHeight(self):
         _min = None
         _max = None
+
         for rod in self.rodList:
 
             gear = self.gearNetwork.getGearFromRodOnChain(rod, self)

@@ -19,6 +19,7 @@ importlib.reload(maya_obj_descriptor)
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
+
 def transform(f):
     def wrapper(*args, **kargs):
         args[0].lockTransform(False)
@@ -34,15 +35,15 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
     neighManager = connections_manager.ConnectionsManager("neighbour")
 
     def __init__(
-            self, 
-            gear_shape, 
+            self,
+            gear_shape,
             gear_construct,
             name=None,
             radius=consts.DEFAULT_RADIUS,
             tWidth=consts.DEFAULT_TWIDTH,
             gearOffset=consts.DEFAULT_GEAR_OFFESET,
             linkedGear=None,
-            gearChain=None, 
+            gearChain=None,
             linkedRod=None):
 
         super(GearAbstract, self).__init__(
@@ -52,7 +53,7 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
             name)
 
         self.shader_bk = None
-        
+
         # ADJUSTING SHAPE -----------------------------------------------------
         self.radius = radius - gearOffset
         self.gearOffset = gearOffset
@@ -104,7 +105,7 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
 
     def calculateConstraintRadius(parentGear, childGear):
         return parentGear.radius + (parentGear.gearOffset / 2) \
-            +  childGear.radius + (childGear.gearOffset / 2)
+            + childGear.radius + (childGear.gearOffset / 2)
 
     def calculateAdjustedRadius(self, radius):
         radius = radius or self.radius
@@ -115,17 +116,17 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
         return tNumber
 
     # MANAGE NEIGHBOURS -------------------------------------------------------
-    def listNeigbours(self): 
+    def listNeigbours(self):
         return GearAbstract.neighManager.listConnections(self)
 
     def isConnected(self, gear):
         return GearAbstract.neighManager.isConnected(self, gear)
 
-    # TODO : del circles. 
+    # TODO : del circles.
     def delNeighbour(self, gear):
         GearAbstract.neighManager.disconnect(self, gear)
-    
-    def addNeighbour(self, gear): 
+
+    def addNeighbour(self, gear):
         GearAbstract.neighManager.connect(self, gear)
         self.initCircleConstraint(gear)
         gear.initCircleConstraint(self)
@@ -177,7 +178,7 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
         pm.move(self.objTransform, [0, 0, newZ],
                 os=True, r=True, wd=True)
         # save current pos -> if new is lower -> move difference in negative.
-        # EN FAIT NON. RETENIR LA VALEUR DU SLIDER + LA VALEUR DE LA POS. 
+        # EN FAIT NON. RETENIR LA VALEUR DU SLIDER + LA VALEUR DE LA POS.
         # LA VALEUR DU SLIDER SERT AU SIGNE, LA VALEUR DE LA POS A LA DISTANCE.
 
     def moveAlong(self, distance):
@@ -188,20 +189,22 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
     def changeHeight(self, height):
         #self.translate[1] = height 
         x, y, z = self.translate
-        self.translate = (x, height, z) # TODO : to change when multiple orientaion.
+        self.translate = (x, height, z) 
+        # TODO : to change when multiple orientaion.
 
     # CONSTRAINTS -------------------------------------------------------------
 
     @transform
     def initCircleConstraint(self, neighbourGear):
         circle = circle_descriptor.CircleDescriptor(
-            nr=(0,1,0), # axis is X-Y TODO: to update when multiple orientation implemented.
+            nr=(0, 1, 0),
+            # axis is X-Y TODO: to update when multiple orientation implemented
             radius=GearAbstract.calculateConstraintRadius(self, neighbourGear))
         pm.move(circle.objTransform, neighbourGear.translate)
         circle.visibility = False
         self.constraintsCircles[neighbourGear] = circle
         pm.parent(circle.objTransform, self.name)
-        pm.parentConstraint(neighbourGear.objTransform, 
+        pm.parentConstraint(neighbourGear.objTransform,
                             circle.objTransform)
 
     @transform
@@ -243,7 +246,7 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
         for g in neighboursGear: g.lockTransform(not lock)
         func[lock](self, *neighboursGear)
         for gear in neighboursGear:
-            newNeighboursGear= [g for g in gear.listNeigbours() if g != self]
+            newNeighboursGear = [g for g in gear.listNeigbours() if g != self]
             if newNeighboursGear:
                 gear.lockChain(*newNeighboursGear, lock=lock)
 

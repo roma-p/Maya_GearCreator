@@ -35,7 +35,6 @@ class GearNetwork():
 
         self.rodManager = connections_manager.ConnectionsManager("rodLinked")
 
-
     # HANDLING NAME -----------------------------------------------------------
 
     def genAutoName(cls):
@@ -94,8 +93,8 @@ class GearNetwork():
 
     def getGearFromTransform(self, transform):
         gearInfo = self.gearDict.get(transform)
-        if gearInfo : return gearInfo[0]
-        else : return None
+        if gearInfo: return gearInfo[0]
+        else: return None
 
     def delGear(self, gear):
         pass
@@ -115,8 +114,8 @@ class GearNetwork():
 
     def getRodFromTransform(self, transform):
         rodInfo = self.rodDict.get(transform)
-        if rodInfo : return rodInfo
-        else : return None
+        if rodInfo: return rodInfo
+        else: return None
 
     # HANDLNING RODS CONNECTIONS ----------------------------------------------
 
@@ -125,7 +124,7 @@ class GearNetwork():
 
     def getRodFromGear(self, gear):
         rodList = self.rodManager.listConnections(gear)
-        if rodList : return rodList[0]
+        if rodList: return rodList[0]
 
     def getGearsFromRod(self, rod):
         return self.rodManager.listConnections(rod)
@@ -135,7 +134,6 @@ class GearNetwork():
         _tmp = [g for g in gearsOnRod if g in gearChain.gearList]
         if _tmp: return _tmp[0]
         else: return None
-
 
     def hasRod(self, gear):
         if self.getRodFromGear(gear): return True

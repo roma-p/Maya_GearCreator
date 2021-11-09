@@ -3,7 +3,7 @@ import importlib
 from functools import partial
 #
 import pymel.core as pm
-from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
+from Maya_GearCreator.Qt import QtWidgets, QtCore
 #
 from Maya_GearCreator.gui import base_widgets
 from Maya_GearCreator.misc import color_shader
@@ -96,8 +96,9 @@ class GearWidget(QtWidgets.QWidget):
         i = 3
 
         for sectionId in gear.GUI_ATTRIBUTES.keys():
-            self.layout.addWidget(GearSubSectionWidget(self.gear, sectionId), 
-                                  i, 0)
+            self.layout.addWidget(
+                GearSubSectionWidget(self.gear, sectionId),
+                i, 0)
             i = i + 1
 
         for neighbour in self.gear.listNeigbours():
@@ -120,9 +121,9 @@ class GearWidget(QtWidgets.QWidget):
         gearNetwork = gearChain.gearNetwork
 
         gear = gearNetwork.addGear(
-            gearChain, 
-            radius=consts.DEFAULT_RADIUS, 
-            gearOffset=consts.DEFAULT_GEAR_OFFESET, 
+            gearChain,
+            radius=consts.DEFAULT_RADIUS,
+            gearOffset=consts.DEFAULT_GEAR_OFFESET,
             linkedGear=gear)
 
         pm.select(clear=True)

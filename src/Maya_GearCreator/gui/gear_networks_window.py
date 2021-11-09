@@ -1,9 +1,7 @@
 import logging
 import importlib
-from functools import partial
 #
-import pymel.core as pm
-from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
+from Maya_GearCreator.Qt import QtWidgets
 #
 from Maya_GearCreator.gui import gear_network_widget
 
@@ -17,10 +15,9 @@ class GearNetworksWidget(QtWidgets.QWidget):
     def __init__(self, *gearNetworks):
         super(GearNetworksWidget, self).__init__()
         self.gearNetworks = set(gearNetworks) or set()
-        #self.gnWidgets = []
+        # self.gnWidgets = []
         self.buildUI()
         self.populate()
-
 
     def buildUI(self):
         self.layout = QtWidgets.QGridLayout(self)
@@ -35,7 +32,8 @@ class GearNetworksWidget(QtWidgets.QWidget):
         for widget in self.findChildren(gear_network_widget.GearNetworkWidget):
             widget.delete()
         for gn in self.gearNetworks:
-            self.scrollLayout.addWidget(gear_network_widget.GearNetworkWidget(gn))
+            self.scrollLayout.addWidget(
+                gear_network_widget.GearNetworkWidget(gn))
 
     def addGearNetwork(self, gn):
         self.gearNetworks.add(gn)

@@ -1,6 +1,3 @@
-import math
-import logging
-import collections
 import pymel.core as pm
 import importlib
 
@@ -14,7 +11,7 @@ importlib.reload(consts)
 # TODO : CHANGING INTERNAL RADIUS of a gear ->
 # if not rod -> just change raidus
 # otherwise changing the radius of the rod
-# rod -> change radius of all linked gears. 
+# rod -> change radius of all linked gears.
 
 class Rod(maya_obj_descriptor.MayaObjDescriptor):
 
@@ -22,7 +19,7 @@ class Rod(maya_obj_descriptor.MayaObjDescriptor):
     DEFAULT_PREFIX = "rod"
 
     def __init__(
-            self, name=None, 
+            self, name=None,
             radius=consts.DEFAULT_ROD_RADIUS,
             height=consts.DEFAULT_ROD_LEN,
             linkedGear=None,
@@ -43,5 +40,3 @@ class Rod(maya_obj_descriptor.MayaObjDescriptor):
     def moveTop(self): pass
 
     def moveBot(self): pass
-
-

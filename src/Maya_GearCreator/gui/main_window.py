@@ -6,7 +6,7 @@ import pymel.core as pm
 from maya import OpenMayaUI as omui
 from maya import OpenMaya as om
 #
-from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
+from Maya_GearCreator.Qt import QtWidgets
 from Maya_GearCreator import Qt
 #
 from Maya_GearCreator import gear_network
@@ -42,6 +42,7 @@ else:
     from shiboken2 import wrapInstance
     from Maya_GearCreator.Qt.QtCore import Signal 
     log.debug("Using PySide2 with shiboken")
+
 
 # HELPERS ---------------------------------------------------------------------
 
@@ -98,12 +99,12 @@ class GearCreatorUI(QtWidgets.QWidget):
         super(GearCreatorUI, self).__init__(parent)
 
         self.layout = QtWidgets.QGridLayout(self)
-        
+
         self.newGearNetwork = QtWidgets.QPushButton("new gear network")
         self.layout.addWidget(self.newGearNetwork, 0, 0)
         self.newGearNetwork.clicked.connect(
             partial(GearCreatorUI.addGearNetwork, self))
-        
+
         # hidden gear widget.
         self.gearWidget = gear_window.GearWidget()
         self.layout.addWidget(self.gearWidget, 1, 0)
@@ -149,7 +150,7 @@ class GearCreatorUI(QtWidgets.QWidget):
                 args[0].previousGear = gear
                 return
             rod = args[0].getRodFromTransform(selected[0])
-            if rod : 
+            if rod:
                 args[0].displayRod(True, rod)
                 args[0].previousGear = gear
                 return
@@ -183,7 +184,7 @@ class GearCreatorUI(QtWidgets.QWidget):
         self.gearWidget.setVisible(not bool)
 
     def displayGN(self, bool):
-        if bool: 
+        if bool:
             self.gearNetworksWidget.populate()
         self.rodWidget.setVisible(not bool)
         self.gearWidget.setVisible(not bool)
@@ -194,9 +195,9 @@ class GearCreatorUI(QtWidgets.QWidget):
         gearChain = gearNetwork.addChain()
 
         gear = gearNetwork.addGear(
-            gearChain, 
-            radius=consts.DEFAULT_RADIUS, 
-            gearOffset=consts.DEFAULT_GEAR_OFFESET, 
+            gearChain,
+            radius=consts.DEFAULT_RADIUS,
+            gearOffset=consts.DEFAULT_GEAR_OFFESET,
             linkedGear=None)
 
         args[0].gearNetworksWidget.addGearNetwork(gearNetwork)

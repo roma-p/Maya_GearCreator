@@ -1,13 +1,7 @@
 import logging
 import importlib
-from functools import partial
 #
-import pymel.core as pm
-from maya import OpenMayaUI as omui
-from maya import OpenMaya as om
-#
-from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
-from Maya_GearCreator import Qt
+from Maya_GearCreator.Qt import QtWidgets, QtCore
 #
 from Maya_GearCreator import gear_network
 from Maya_GearCreator.gui import base_widgets
@@ -91,7 +85,7 @@ class GearChainWidget(QtWidgets.QWidget):
             "height", 0, 1, 0.05,
             getter=_getHeight,
             setter=_setHeight)
-        self.layout.addWidget(self.heightslider, 2, 1) 
+        self.layout.addWidget(self.heightslider, 2, 1)
         self.heightslider.setVisible(False)
 
     def populate(self):
@@ -104,8 +98,8 @@ class GearChainWidget(QtWidgets.QWidget):
         self.slider.setMaximum(self.gearChain.calculateMaxTWidth()
             * self.T_WIDTH_SLIDER_FACTOR)
 
-        if self.gearChain.rodList : show = True
-        else : show = False
+        if self.gearChain.rodList: show = True
+        else: show = False
 
         self.heightslider.setVisible(show)
         if show:

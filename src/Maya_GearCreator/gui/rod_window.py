@@ -1,9 +1,8 @@
 import logging
 import importlib
-from functools import partial
 #
 import pymel.core as pm
-from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
+from Maya_GearCreator.Qt import QtWidgets
 #
 from Maya_GearCreator.gui import base_widgets
 from Maya_GearCreator.misc import color_shader
@@ -25,7 +24,6 @@ class RodWidget(QtWidgets.QWidget):
         super(RodWidget, self).__init__()
         self.buildUI()
         self.rod = None
-
 
     def buildUI(self):
         self.layout = QtWidgets.QGridLayout(self)
@@ -49,8 +47,6 @@ class RodWidget(QtWidgets.QWidget):
         rod = self.rod
         gearNetwork = rod.gearNetwork
         chain = gearNetwork.addChain(rod=rod)
-        gear  = gearNetwork.addGearOnRod(rod, chain)
+        gear = gearNetwork.addGearOnRod(rod, chain)
         pm.select(clear=True)
         pm.select(gear.objTransform)
-
-
