@@ -20,11 +20,12 @@ class GearChain():
 
     def __init__(self, gearNetwork, tWidth=0.3):
         name = self.genAutoName()
-        self.gearList = []
         self.gearNetwork = gearNetwork
+        
         self.group = pm.group(em=True, name=name)
         self.name = name
 
+        self.gearList = []
         self.rodList = []
 
         self.group.addAttr(
@@ -38,8 +39,7 @@ class GearChain():
             attributeType="float")
 
         self.tWidth = tWidth
-        self.height = 0 # TODO: to be a vector when multiple gear orientation allowed 
-
+        self.height = 0  # TODO: to be a vector when multiple gear orientation allowed 
 
     def __del__(self): pass
         # if more than one neigbour: impossible I guess. 
