@@ -39,7 +39,7 @@ class GearNetworkWidget(QtWidgets.QWidget):
         self.modifiableName.set(self.gearNetwork.name,
                                 self.gearNetwork.setName)
 
-        for gearChain in self.gearNetwork.chainList:
+        for gearChain in self.gearNetwork.chainManager:
             if gearChain not in self.gearChainDict.keys():
                 widget = GearChainWidget(gearChain)
                 self.layout.addWidget(widget)
@@ -98,7 +98,7 @@ class GearChainWidget(QtWidgets.QWidget):
         self.slider.setMaximum(self.gearChain.calculateMaxTWidth()
             * self.T_WIDTH_SLIDER_FACTOR)
 
-        if self.gearChain.rodList: show = True
+        if self.gearChain.listRod(): show = True
         else: show = False
 
         self.heightslider.setVisible(show)

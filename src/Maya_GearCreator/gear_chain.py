@@ -5,10 +5,12 @@ import pymel.core as pm
 from Maya_GearCreator.gears import gear_basic
 from Maya_GearCreator.gears import gear
 from Maya_GearCreator import consts
+from Maya_GearCreator.misc import children_manager
 
 importlib.reload(gear_basic)
 importlib.reload(gear)
 importlib.reload(consts)
+importlib.reload(children_manager)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -21,31 +23,32 @@ class GearChain():
     def __init__(self, gearNetwork, tWidth=0.3):
         name = self.genAutoName()
         self.gearNetwork = gearNetwork
-        
+
         self.group = pm.group(em=True, name=name)
         self.name = name
 
-        self.gearList = []
-        self.rodList = []
+        self.gearList = children_manager.ChildrenManager_MayaDescriptor(
+            self.group, "gear")
 
         self.group.addAttr(
             "tWidth",
             keyable=True,
             attributeType="float")
+        self.tWidth = tWidth
 
         self.group.addAttr(
             "height",
             keyable=True,
             attributeType="float")
+        self.height = 0
 
-        self.tWidth = tWidth
-        self.height = 0  # TODO: to be a vector when multiple gear orientation allowed 
+        # TODO: to be a vector when multiple gear orientation allowed
 
     def __del__(self): pass
-        # if more than one neigbour: impossible I guess. 
-        # delete transform / construct
-        # delete circle
-        # delete constraints. 
+    # if more than one neigbour: impossible I guess.
+    # delete transform / construct
+    # delete circle
+    # delete constraints.
 
     # HANDLING NAME -----------------------------------------------------------
 
@@ -97,7 +100,7 @@ class GearChain():
         self.group.height.set(height)
 
     def changeHeight(self, height):
-        if not self.rodList: return
+        if not self.listRod(): return
         _min, _max = self.calculateMinMaxHeight()
         if height < _min or height > _max: return
         for gear in self.gearList: 
@@ -124,7 +127,7 @@ class GearChain():
             linkedGear=linkedGear,
             linkedRod=linkedRod,
             gearChain=self)
-        self.gearList.append(g)
+        self.gearList.add(g)
         pm.parent(g.objTransform, self.name)
         return g
 
@@ -140,7 +143,7 @@ class GearChain():
         _min = None
         _max = None
 
-        for rod in self.rodList:
+        for rod in self.listRod():
 
             gear = self.gearNetwork.getGearFromRodOnChain(rod, self)
 
@@ -156,3 +159,6 @@ class GearChain():
             if not _max or _tmp_max < _max:
                 _max = _tmp_max
         return _min, _max
+
+    def listRod(self):
+        return self.gearNetwork.getRodsOnChains(self)

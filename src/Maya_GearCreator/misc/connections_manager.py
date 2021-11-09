@@ -56,3 +56,7 @@ class ConnectionsManager():
     def hasConnection(self, objDescriptor):
         if self.listConnections(objDescriptor): return True
         else: return False
+
+    def getDescriptor(self, constructor):
+        if constructor in self.const2Descriptor:
+            return self.const2Descriptor[constructor]

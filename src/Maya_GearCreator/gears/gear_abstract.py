@@ -8,12 +8,14 @@ from Maya_GearCreator import gear_chain
 from Maya_GearCreator.misc import circle_descriptor
 from Maya_GearCreator.misc import connections_manager
 from Maya_GearCreator.misc import maya_obj_descriptor
+from Maya_GearCreator.misc import children_manager
 
 importlib.reload(consts)
 importlib.reload(gear_chain)
 importlib.reload(circle_descriptor)
 importlib.reload(connections_manager)
 importlib.reload(maya_obj_descriptor)
+importlib.reload(children_manager)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -59,7 +61,7 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
         self.sides = GearAbstract.calculateTNumber(tWidth, self.radius)
 
         # HANDLNING NEIGHBOURS ------------------------------------------------
-        self.constraintsCircles = {}
+        self.constraintsCircles = {}  # TODO: -> Children MANAGER.
         self.circleConstraints = []
         self.parentConstraints = []
 
