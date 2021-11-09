@@ -59,12 +59,12 @@ class GearNetwork():
         chain = gear_chain.GearChain(self, tWidth)
         self.chainList.append(chain)
         pm.parent(chain.group, self.name)
-        if rod: 
+        if rod:
             self.rodToChains[rod].add(chain)
         return chain
 
     def addGear(
-            self, 
+            self,
             gearChain,
             name=None,
             radius=consts.DEFAULT_RADIUS,
@@ -81,14 +81,14 @@ class GearNetwork():
             gearOffset=consts.DEFAULT_GEAR_OFFESET):
 
         gear = gearChain.addGear(
-            name=name, 
+            name=name,
             radius=radius,
             gearOffset=gearOffset,
             linkedRod=rod)
         gear.internalRadius = rod.radius
         self.gearDict[gear.objTransform] = (gear, gearChain)
         self.rodToChains[rod].add(gear.gearChain)
-        self.rodManager.connect(rod, gear)
+        self.connectRod(rod, gear)
         gearChain.rodList.append(rod)
         return rod
 
@@ -101,7 +101,7 @@ class GearNetwork():
         pass
 
     def addRod(self, gear):
-        if not self.rodManager.hasConnection(gear):
+        if not self.hasRod(gear):
             r = rod.Rod(
                 linkedGear=gear,
                 radius=gear.internalRadius,
@@ -109,11 +109,34 @@ class GearNetwork():
             self.rodToChains[r] = {gear.gearChain}
             self.rodDict[r.objTransform] = r
             gear.gearChain.rodList.append(r)
-            self.rodManager.connect(r, gear)
+            self.connectRod(r, gear)
             pm.parent(r.name, self.rodsGroup)
             return r
-    
+
     def getRodFromTransform(self, transform):
         rodInfo = self.rodDict.get(transform)
         if rodInfo : return rodInfo
         else : return None
+
+    # HANDLNING RODS CONNECTIONS ----------------------------------------------
+
+    def connectRod(self, rod, gear):
+        self.rodManager.connect(gear, rod)
+
+    def getRodFromGear(self, gear):
+        rodList = self.rodManager.listConnections(gear)
+        if rodList : return rodList[0]
+
+    def getGearsFromRod(self, rod):
+        return self.rodManager.listConnections(rod)
+
+    def getGearFromRodOnChain(self, rod, gearChain):
+        gearsOnRod = self.getGearsFromRod(rod)
+        _tmp = [g for g in gearsOnRod if g in gearChain.gearList]
+        if _tmp: return _tmp[0]
+        else: return None
+
+
+    def hasRod(self, gear):
+        if self.getRodFromGear(gear): return True
+        else: return False

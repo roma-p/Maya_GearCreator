@@ -28,7 +28,7 @@ class GearChain():
         self.rodList = []
 
         self.group.addAttr(
-            "tWidth", 
+            "tWidth",
             keyable=True,
             attributeType="float")
 
@@ -116,7 +116,7 @@ class GearChain():
             log.error("gearChain not empty, so new gear has to be connected.")
             return
         g = gear_basic.GearBasic(
-            name=name, 
+            name=name,
             radius=radius,
             tWidth=self.tWidth,
             gearOffset=gearOffset,
@@ -138,15 +138,19 @@ class GearChain():
     def calculateMinMaxHeight(self):
         _min = None
         _max = None
-        for rod in self.rodList : 
-            pos = rod.translate[1] # TODO : Depends on orientation. !!!!!!!!!
-            _tmp = rod.height / 2
-            
-            _tmp_min = pos - _tmp
-            _tmp_max = pos + _tmp        
-            
-            if not _min or _tmp_min > _min : 
+        for rod in self.rodList:
+
+            gear = self.gearNetwork.getGearFromRodOnChain(rod, self)
+
+            pos = rod.translate[1]  # TODO : Depends on orientation. !!!!!!!!!
+            _rodDelta = rod.height / 2
+            _gearDelta = gear.height / 2
+
+            _tmp_min = pos - _rodDelta + _gearDelta
+            _tmp_max = pos + _rodDelta - _gearDelta
+
+            if not _min or _tmp_min > _min:
                 _min = _tmp_min
-            if not _max or _tmp_max < _max : 
+            if not _max or _tmp_max < _max:
                 _max = _tmp_max
         return _min, _max

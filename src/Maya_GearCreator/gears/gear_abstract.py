@@ -70,10 +70,6 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
         if linkedRod:
             self.translate = linkedRod.translate
 
-        print("yyytttttt")
-        print(self.listNeigbours())
-        print("yyytttttt")
-
         self.gearChain = gearChain
         self.tWidth = tWidth
 
@@ -145,7 +141,6 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
 
     def changeRadius(self, radius):
         raise NotImplementedError()
-
 
     def activateMoveMode(self, rootGear):
         # 1 define constraint to move along root gear
