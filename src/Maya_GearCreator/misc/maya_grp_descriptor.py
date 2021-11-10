@@ -16,12 +16,17 @@ log.setLevel(logging.DEBUG)
 class MayaGrpDescriptor():
 
     DEFAULT_PREFIX = "group"
-    groupIdx = 0
+    groupIdx = 0 # TODO : NOT TRUE BETWEEN TWO EXECUTION. 
 
     def __init__(self, name=None, parentObj=None):
 
         name = name or self.genAutoName()
+        print("ouiiiii")
+        print(self.groupIdx)
+        print(name)
         self.group = helpers.createGroup(name, parentObj)
+        print(self.group)
+        print("ouiiiii")
         self.name = name
 
     def createGrpChildrenM(self, tag):

@@ -37,8 +37,10 @@ class Rod(maya_obj_descriptor.MayaObjDescriptor):
         self.radius = radius
         self.height = height
 
-        if linkedGear: self.translate = linkedGear.translate
-        if gearNetwork: self.gearNetwork = gearNetwork
+        if linkedGear:
+            self.translate = linkedGear.translate
+        if gearNetwork:
+            self.gearNetwork = gearNetwork
 
         #lock transform.
 

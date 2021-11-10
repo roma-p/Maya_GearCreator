@@ -76,7 +76,7 @@ def parseSingleGear(gearChain, gearTransform):
     gearInput = getInputs(gearTransform, inputType=pm.nodetypes.PolyGear)[0]
     gear = gear_basic.GearBasic(
         name=str(gearTransform),
-        radius=gearInput.radius.get(),
+        radius=gearInput.radius.get() + gearInput.gearOffset.get(),
         tWidth=gearChain.tWidth,
         gearOffset=gearInput.gearOffset.get(),
         gearChain=gearChain,
@@ -99,11 +99,13 @@ def parseSingleCircle(gear, circleTransform):
 
 def parseSingleRod(gearNetwork, rodTransform):
     rodInput = getInputs(rodTransform, pm.nodetypes.PolyCylinder)[0]
-    return rod.Rod(
+    radius = rodInput.radius.get()
+    r = rod.Rod(
         gearNetwork=gearNetwork,
         rodExists=True,
         rodData=(rodTransform, rodInput))
-
+    r.radius = radius
+    return r
 
 # LISTING GROUPS --------------------------------------------------------------
 

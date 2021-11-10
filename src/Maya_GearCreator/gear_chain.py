@@ -89,10 +89,9 @@ class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
             linkedGear=None,
             linkedRod=None):
 
-#        if len(self.gearList) > 0 and not linkedGear:
-#            log.error("gearChain not empty, so new gear has to be connected.")
-#            return
-        print("ouiiii")
+       # if len(self.gearList) > 0 and not linkedGear:
+           # log.error("gearChain not empty, so new gear has to be connected.")
+           # return
         g = gear_basic.GearBasic(
             name=name,
             radius=radius,
@@ -101,8 +100,6 @@ class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
             linkedGear=linkedGear,
             linkedRod=linkedRod,
             gearChain=self)
-        print(g)
-        print("aaaaaaaaaa")
         self.gearList.add(g)
         return g
 
