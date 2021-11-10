@@ -62,3 +62,6 @@ class ConnectionsManager():
     def getDescriptor(self, constructor):
         if constructor in self.const2Descriptor:
             return self.const2Descriptor[constructor]
+
+    # -> TO set VALUES OF self.const2Descriptor
+    def parse(*objDescriptor): pass

@@ -33,7 +33,11 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
 
     gearIdx = 0
     DEFAULT_PREFIX = "gear"
-    neighManager = connections_manager.ConnectionsManager("neighbour")
+
+    neighManager = connections_manager.ConnectionsManager(
+        consts.TAG_CONNECT_NEIGHBOUR)
+    cCirclesConnectManager = connections_manager.ConnectionsManager(
+        consts.TAG_CONNECT_CONSTRAINTS_C)
 
     def __init__(
             self,
@@ -61,9 +65,12 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
         self.sides = GearAbstract.calculateTNumber(tWidth, self.radius)
 
         # HANDLNING NEIGHBOURS ------------------------------------------------
-        self.constraintsCircles = {}  # TODO: -> Children MANAGER.
         self.circleConstraints = []
         self.parentConstraints = []
+
+        # HANDLING CONSTRAINT_CIRCLES
+        self.cCirclesChildrenManager = self.createObjChildrenM(
+            tag=consts.TAG_CONSTRAINTS_C)
 
         if linkedGear:
             self.addNeighbour(linkedGear)
@@ -132,6 +139,16 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
         self.initCircleConstraint(gear)
         gear.initCircleConstraint(self)
 
+    # MANAGE CONSTRAINT CIRCLE ------------------------------------------------
+    def addConstraintCircle(self, neighbourGear, circle):
+        GearAbstract.cCirclesConnectManager.connect(circle, neighbourGear)
+        self.cCirclesChildrenManager.add(circle)
+
+    def getRelatedConstraintCircle(self, neighbourGear):
+        return next(
+            g for g in GearAbstract.cCirclesConnectManager.listConnections(neighbourGear)
+            if g in self.cCirclesChildrenManager)
+
     # MODIFY ------------------------------------------------------------------
 
     def lockTransform(self, lock=True):
@@ -188,9 +205,8 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
 
     @transform
     def changeHeight(self, height):
-        #self.translate[1] = height 
         x, y, z = self.translate
-        self.translate = (x, height, z) 
+        self.translate = (x, height, z)
         # TODO : to change when multiple orientaion.
 
     # CONSTRAINTS -------------------------------------------------------------
@@ -203,23 +219,25 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
             radius=GearAbstract.calculateConstraintRadius(self, neighbourGear))
         pm.move(circle.objTransform, neighbourGear.translate)
         circle.visibility = False
-        self.constraintsCircles[neighbourGear] = circle
-        pm.parent(circle.objTransform, self.name)
+
+        self.addConstraintCircle(neighbourGear, circle)
+
         pm.parentConstraint(neighbourGear.objTransform,
                             circle.objTransform)
 
     @transform
     def activateCircleConstraint(self, neighbourGear):
+        constraintsCircle = self.getRelatedConstraintCircle(neighbourGear)
         self.circleConstraints = [
             pm.geometryConstraint(
-                self.constraintsCircles[neighbourGear].objTransform,
+                constraintsCircle.objTransform,
                 self.objTransform),
             pm.aimConstraint(neighbourGear.objTransform, self.objTransform)
         ]
-        self.constraintsCircles[neighbourGear].visibility = True
+        constraintsCircle.visibility = True
 
     def desactivateCircleConstraint(self, neighbourGear):
-        self.constraintsCircles[neighbourGear].visibility = False
+        self.getRelatedConstraintCircle(neighbourGear).visibility = False
         for constraint in self.circleConstraints:
             pm.delete(constraint)
         self.circleConstraints = []
@@ -244,7 +262,8 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
             True: GearAbstract.activateParentConstraint,
             False: GearAbstract.desactivateParentConstraint
         }
-        for g in neighboursGear: g.lockTransform(not lock)
+        for g in neighboursGear:
+            g.lockTransform(not lock)
         func[lock](self, *neighboursGear)
         for gear in neighboursGear:
             newNeighboursGear = [g for g in gear.listNeigbours() if g != self]

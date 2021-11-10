@@ -46,7 +46,7 @@ class RodWidget(QtWidgets.QWidget):
     def addGear(self):
         rod = self.rod
         gearNetwork = rod.gearNetwork
-        chain = gearNetwork.addChain(rod=rod)
+        chain = gearNetwork.addChain()
         gear = gearNetwork.addGearOnRod(rod, chain)
         pm.select(clear=True)
         pm.select(gear.objTransform)

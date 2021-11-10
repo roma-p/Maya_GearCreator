@@ -1,5 +1,10 @@
 import logging
+import importlib
 import pymel.core as pm
+
+from Maya_GearCreator.misc import children_manager as childrenM
+
+importlib.reload(childrenM)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -74,7 +79,7 @@ class MayaObjDescriptor():
         pm.rename(self.objTransform, name)
 
     # Redondant but used as signal callback for UI
-    # TODO ; but redundant avec setAttr? 
+    # TODO ; but redundant avec setAttr?
     def setName(self, name):
         self.name = name
 
@@ -87,3 +92,9 @@ class MayaObjDescriptor():
             else:
                 log.error("{} has no attribute: {}.".format(self.name,
                                                             attrName))
+
+    def createGrpChildrenM(self, tag):
+        return childrenM.ChildrenManager_GrpDescriptor(self.objTransform, tag)
+
+    def createObjChildrenM(self, tag):
+        return childrenM.ChildrenManager_ObjDescriptor(self.objTransform, tag)

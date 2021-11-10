@@ -20,14 +20,14 @@ class GearBasic(gear_abstract.GearAbstract):
     GUI_ATTRIBUTES = {
         "base": {
             "internalRadius": (0, 5, 0.1, 15),
-            "height": (0, 5, 0.1, 15), 
+            "height": (0, 5, 0.1, 15),
             "heightDivisions": (1, 10, 1, None)
         },
         "teeth": {
             "gearSpacing": (0, 1, 0.01, None),
-            "gearOffset": (0, 1, 0.05, None), # <- to change ! shall update radius!!
+            "gearOffset": (0, 1, 0.05, None),  # <- to change ! shall update radius!!
             "gearTip": (0, 1, 0.05, None),
-            "gearMiddle": (0, 1, 0.05, None)        
+            "gearMiddle": (0, 1, 0.05, None)
         }
     }
 
@@ -38,12 +38,17 @@ class GearBasic(gear_abstract.GearAbstract):
             gearOffset=consts.DEFAULT_GEAR_OFFESET,
             linkedGear=None,
             gearChain=None,
-            linkedRod=None):
+            linkedRod=None,
+            gearExists=False,
+            gearData=None):
 
-        gear_shape, gear_construct = GearBasic.instantiateGear()
+        if gearExists:
+            gear_transform, gear_construct = gearData
+        else:
+            gear_transform, gear_construct = GearBasic.instantiateGear()
 
         super(GearBasic, self).__init__(
-            gear_shape, gear_construct,
+            gear_transform, gear_construct,
             name, radius,
             tWidth, gearOffset,
             linkedGear, gearChain,
@@ -64,8 +69,9 @@ class GearBasic(gear_abstract.GearAbstract):
                 neighbour.lockChain(*toLock, lock=True)
                 new_radius = GearBasic.calculateConstraintRadius(
                     self, neighbour)
-                neighbour.constraintsCircles[self].radius = new_radius
-                self.constraintsCircles[neighbour].radius = new_radius
+
+                neighbour.getRelatedConstraintCircle(self).radius = new_radius
+                self.getRelatedConstraintCircle(neighbour).radius = new_radius
 
                 # if only one neighbour, more handy to move current gear.
                 # if multiple neighbours, not possible.

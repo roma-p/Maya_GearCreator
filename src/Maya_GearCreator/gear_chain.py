@@ -26,6 +26,7 @@ class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
         super(GearChain, self).__init__(name=None, parentObj=gearNetwork.group)
 
         self.gearList = self.createObjChildrenM(tag=consts.TAG_GEAR)
+        # TODO : change name. -> gearManager.
 
         self.group.addAttr(
             "tWidth",
@@ -37,7 +38,7 @@ class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
             "height",
             keyable=True,
             attributeType="float")
-        self.height = 0
+#        self.height = 0
 
         self.gearNetwork = gearNetwork
 

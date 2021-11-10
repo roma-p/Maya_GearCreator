@@ -82,6 +82,7 @@ class ChildrenManager_GrpDescriptor(collections.MutableSet):
         return [self.grpToGearChain[grp] for grp in self.childrenManger
                 if grp in self.grpToGearChain]
 
+    def parse(self, *transformList): pass
 
 class ChildrenManager_ObjDescriptor(collections.MutableSet):
 
@@ -117,3 +118,5 @@ class ChildrenManager_ObjDescriptor(collections.MutableSet):
     def getDescriptor(self, constructor):
         if constructor in self.transformToDescr:
             return self.transformToDescr[constructor]
+
+    def parse(self, *transformList): pass

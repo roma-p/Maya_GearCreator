@@ -120,7 +120,7 @@ class GearCreatorUI(QtWidgets.QWidget):
         self.layout.addWidget(self.gearNetworksWidget, 1, 0)
         self.gearNetworksWidget.setVisible(True)
 
-        self.gearNetworkDict = {}
+        self.gearNetworkList = []
 
         self.buildUI()
         self.populate()
@@ -158,15 +158,17 @@ class GearCreatorUI(QtWidgets.QWidget):
         args[0].displayGN(True)
 
     def getGearFromTransform(self, objTransform):
-        for network in self.gearNetworkDict.keys():
+        for network in self.gearNetworkList:
             gear = network.getGearFromTransform(objTransform)
-            if gear: return gear
+            if gear:
+                return gear
         return None
 
     def getRodFromTransform(self, objTransform):
-        for network in self.gearNetworkDict.keys():
+        for network in self.gearNetworkList:
             rod = network.getRodFromTransform(objTransform)
-            if rod: return rod
+            if rod:
+                return rod
         return None
 
     def displayGear(self, bool, gear=None):
@@ -201,7 +203,12 @@ class GearCreatorUI(QtWidgets.QWidget):
             linkedGear=None)
 
         args[0].gearNetworksWidget.addGearNetwork(gearNetwork)
-        args[0].gearNetworkDict[gearNetwork] = "bijour"
+        args[0].gearNetworkList.append(gearNetwork)
 
         pm.select(clear=True)
         pm.select(gear.objTransform)
+
+    def addExistingGearNetwork(self, *gearNetworks):
+        for gearNetwork in gearNetworks:
+            self.gearNetworksWidget.addGearNetwork(gearNetwork)
+            self.gearNetworkList.append(gearNetwork)
