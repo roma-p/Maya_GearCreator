@@ -47,12 +47,13 @@ class GearBasic(gear_abstract.GearAbstract):
         else:
             gear_transform, gear_construct = GearBasic.instantiateGear()
 
-        super(GearBasic, self).__init__(
+        super().__init__(
             gear_transform, gear_construct,
             name, radius,
             tWidth, gearOffset,
             linkedGear, gearChain,
-            linkedRod)
+            linkedRod,
+            _class=GearBasic)
 
     def changeRadius(self, radius, resizeNeighbour=False):
         adjustedRadius = self.calculateAdjustedRadius(radius)

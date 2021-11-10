@@ -20,7 +20,7 @@ class ChildrenManager(collections.MutableSet):
         return len(self._listChildren())
 
     def __contains__(self, obj):
-        return obj in self._listChildren(obj)
+        return obj in self._listChildren()
 
     def __iter__(self):
         for item in (
@@ -55,7 +55,7 @@ class ChildrenManager_GrpDescriptor(collections.MutableSet):
         self.childrenManger = ChildrenManager(
             parentObj,
             childrenTag)
-        self.grpToGearChain = {}
+        self.grpToDescriptor = {}
 
     def __len__(self):
         return len(self.childrenManger)
@@ -65,24 +65,27 @@ class ChildrenManager_GrpDescriptor(collections.MutableSet):
 
     def __iter__(self):
         for item in (
-                self.grpToGearChain[grp] for grp in self.childrenManger
-                if grp in self.grpToGearChain):
+                self.grpToDescriptor[grp] for grp in self.childrenManger
+                if grp in self.grpToDescriptor):
             yield item
 
     def add(self, gearChain):
         self.childrenManger.add(gearChain.group)
-        self.grpToGearChain[gearChain.group] = gearChain
+        self.grpToDescriptor[gearChain.group] = gearChain
 
     def discard(self, gearChain):
         if gearChain in self._list_children():
             self.childrenManger.discard(gearChain.group)
-            self.grpToGearChain.pop(gearChain.group)
+            self.grpToDescriptor.pop(gearChain.group)
 
     def _list_children(self):
-        return [self.grpToGearChain[grp] for grp in self.childrenManger
-                if grp in self.grpToGearChain]
+        return [self.grpToDescriptor[grp] for grp in self.childrenManger
+                if grp in self.grpToDescriptor]
 
-    def parse(self, *transformList): pass
+    def parse(self, *grpDescriptors):
+        for grpDescr in grpDescriptors:
+            if grpDescr.group in self.childrenManger:
+                self.grpToDescriptor[grpDescr.group] = grpDescr
 
 class ChildrenManager_ObjDescriptor(collections.MutableSet):
 
@@ -119,4 +122,7 @@ class ChildrenManager_ObjDescriptor(collections.MutableSet):
         if constructor in self.transformToDescr:
             return self.transformToDescr[constructor]
 
-    def parse(self, *transformList): pass
+    def parse(self, *objDescriptors):
+        for objDescr in objDescriptors:
+            if objDescr.objTransform in self.childrenManger:
+                self.transformToDescr[objDescr.objTransform] = objDescr

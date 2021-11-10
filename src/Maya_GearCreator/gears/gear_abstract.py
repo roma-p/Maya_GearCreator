@@ -49,13 +49,26 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
             gearOffset=consts.DEFAULT_GEAR_OFFESET,
             linkedGear=None,
             gearChain=None,
-            linkedRod=None):
+            linkedRod=None,
+            _class=None):
 
-        super(GearAbstract, self).__init__(
+        _class = _class or GearAbstract
+
+        print(GearAbstract)
+        print(self)
+        print(type(self))
+        print(issubclass(type(self), GearAbstract))
+
+        super().__init__(
             gear_shape,
             gear_construct,
-            GearAbstract,
+            _class,
             name)
+
+        print("uuuu")
+        print(hasattr(self, "internalRadius"))
+        print("uuuu")
+
 
         self.shader_bk = None
 

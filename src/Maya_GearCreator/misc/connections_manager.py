@@ -40,7 +40,7 @@ class ConnectionsManager():
         return objDescriptorB in connections
 
     def listConnections(self, objDescriptor):
-        if not self._checkNeighbourExists(objDescriptor):
+        if not self._checkHasTag(objDescriptor):
             return []
         connected_constr = pm.listConnections(
             self._formatConnection(objDescriptor))
@@ -50,7 +50,7 @@ class ConnectionsManager():
         return "{}.{}".format(str(objDescriptor.objConstructor),
                               self.connection_name)
 
-    def _checkNeighbourExists(self, objDescriptor):
+    def _checkHasTag(self, objDescriptor):
         return objDescriptor.objConstructor.hasAttr(self.connection_name)
 
     def hasConnection(self, objDescriptor):
@@ -59,9 +59,18 @@ class ConnectionsManager():
         else:
             return False
 
+    def _hasConstructorConnection(self, constructor):
+        if not constructor.hasAttr(self.connection_name):
+            return False
+        connectionList = pm.listConnections("{}.{}".format(
+            str(constructor), self.connection_name))
+        return bool(connectionList)
+
     def getDescriptor(self, constructor):
         if constructor in self.const2Descriptor:
             return self.const2Descriptor[constructor]
 
-    # -> TO set VALUES OF self.const2Descriptor
-    def parse(*objDescriptor): pass
+    def parse(self, *objDescriptors):
+        for objDescr in objDescriptors:
+            if self._hasConstructorConnection(objDescr.objConstructor):
+                self.const2Descriptor[objDescr.objConstructor] = objDescr

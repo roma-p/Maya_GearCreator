@@ -42,6 +42,7 @@ class MayaObjDescriptor():
         for attrName in MayaObjDescriptor.TRANSFORM_PRP_WHITE_LIST:
             self._createProperty("objTransform", attrName, _class)
 
+
     # def __eq__(self, another):
     #     if not hasattr(another, "objTransform") \
     #             or hasattr(another, "objConstructor"):

@@ -4,6 +4,7 @@ import logging
 from Maya_GearCreator.gears import gear_basic
 from Maya_GearCreator.gears import gear
 from Maya_GearCreator import consts
+from Maya_GearCreator.misc import helpers
 from Maya_GearCreator.misc import children_manager
 from Maya_GearCreator.misc import maya_grp_descriptor
 
@@ -12,6 +13,7 @@ importlib.reload(gear)
 importlib.reload(consts)
 importlib.reload(children_manager)
 importlib.reload(maya_grp_descriptor)
+importlib.reload(helpers)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -21,24 +23,20 @@ class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
     DEFAULT_PREFIX = "gearChain"
     groupIdx = 0
 
-    def __init__(self, gearNetwork, tWidth=0.3):
+    def __init__(self, gearNetwork, name=None, tWidth=0.3):
 
-        super(GearChain, self).__init__(name=None, parentObj=gearNetwork.group)
+        super(GearChain, self).__init__(name=name, parentObj=gearNetwork.group)
 
         self.gearList = self.createObjChildrenM(tag=consts.TAG_GEAR)
         # TODO : change name. -> gearManager.
 
-        self.group.addAttr(
-            "tWidth",
-            keyable=True,
-            attributeType="float")
-        self.tWidth = tWidth
-
-        self.group.addAttr(
-            "height",
-            keyable=True,
-            attributeType="float")
 #        self.height = 0
+
+        helpers.safeAddAttr(self.group, "tWidth", "float", True)
+        helpers.safeAddAttr(self.group, "height", "float", True)
+
+        if tWidth:
+            self.tWidth = tWidth
 
         self.gearNetwork = gearNetwork
 
@@ -91,9 +89,10 @@ class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
             linkedGear=None,
             linkedRod=None):
 
-        if self.gearList and not linkedGear:
-            log.error("gearChain not empty, so new gear has to be connected.")
-            return
+#        if len(self.gearList) > 0 and not linkedGear:
+#            log.error("gearChain not empty, so new gear has to be connected.")
+#            return
+        print("ouiiii")
         g = gear_basic.GearBasic(
             name=name,
             radius=radius,
@@ -102,6 +101,8 @@ class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
             linkedGear=linkedGear,
             linkedRod=linkedRod,
             gearChain=self)
+        print(g)
+        print("aaaaaaaaaa")
         self.gearList.add(g)
         return g
 

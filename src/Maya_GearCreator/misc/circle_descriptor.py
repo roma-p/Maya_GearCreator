@@ -13,10 +13,19 @@ class CircleDescriptor(maya_obj_descriptor.MayaObjDescriptor):
     DEFAULT_PREFIX = "circle"
     gearIdx = 0
 
-    def __init__(self, nr, radius):
+    def __init__(
+            self,
+            nr=None,
+            radius=None,
+            circleExists=False,
+            circleData=None):
 
-        circle_shape, circle_construct = pm.circle(radius=radius, nr=nr)
+        if circleExists:
+            circle_transform, circle_construct = circleData
+        else:
+            circle_transform, circle_construct = pm.circle(
+                radius=radius, nr=nr)
         super(CircleDescriptor, self).__init__(
-            circle_shape,
+            circle_transform,
             circle_construct,
             CircleDescriptor)

@@ -23,11 +23,16 @@ class Rod(maya_obj_descriptor.MayaObjDescriptor):
             radius=consts.DEFAULT_ROD_RADIUS,
             height=consts.DEFAULT_ROD_LEN,
             linkedGear=None,
-            gearNetwork=None):
+            gearNetwork=None,
+            rodExists=False,
+            rodData=None):
 
-        rod_shape, rode_construct = pm.polyCylinder()
+        if rodExists:
+            rod_transform, rode_construct = rodData
+        else:
+            rod_transform, rode_construct = pm.polyCylinder()
 
-        super(Rod, self).__init__(rod_shape, rode_construct, Rod, name)
+        super(Rod, self).__init__(rod_transform, rode_construct, Rod, name)
 
         self.radius = radius
         self.height = height

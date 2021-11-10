@@ -1,4 +1,3 @@
-import logging
 import pymel.core as pm
 
 
@@ -7,9 +6,23 @@ def createGroup(groupName, parentObj=None):
     # FIXME: check may not be a group....
     # FIXME: check for parentObj existence.
     # check group existance:
-    for child in pm.listRelatives(parentObj, children=True):
-        if child.name == groupName:
-            return child
+
+    def _get_group(groupName, parentObj=None):
+        if parentObj:
+            for child in pm.listRelatives(parentObj, children=True):
+                if str(child) == groupName:
+                    return child
+        else:
+            allNameMatched = pm.ls(groupName)
+            allTopLevel = [grp for grp in allNameMatched
+                           if not pm.listRelatives(grp, parent=True)]
+            if allTopLevel:
+                return allTopLevel[0]
+
+    group = _get_group(groupName, parentObj)
+    if group:
+        return group
+
     group = pm.group(em=True, name=groupName)
     pm.parent(group, parentObj)
     return group
@@ -32,3 +45,8 @@ def addTag(obj, tagName, category=TAG_CATEGORY):
 def delTag(obj, tagName):
     if not obj.hasAttr(tagName):
         obj.deleteAttr(tagName)
+
+
+def safeAddAttr(obj, attrName, attributeType, keyable=True,):
+    if not obj.hasAttr(attrName):
+        obj.addAttr(attrName, attributeType=attributeType, keyable=keyable)

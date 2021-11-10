@@ -45,8 +45,8 @@ class GearNetwork(maya_grp_descriptor.MayaGrpDescriptor):
         # adding Tag tag
         helpers.addTag(self.group, consts.TAG_GEARNETWORK)
 
-    def addChain(self, tWidth=0.3):
-        chain = gear_chain.GearChain(self, tWidth)
+    def addChain(self, tWidth=0.3, name=None):
+        chain = gear_chain.GearChain(self, tWidth=tWidth, name=name)
         self.chainManager.add(chain)
         return chain
 
@@ -133,4 +133,10 @@ class GearNetwork(maya_grp_descriptor.MayaGrpDescriptor):
             rod = self.getRodFromGear(gear)
             if rod:
                 ret.add(rod)
+        return ret
+
+    def listGears(self):
+        ret = []
+        for gearChain in self.chainManager:
+            ret += list(gearChain.gearList)
         return ret

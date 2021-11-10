@@ -3,17 +3,17 @@ import os
 import logging
 import importlib
 
-from Maya_GearCreator.misc import helpers
+from Maya_GearCreator.gui import main_window
 from Maya_GearCreator import parser
 from Maya_GearCreator import consts
+from Maya_GearCreator.misc import helpers
 
+importlib.reload(main_window)
 importlib.reload(helpers)
 importlib.reload(parser)
 importlib.reload(consts)
 
-
 DEBUG_PATH = "D:/dev/Maya_GearCreator/src/"
-
 
 def addToPyPath(path):
     if not os.path.exists(path):
@@ -30,8 +30,8 @@ if __name__ == "__main__":
     # launching plugin --------------------------------------------------------
     if DEBUG_PATH:
         addToPyPath(os.path.dirname(DEBUG_PATH))
-        from Maya_GearCreator.gui import main_window
-        importlib.reload(main_window)
+
+
 
     logging.basicConfig()
     log = logging.getLogger("GearCreator")
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     helpers.TAG_CATEGORY = consts.TAG_CATEGORY
 
     ui = main_window.GearCreatorUI(dock=False)
-    #ui.addExistingGearNetwork(*parser.parse())
+    ui.addExistingGearNetwork(*parser.parse())
 
 """
 TODO LIST:
