@@ -1,6 +1,5 @@
 import importlib
 import logging
-import pymel.core as pm
 
 from Maya_GearCreator import gear_chain
 from Maya_GearCreator import rod
@@ -8,6 +7,7 @@ from Maya_GearCreator import consts
 from Maya_GearCreator.misc import helpers
 from Maya_GearCreator.misc import children_manager as childrenM
 from Maya_GearCreator.misc import connections_manager as connectionM
+from Maya_GearCreator.misc import maya_grp_descriptor
 
 importlib.reload(gear_chain)
 importlib.reload(rod)
@@ -15,61 +15,35 @@ importlib.reload(consts)
 importlib.reload(connectionM)
 importlib.reload(childrenM)
 importlib.reload(helpers)
+importlib.reload(maya_grp_descriptor)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 
-class GearNetwork():
+class GearNetwork(maya_grp_descriptor.MayaGrpDescriptor):
+
     DEFAULT_PREFIX = "gearNetwork"
-    TAG = "GEARNETWORK"
-
-    # better unique name....
-
-    gearNetworkIdx = 0
+    groupIdx = 0
 
     def __init__(self, name=None):
-        name = name or self.genAutoName()
 
-        # TODO : -> IF GROUP EXIST: NOT CREATE IT BUT REFERENCE IT.
-        # SO FUNCTION IN HELPERS 'CREATE DIR' -> if already exists only return it. 
+        super(GearNetwork, self).__init__(name=name, parentObj=None)
 
-        # handling gear chains.
-        self.group = pm.group(em=True, name=name)
-        self.chainManager = childrenM.ChildrenManager_GrpDescriptor(self.group)
+        # gear chain handler.
+        self.chainManager = self.createGrpChildrenM(consts.TAG_GEARCHAIN)
 
-        # handling rods:
-        self.rodsGroup = pm.group(em=True, name="rods")
-        pm.parent(self.rodsGroup, self.name)
-        # storing rods.
-        self.rodChildrenManager = childrenM.ChildrenManager_ObjDescriptor(
-            self.rodsGroup, "rod")
-        # storing connection between rods and gears.
-        self.rodConnectManager = connectionM.ConnectionsManager("rodLinked")
+        # rods subgroup and rods handler.
+        self.rodsDescriptor = maya_grp_descriptor.MayaGrpDescriptor(
+            name=consts.ROD_SUBGROUP,
+            parentObj=self.group)
+        self.rodChildrenManager = self.rodsDescriptor.createObjChildrenM(
+            tag=consts.TAG_ROD)
+        self.rodConnectManager = connectionM.ConnectionsManager(
+            consts.TAG_CONNECT_ROD)
 
         # adding Tag tag
-        helpers.addTag(self.group, GearNetwork.TAG)
-
-        self.name = name
-
-    # HANDLING NAME -----------------------------------------------------------
-
-    def genAutoName(cls):
-        name = "{}{}".format(cls.DEFAULT_PREFIX, cls.gearNetworkIdx)
-        cls.gearNetworkIdx += 1
-        return name
-
-    # Redondant but used as signal callback for UI
-    def setName(self, name):
-        self.name = name
-
-    @property
-    def name(self):
-        return str(self.group)
-
-    @name.setter
-    def name(self, name):
-        pm.rename(self.group, name)
+        helpers.addTag(self.group, consts.TAG_GEARNETWORK)
 
     def addChain(self, tWidth=0.3, rod=None):
         chain = gear_chain.GearChain(self, tWidth)

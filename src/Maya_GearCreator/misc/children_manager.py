@@ -51,12 +51,10 @@ class ChildrenManager(collections.MutableSet):
 
 class ChildrenManager_GrpDescriptor(collections.MutableSet):
 
-    TAG = "gearChain"
-
-    def __init__(self, parentObj):
+    def __init__(self, parentObj, childrenTag):
         self.childrenManger = ChildrenManager(
             parentObj,
-            ChildrenManager_GrpDescriptor.TAG)
+            childrenTag)
         self.grpToGearChain = {}
 
     def __len__(self):
