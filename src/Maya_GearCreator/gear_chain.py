@@ -27,7 +27,7 @@ class GearChain():
         self.group = pm.group(em=True, name=name)
         self.name = name
 
-        self.gearList = children_manager.ChildrenManager_MayaDescriptor(
+        self.gearList = children_manager.ChildrenManager_ObjDescriptor(
             self.group, "gear")
 
         self.group.addAttr(

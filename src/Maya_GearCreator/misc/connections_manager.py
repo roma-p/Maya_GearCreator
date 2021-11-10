@@ -3,8 +3,11 @@ import pymel.core as pm
 import importlib
 
 from Maya_GearCreator.misc import maya_obj_descriptor
+from Maya_GearCreator.misc import helpers
+
 
 importlib.reload(maya_obj_descriptor)
+importlib.reload(helpers)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -17,31 +20,28 @@ class ConnectionsManager():
 
     def connect(self, objDescriptorA, objDescriptorB):
         for obj in (objDescriptorA, objDescriptorB):
-            # if not issubclass(type(obj),
-                    # maya_obj_descriptor.MayaObjDescriptor):
-                # return False
             constructor = obj.objConstructor
             self.const2Descriptor[constructor] = obj
-            if not constructor.hasAttr(self.connection_name):
-                constructor.addAttr(
-                    self.connection_name,
-                    keyable=True,
-                    attributeType="bool")
+            helpers.addTag(constructor, self.connection_name)
         pm.connectAttr(self._formatConnection(objDescriptorB),
                        self._formatConnection(objDescriptorA))
         return True
 
     def disconnect(self, objDescriptorA, objDescriptorB):
-        if not self.isConnected(objDescriptorA, objDescriptorB): return
+        if not self.isConnected(objDescriptorA, objDescriptorB):
+            return
         pm.disconnectAttr(self._formatConnection(objDescriptorA),
                           self._formatConnection(objDescriptorB))
+        for obj in (objDescriptorA, objDescriptorB):
+            helpers.delTag(obj, self.connection_name)
 
     def isConnected(self, objDescriptorA, objDescriptorB):
         connections = self.listConnections(objDescriptorA)
         return objDescriptorB in connections
 
     def listConnections(self, objDescriptor):
-        if not self._checkNeighbourExists(objDescriptor): return []
+        if not self._checkNeighbourExists(objDescriptor):
+            return []
         connected_constr = pm.listConnections(
             self._formatConnection(objDescriptor))
         return [self.const2Descriptor[c] for c in connected_constr]
@@ -54,8 +54,10 @@ class ConnectionsManager():
         return objDescriptor.objConstructor.hasAttr(self.connection_name)
 
     def hasConnection(self, objDescriptor):
-        if self.listConnections(objDescriptor): return True
-        else: return False
+        if self.listConnections(objDescriptor):
+            return True
+        else:
+            return False
 
     def getDescriptor(self, constructor):
         if constructor in self.const2Descriptor:

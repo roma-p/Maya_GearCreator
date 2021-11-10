@@ -5,6 +5,7 @@ import pymel.core as pm
 from Maya_GearCreator import gear_chain
 from Maya_GearCreator import rod
 from Maya_GearCreator import consts
+from Maya_GearCreator.misc import helpers
 from Maya_GearCreator.misc import children_manager as childrenM
 from Maya_GearCreator.misc import connections_manager as connectionM
 
@@ -13,6 +14,7 @@ importlib.reload(rod)
 importlib.reload(consts)
 importlib.reload(connectionM)
 importlib.reload(childrenM)
+importlib.reload(helpers)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -20,23 +22,33 @@ log.setLevel(logging.DEBUG)
 
 class GearNetwork():
     DEFAULT_PREFIX = "gearNetwork"
+    TAG = "GEARNETWORK"
+
+    # better unique name....
+
     gearNetworkIdx = 0
 
     def __init__(self, name=None):
         name = name or self.genAutoName()
 
+        # TODO : -> IF GROUP EXIST: NOT CREATE IT BUT REFERENCE IT.
+        # SO FUNCTION IN HELPERS 'CREATE DIR' -> if already exists only return it. 
+
         # handling gear chains.
         self.group = pm.group(em=True, name=name)
-        self.chainManager = childrenM.ChildrenManager_GearChain(self.group)
+        self.chainManager = childrenM.ChildrenManager_GrpDescriptor(self.group)
 
         # handling rods:
         self.rodsGroup = pm.group(em=True, name="rods")
         pm.parent(self.rodsGroup, self.name)
         # storing rods.
-        self.rodChildrenManager = childrenM.ChildrenManager_MayaDescriptor(
+        self.rodChildrenManager = childrenM.ChildrenManager_ObjDescriptor(
             self.rodsGroup, "rod")
         # storing connection between rods and gears.
         self.rodConnectManager = connectionM.ConnectionsManager("rodLinked")
+
+        # adding Tag tag
+        helpers.addTag(self.group, GearNetwork.TAG)
 
         self.name = name
 
@@ -117,7 +129,8 @@ class GearNetwork():
 
     def getRodFromGear(self, gear):
         rodList = self.rodConnectManager.listConnections(gear)
-        if rodList: return rodList[0]
+        if rodList:
+            return rodList[0]
 
     def getGearsFromRod(self, rod):
         return self.rodConnectManager.listConnections(rod)
@@ -125,12 +138,16 @@ class GearNetwork():
     def getGearFromRodOnChain(self, rod, gearChain):
         gearsOnRod = self.getGearsFromRod(rod)
         _tmp = [g for g in gearsOnRod if g in gearChain.gearList]
-        if _tmp: return _tmp[0]
-        else: return None
+        if _tmp:
+            return _tmp[0]
+        else:
+            return None
 
     def hasRod(self, gear):
-        if self.getRodFromGear(gear): return True
-        else: return False
+        if self.getRodFromGear(gear):
+            return True
+        else:
+            return False
 
     def listRodChains(self, rod):
         return set([g.gearChain for g in self.getGearsFromRod(rod)
@@ -140,5 +157,6 @@ class GearNetwork():
         ret = set()
         for gear in gearChain.gearList:
             rod = self.getRodFromGear(gear)
-            if rod: ret.add(rod)
+            if rod:
+                ret.add(rod)
         return ret

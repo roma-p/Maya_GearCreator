@@ -1,6 +1,11 @@
 import logging
 import collections
 import pymel.core as pm
+import importlib
+
+from Maya_GearCreator.misc import helpers
+
+importlib.reload(helpers)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -25,15 +30,12 @@ class ChildrenManager(collections.MutableSet):
 
     def add(self, obj):
 
-        if not obj.hasAttr(self.childrenTag):
-            obj.addAttr(self.childrenTag,
-                        keyable=False,
-                        attributeType="bool")
+        helpers.addTag(obj, self.childrenTag)
         pm.parent(obj, self.parentObj)
 
     def discard(self, obj):
         if obj in self:
-            obj.deleteAttr(ChildrenManager.TAGNAME)
+            helpers.delTag(self.childrenTag)
             pm.parent(obj, world=True)
 
     # PRIVATE -----------------------------------------------------------------
@@ -47,10 +49,14 @@ class ChildrenManager(collections.MutableSet):
         return (obj.hasAttr(self.childrenTag))
 
 
-class ChildrenManager_GearChain(collections.MutableSet):
+class ChildrenManager_GrpDescriptor(collections.MutableSet):
+
+    TAG = "gearChain"
 
     def __init__(self, parentObj):
-        self.childrenManger = ChildrenManager(parentObj, "gearChain")
+        self.childrenManger = ChildrenManager(
+            parentObj,
+            ChildrenManager_GrpDescriptor.TAG)
         self.grpToGearChain = {}
 
     def __len__(self):
@@ -79,7 +85,7 @@ class ChildrenManager_GearChain(collections.MutableSet):
                 if grp in self.grpToGearChain]
 
 
-class ChildrenManager_MayaDescriptor(collections.MutableSet):
+class ChildrenManager_ObjDescriptor(collections.MutableSet):
 
     def __init__(self, parentObj, tag):
         self.childrenManger = ChildrenManager(parentObj, tag)

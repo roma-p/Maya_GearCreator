@@ -3,6 +3,13 @@ import os
 import logging
 import importlib
 
+from Maya_GearCreator.misc import helpers
+from Maya_GearCreator import consts
+
+importlib.reload(consts)
+importlib.reload(helpers)
+
+
 DEBUG_PATH = "D:/dev/Maya_GearCreator/src/"
 
 
@@ -27,6 +34,8 @@ if __name__ == "__main__":
     logging.basicConfig()
     log = logging.getLogger("GearCreator")
     log.setLevel(logging.DEBUG)
+
+    helpers.TAG_CATEGORY = consts.TAG_CATEGORY
 
     ui = main_window.GearCreatorUI(dock=False)
 
@@ -65,4 +74,6 @@ prio list:
 * recalculated at every populate.
 * gearOffset property and internal radius to ovveride.
 
+* function "AD TAG" ds misc... (hidden not keyable)
+* not used str on transform so can have multiple gears with same name.
 """
