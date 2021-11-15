@@ -16,18 +16,23 @@ log.setLevel(logging.DEBUG)
 class MayaGrpDescriptor():
 
     DEFAULT_PREFIX = "group"
-    groupIdx = 0 # TODO : NOT TRUE BETWEEN TWO EXECUTION. 
+    groupIdx = 0  # TODO : NOT TRUE BETWEEN TWO EXECUTION.
+    # TODO : GROUP HIDDEN ATTRIBUTE!
+    # MIAS OU????
+    # arg DEGUEULASSE : "group EXIST" ???
 
-    def __init__(self, name=None, parentObj=None):
+    def __init__(
+            self,
+            name=None, parentObj=None,
+            groupExists=False, group=None):
 
-        name = name or self.genAutoName()
-        print("ouiiiii")
-        print(self.groupIdx)
-        print(name)
-        self.group = helpers.createGroup(name, parentObj)
-        print(self.group)
-        print("ouiiiii")
-        self.name = name
+        if groupExists:
+            self.group = group
+            self.name = str(group)
+        else:
+            name = name or self.genAutoName()
+            self.group = helpers.createGroup(name, parentObj)
+            self.name = name
 
     def createGrpChildrenM(self, tag):
         return childrenM.ChildrenManager_GrpDescriptor(self.group, tag)

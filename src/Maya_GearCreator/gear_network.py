@@ -26,9 +26,15 @@ class GearNetwork(maya_grp_descriptor.MayaGrpDescriptor):
     DEFAULT_PREFIX = "gearNetwork"
     groupIdx = 0
 
-    def __init__(self, name=None, parentObj=None):
+    def __init__(
+            self,
+            name=None, parentObj=None,
+            networkExists=False,
+            networkGroup=None):
 
-        super(GearNetwork, self).__init__(name=name, parentObj=parentObj)
+        super(GearNetwork, self).__init__(
+            name=name, parentObj=parentObj,
+            groupExists=networkExists, group=networkGroup)
 
         # gear chain handler.
         self.chainManager = self.createGrpChildrenM(consts.TAG_GEARCHAIN)

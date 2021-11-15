@@ -3,6 +3,7 @@ import logging
 import pymel.core as pm
 
 from Maya_GearCreator import gear_network
+from Maya_GearCreator import gear_chain
 from Maya_GearCreator import consts
 from Maya_GearCreator.gears import gear_basic
 from Maya_GearCreator.gears import gear_abstract
@@ -10,6 +11,7 @@ from Maya_GearCreator.misc import circle_descriptor
 from Maya_GearCreator import rod
 
 importlib.reload(gear_network)
+importlib.reload(gear_chain)
 importlib.reload(consts)
 importlib.reload(gear_basic)
 importlib.reload(gear_abstract)
@@ -44,7 +46,9 @@ def parseSingleGearNetwork(gearNetworkGroup):
     parentGroup = pm.listRelatives(gearNetworkGroup, parent=True) or None
     gearNetwork = gear_network.GearNetwork(
         name=str(gearNetworkGroup),
-        parentObj=parentGroup)
+        parentObj=parentGroup,
+        networkExists=True,
+        networkGroup=gearNetworkGroup)
     # 2 parsing and referencing gear chains
     gearChainList = []
     for gearChainGroup in getGearChainsGroups(gearNetwork):
@@ -60,16 +64,22 @@ def parseSingleGearNetwork(gearNetworkGroup):
 
 
 def parseSingleGearChain(gearNetwork, gearChainGroup):
-    gearChain = gearNetwork.addChain(
+
+    gc = gear_chain.GearChain(
+        gearNetwork,
         tWidth=gearChainGroup.getAttr("tWidth"),
-        name=str(gearChainGroup))
-    gearChain.height = gearChainGroup.getAttr("height")  # FIXME ? automatique?
+        name=str(gearChainGroup),
+        chainExists=True,
+        chainGroup=gearChainGroup)
+    gearNetwork.chainManager.add(gc)
+
+    gc.height = gearChainGroup.getAttr("height")  # FIXME ? automatique?
     gearList = []
-    for gearTransform in getGearTransforms(gearChain):
-        gear = parseSingleGear(gearChain, gearTransform)
+    for gearTransform in getGearTransforms(gc):
+        gear = parseSingleGear(gc, gearTransform)
         gearList.append(gear)
-    gearChain.gearList.parse(*gearList)
-    return gearChain
+    gc.gearList.parse(*gearList)
+    return gc
 
 
 def parseSingleGear(gearChain, gearTransform):

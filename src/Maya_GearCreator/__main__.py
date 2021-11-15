@@ -3,6 +3,20 @@ import os
 import logging
 import importlib
 
+DEBUG_PATH = "D:/dev/Maya_GearCreator/src/"
+
+
+def addToPyPath(path):
+    if not os.path.exists(path):
+        return False
+    if path not in sys.path:
+        sys.path.append(path)
+    return True
+
+
+if DEBUG_PATH:
+    addToPyPath(os.path.dirname(DEBUG_PATH))
+
 from Maya_GearCreator.gui import main_window
 from Maya_GearCreator import parser
 from Maya_GearCreator import consts
@@ -13,14 +27,7 @@ importlib.reload(helpers)
 importlib.reload(parser)
 importlib.reload(consts)
 
-DEBUG_PATH = "D:/dev/Maya_GearCreator/src/"
 
-def addToPyPath(path):
-    if not os.path.exists(path):
-        return False
-    if path not in sys.path:
-        sys.path.append(path)
-    return True
 
 # def registerPlugin(): pass
 # def unRegisterPlugin(): pass
@@ -28,10 +35,6 @@ def addToPyPath(path):
 
 if __name__ == "__main__":
     # launching plugin --------------------------------------------------------
-    if DEBUG_PATH:
-        addToPyPath(os.path.dirname(DEBUG_PATH))
-
-
 
     logging.basicConfig()
     log = logging.getLogger("GearCreator")
@@ -58,9 +61,6 @@ TODO LIST:
 *!! multi forme. -> différentes formes de gear possibles
 *!! multi chain.
 
-* change radius: 
-    - si un voisin seuelement, c' le gear actuel qui se décale, pas les voisins....
-      (plus sympa à l'utilisation).
 * Change teeth:
     -automatically adjust neighbours? 
     - some of gearSpacing of two neighbours = 1 ? 
@@ -70,6 +70,11 @@ prio list:
     - nettoyage des duplicat d'information
     - refacto en utilisant le gear primitive
     (debug le deplacement)
+- REFACTO DES DESCRIPTOR. 
+    - only add properties for transform, no input in __init__
+    - add a "addInput" method name, input. 
+    - (add an attr to the input or a connection to be easily parsed.)
+- Comment fr un bon parser automatique? 
 
 !!
 * calculate min/max for ihm either from fix values or from function... 
@@ -78,4 +83,8 @@ prio list:
 
 * function "AD TAG" ds misc... (hidden not keyable)
 * not used str on transform so can have multiple gears with same name.
+
+
+
+
 """

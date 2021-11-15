@@ -2,7 +2,7 @@ import pymel.core as pm
 
 
 # if group exist -> return group, otherwise create it and return it.
-def createGroup(groupName, parentObj=None):
+def createGroupSafe(groupName, parentObj=None):
     # FIXME: check may not be a group....
     # FIXME: check for parentObj existence.
     # check group existance:
@@ -23,6 +23,12 @@ def createGroup(groupName, parentObj=None):
     if group:
         return group
 
+    group = pm.group(em=True, name=groupName)
+    pm.parent(group, parentObj)
+    return group
+
+
+def createGroup(groupName, parentObj=None):
     group = pm.group(em=True, name=groupName)
     pm.parent(group, parentObj)
     return group

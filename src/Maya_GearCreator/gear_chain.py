@@ -23,9 +23,15 @@ class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
     DEFAULT_PREFIX = "gearChain"
     groupIdx = 0
 
-    def __init__(self, gearNetwork, name=None, tWidth=0.3):
+    def __init__(
+            self, gearNetwork,
+            name=None, tWidth=0.3,
+            chainExists=False,
+            chainGroup=None):
 
-        super(GearChain, self).__init__(name=name, parentObj=gearNetwork.group)
+        super(GearChain, self).__init__(
+            name=name, parentObj=gearNetwork.group,
+            groupExists=chainExists, group=chainGroup)
 
         self.gearList = self.createObjChildrenM(tag=consts.TAG_GEAR)
         # TODO : change name. -> gearManager.
@@ -92,6 +98,7 @@ class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
        # if len(self.gearList) > 0 and not linkedGear:
            # log.error("gearChain not empty, so new gear has to be connected.")
            # return
+
         g = gear_basic.GearBasic(
             name=name,
             radius=radius,
