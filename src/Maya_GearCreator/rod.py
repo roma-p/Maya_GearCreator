@@ -1,10 +1,10 @@
 import pymel.core as pm
 import importlib
 
-from Maya_GearCreator.misc import maya_obj_descriptor
+from Maya_GearCreator.misc import maya_obj_descriptor as mob
 from Maya_GearCreator import consts
 
-importlib.reload(maya_obj_descriptor)
+importlib.reload(mob)
 importlib.reload(consts)
 
 
@@ -47,3 +47,17 @@ class Rod(maya_obj_descriptor.MayaObjDescriptor):
     def moveTop(self): pass
 
     def moveBot(self): pass
+
+    def _lockChain_recc(self, rootGear, lock=True):
+        func = {
+            True: mob.MayaObjDescriptor.activateParentConstraint,
+            False: mob.MayaObjDescriptor.desactivateParentConstraint
+        }
+        gears = [g for g in self.gearNetwork.getGearsFromRod(self)
+                if g != rootGear]
+        for g in gears:
+            g.lockTransform(not lock)
+            func[lock](self, *gears)
+        for g in gears:
+            new_gears, new_rod = g._find_children(self)
+            g._lockChain_recc(*new_gears, lock=lock, rod=new_rod)

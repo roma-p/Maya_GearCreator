@@ -65,9 +65,17 @@ class GearBasic(gear_abstract.GearAbstract):
             # TODO : NOT IMPLEMENTED.
         else:
             move_self = len(self.listNeigbours()) == 1
+
             for neighbour in self.listNeigbours():
-                toLock = [n for n in neighbour.listNeigbours() if n != self]
-                neighbour.lockChain(*toLock, lock=True)
+
+                if move_self:
+                    arg = (self, neighbour)
+                else:
+                    arg = (neighbour, self)
+
+                arg[0].lockChain(rootObj=arg[1], lock=True)
+
+                # neighbour.lockChain(rootObj=self, lock=True)
                 new_radius = GearBasic.calculateConstraintRadius(
                     self, neighbour)
 
@@ -80,4 +88,5 @@ class GearBasic(gear_abstract.GearAbstract):
                     self.adjustGearToCircleConstraint(neighbour)
                 else:
                     neighbour.adjustGearToCircleConstraint(self)
-                neighbour.lockChain(*toLock, lock=False)
+                arg[0].lockChain(rootObj=arg[1], lock=False)
+                # neighbour.lockChain(rootObj=self, lock=False)

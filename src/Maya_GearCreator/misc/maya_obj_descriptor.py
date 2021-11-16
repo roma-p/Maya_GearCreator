@@ -35,6 +35,7 @@ class MayaObjDescriptor():
         self.objTransform = objTransform
         self.objConstructor = objConstructor
         self.name = name or self.genAutoName()
+        self.parentConstraints = []
 
         for attrName in pm.listAttr(self.objConstructor):
             if attrName not in MayaObjDescriptor.CONSTRUCT_PRP_BLACK_LIST:
@@ -99,3 +100,18 @@ class MayaObjDescriptor():
 
     def createObjChildrenM(self, tag):
         return childrenM.ChildrenManager_ObjDescriptor(self.objTransform, tag)
+
+    def lockTransform(self, lock=True):
+        for transform in ("translate", "rotate", "scale"):
+            pm.setAttr(self.name + "." + transform, lock=lock)
+
+    def activateParentConstraint(self, *gears):
+        for gear in gears:
+            self.parentConstraints.append(
+                pm.parentConstraint(self.objTransform, gear.objTransform,
+                                    maintainOffset=True))
+
+    def desactivateParentConstraint(self, *gears):
+        for constraint in self.parentConstraints:
+            pm.delete(constraint)
+        self.parentConstraints = []

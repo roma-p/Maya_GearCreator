@@ -7,14 +7,14 @@ from Maya_GearCreator import consts
 from Maya_GearCreator import gear_chain
 from Maya_GearCreator.misc import circle_descriptor
 from Maya_GearCreator.misc import connections_manager
-from Maya_GearCreator.misc import maya_obj_descriptor
+from Maya_GearCreator.misc import maya_obj_descriptor as mob
 from Maya_GearCreator.misc import children_manager
 
 importlib.reload(consts)
 importlib.reload(gear_chain)
 importlib.reload(circle_descriptor)
 importlib.reload(connections_manager)
-importlib.reload(maya_obj_descriptor)
+importlib.reload(mob)
 importlib.reload(children_manager)
 
 log = logging.getLogger(__name__)
@@ -69,7 +69,6 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
 
         # HANDLNING NEIGHBOURS ------------------------------------------------
         self.circleConstraints = []
-        self.parentConstraints = []
 
         # HANDLING CONSTRAINT_CIRCLES
         self.cCirclesChildrenManager = self.createObjChildrenM(
@@ -154,10 +153,6 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
 
     # MODIFY ------------------------------------------------------------------
 
-    def lockTransform(self, lock=True):
-        for transform in ("translate", "rotate", "scale"):
-            pm.setAttr(self.name + "." + transform, lock=lock)
-
     def changeTWidth(self, tWidth):
         self.sides = GearAbstract.calculateTNumber(tWidth, self.radius)
 
@@ -169,7 +164,7 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
         self.moveMode = rootGear
         self.activateCircleConstraint(rootGear)
         # 2 lock the rest of the chain.
-        self.lockChain(*[g for g in self.listNeigbours() if g != rootGear])
+        self.lockChain(rootObj=rootGear, lock=True)
         pm.setAttr(self.name + ".translate", lock=False)
         # 3 TODO: SHOW / HIDE CONSTRAINT CIRCLE.
         # TODO 4 !!!!!!!
@@ -182,8 +177,8 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
     def desactivateMoveMode(self):
         if not self.moveMode: return
         self.desactivateCircleConstraint(self.moveMode)
-        self.lockChain(*[g for g in self.listNeigbours() if g != self],
-                       lock=False)
+        self.lockChain(rootObj=self, lock=False)
+        # self.lockChain(*[g for g in self.listNeigbours() if g != self], lock=False)
         self.lockTransform()
 
     def calculateMoveAlong(self):
@@ -260,18 +255,35 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
             pm.delete(constraint)
         self.parentConstraints = []
 
-    def lockChain(self, *neighboursGear, lock=True):
+    def lockChain(self, rootObj, lock=True):
+        gears, r = self._find_children(rootObj)
+        self._lockChain_recc(*gears, lock=lock, rod=r)
+
+    def _lockChain_recc(self, *neighboursGear, lock=True, rod=None):
         func = {
-            True: GearAbstract.activateParentConstraint,
-            False: GearAbstract.desactivateParentConstraint
+            True: mob.MayaObjDescriptor.activateParentConstraint,
+            False: mob.MayaObjDescriptor.desactivateParentConstraint
         }
+        allObj = list(neighboursGear)
+        if rod:
+            allObj.append(rod)
+        for obj in allObj:
+            obj.lockTransform(not lock)
+        func[lock](self, *allObj)
         for g in neighboursGear:
-            g.lockTransform(not lock)
-        func[lock](self, *neighboursGear)
-        for gear in neighboursGear:
-            newNeighboursGear = [g for g in gear.listNeigbours() if g != self]
-            if newNeighboursGear:
-                gear.lockChain(*newNeighboursGear, lock=lock)
+            new_gears, new_rod = g._find_children(self)
+            g._lockChain_recc(*new_gears, lock=lock, rod=new_rod)
+        if rod:
+            rod._lockChain_recc(self, lock=lock)
+
+    def _find_children(self, rootObj):
+        ret_gears = [g for g in self.listNeigbours() if g != rootObj]
+        r = self.gearChain.gearNetwork.getRodFromGear(self)
+        if r and r != rootObj:
+            ret_rod = r
+        else:
+            ret_rod = None
+        return ret_gears, ret_rod
 
     # SHADER ------------------------------------------------------------------
 
