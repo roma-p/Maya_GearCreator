@@ -40,9 +40,20 @@ class GearNetwork(maya_grp_descriptor.MayaGrpDescriptor):
         self.chainManager = self.createGrpChildrenM(consts.TAG_GEARCHAIN)
 
         # rods subgroup and rods handler.
-        self.rodsDescriptor = maya_grp_descriptor.MayaGrpDescriptor(
-            name=consts.ROD_SUBGROUP,
-            parentObj=self.group)
+
+        if networkExists:
+            rodGroup = helpers.getGroup(
+                consts.ROD_SUBGROUP,
+                self.group)
+            self.rodsDescriptor = maya_grp_descriptor.MayaGrpDescriptor(
+                name=consts.ROD_SUBGROUP,
+                parentObj=self.group,
+                groupExists=True,
+                group=rodGroup)
+        else:
+            self.rodsDescriptor = maya_grp_descriptor.MayaGrpDescriptor(
+                name=consts.ROD_SUBGROUP,
+                parentObj=self.group)
         self.rodChildrenManager = self.rodsDescriptor.createObjChildrenM(
             tag=consts.TAG_ROD)
         self.rodConnectManager = connectionM.ConnectionsManager(

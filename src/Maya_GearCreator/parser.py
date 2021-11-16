@@ -60,6 +60,7 @@ def parseSingleGearNetwork(gearNetworkGroup):
         rodList.append(parseSingleRod(gearNetwork, rodTransform))
     gearNetwork.rodChildrenManager.parse(*rodList)
     gearNetwork.rodConnectManager.parse(*rodList + gearNetwork.listGears())
+    #gearNetwork.rodConnectManager.parse(*rodList)
     return gearNetwork
 
 

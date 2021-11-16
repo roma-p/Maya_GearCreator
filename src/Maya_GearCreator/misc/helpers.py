@@ -7,25 +7,26 @@ def createGroupSafe(groupName, parentObj=None):
     # FIXME: check for parentObj existence.
     # check group existance:
 
-    def _get_group(groupName, parentObj=None):
-        if parentObj:
-            for child in pm.listRelatives(parentObj, children=True):
-                if str(child) == groupName:
-                    return child
-        else:
-            allNameMatched = pm.ls(groupName)
-            allTopLevel = [grp for grp in allNameMatched
-                           if not pm.listRelatives(grp, parent=True)]
-            if allTopLevel:
-                return allTopLevel[0]
-
-    group = _get_group(groupName, parentObj)
+    group = getGroup(groupName, parentObj)
     if group:
         return group
 
     group = pm.group(em=True, name=groupName)
     pm.parent(group, parentObj)
     return group
+
+
+def getGroup(groupName, parentObj=None):
+    if parentObj:
+        for child in pm.listRelatives(parentObj, children=True):
+            if str(child) == groupName:
+                return child
+    else:
+        allNameMatched = pm.ls(groupName)
+        allTopLevel = [grp for grp in allNameMatched
+                       if not pm.listRelatives(grp, parent=True)]
+        if allTopLevel:
+            return allTopLevel[0]
 
 
 def createGroup(groupName, parentObj=None):
