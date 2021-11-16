@@ -29,7 +29,7 @@ def transform(f):
         return ret
     return wrapper
 
-class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
+class GearAbstract(mob.MayaObjDescriptor):
 
     gearIdx = 0
     DEFAULT_PREFIX = "gear"
@@ -206,6 +206,14 @@ class GearAbstract(maya_obj_descriptor.MayaObjDescriptor):
         x, y, z = self.translate
         self.translate = (x, height, z)
         # TODO : to change when multiple orientaion.
+
+    def changeInternalRadius(self, newRadius):
+        # TODO : checks.
+        r = self.gearChain.gearNetwork.getRodFromGear(self)
+        if not r:
+            self.internalRadius = newRadius
+        else:
+            r.changeRadius(newRadius)
 
     # CONSTRAINTS -------------------------------------------------------------
 

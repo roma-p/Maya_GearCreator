@@ -19,13 +19,13 @@ class GearBasic(gear_abstract.GearAbstract):
 
     GUI_ATTRIBUTES = {
         "base": {
-            "internalRadius": (0, 5, 0.1, 15),
+            # "internalRadius": (0, 5, 0.1, 15), <- TODO : shall call changeInternalRadius rather than directly access property.
             "height": (0, 5, 0.1, 15),
             "heightDivisions": (1, 10, 1, None)
         },
         "teeth": {
             "gearSpacing": (0, 1, 0.01, None),
-            "gearOffset": (0, 1, 0.05, None),  # <- to change ! shall update radius!!
+            "gearOffset": (0, 1, 0.05, None),  #  <- to change ! shall update radius!!
             "gearTip": (0, 1, 0.05, None),
             "gearMiddle": (0, 1, 0.05, None)
         }

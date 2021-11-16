@@ -30,6 +30,7 @@ class RodWidget(QtWidgets.QWidget):
         self.modifiableName = base_widgets.ModifiableName("", None)
         self.layout.addWidget(self.modifiableName, 0, 0, 1, 2)
 
+
         self.addGearBtn = QtWidgets.QPushButton("Add Gear")
         self.layout.addWidget(self.addGearBtn, 2, 0)
 
@@ -38,6 +39,16 @@ class RodWidget(QtWidgets.QWidget):
         self.rod = rod
         self.modifiableName.set(rod.name,
                                 rod.setName)
+
+        def _getRadius(): return self.rod.radius
+        def _setRadius(val): self.rod.changeRadius(val)
+        self.radiusSlider = base_widgets.EnhancedSlider(
+            "radius", 0, 1, 0.05,
+            getter=_getRadius,
+            setter=_setRadius)
+        self.layout.addWidget(self.radiusSlider, 1, 0)
+
+        self.radiusSlider.populate()
 
         try : self.addGearBtn.clicked.disconnect()
         except Exception: pass

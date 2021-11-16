@@ -13,7 +13,18 @@ importlib.reload(consts)
 # otherwise changing the radius of the rod
 # rod -> change radius of all linked gears.
 
-class Rod(maya_obj_descriptor.MayaObjDescriptor):
+'''
+cylinder faces:
+
+"sub" -> SubdivisionsAxis
+
+around  -> [0, sub -1 ]
+bot     -> [sub, sub * 2 - 1]
+top     -> [sub *2, sub *3 -1 ]
+
+'''
+
+class Rod(mob.MayaObjDescriptor):
 
     rodIdx = 0
     DEFAULT_PREFIX = "rod"
@@ -42,11 +53,39 @@ class Rod(maya_obj_descriptor.MayaObjDescriptor):
         if gearNetwork:
             self.gearNetwork = gearNetwork
 
-        #lock transform.
+        self.lockTransform()
 
-    def moveTop(self): pass
+    def changeLen(self, newHeight, top=True):
+        selection_bk = pm.ls(sl=True)
+        pm.select(self.getFacesStr(top))
+        pm.move(0, newHeight, 0, r=True, os=True, wd=True)  # TODO : checks keyswords.
+        pm.select(clear=True)
+        pm.select(selection_bk)  # ??
 
-    def moveBot(self): pass
+    def getFacesStr(self, top=True):
+        faces_idx = {
+            True: self.getTopFaces,
+            False: self.getBotFaces
+        }[top]()
+        return "{}.f{}".format(self.name, list(faces_idx))
+
+    def getTopFacesIdx(self):
+        return (self.subdivisionsAxis * 2, self.subdivisionsAxis * 3 - 1)
+
+    def getBotFacesIdx(self):
+        return (self.subdivisionsAxis, self.subdivisionsAxis * 2 - 1)
+
+    def getLen(self, top=True):
+        faces = pm.ls(self.getFacesStr(top))
+        point_pos = faces[0].getPoints()[0]
+        height = point_pos[1]  # TODO: to change if multiple orientation.
+        return height
+
+    def changeRadius(self, newRadius):
+        # CHECKERS....
+        self.radius = newRadius
+        for g in self.gearNetwork.getGearsFromRod(self):
+            g.internalRadius = newRadius
 
     def _lockChain_recc(self, rootGear, lock=True):
         func = {
@@ -54,7 +93,7 @@ class Rod(maya_obj_descriptor.MayaObjDescriptor):
             False: mob.MayaObjDescriptor.desactivateParentConstraint
         }
         gears = [g for g in self.gearNetwork.getGearsFromRod(self)
-                if g != rootGear]
+                    if g != rootGear]
         for g in gears:
             g.lockTransform(not lock)
             func[lock](self, *gears)
