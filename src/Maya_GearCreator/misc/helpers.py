@@ -68,7 +68,7 @@ def hashable(v):
     return True
 
 
-def _formatMeshStr(transformName, meshType, *args):
+def formatMeshStr(transformName, meshType, *args):
     meshTypeDict = {
         "face": "f",
         "vertex": "vtx",
@@ -88,7 +88,7 @@ def _formatMeshStr(transformName, meshType, *args):
 
 def ls(transformName, meshType, *args, **kargs):
     ret = []
-    strs = _formatMeshStr(transformName, meshType, *args)
+    strs = formatMeshStr(transformName, meshType, *args)
     for _tmp in strs:
         _ret = pm.ls(_tmp, **kargs)
         if _ret:
@@ -97,7 +97,7 @@ def ls(transformName, meshType, *args, **kargs):
 
 
 def select(transformName, meshType, *args, **kargs):
-    _tmp = _formatMeshStr(transformName, meshType, *args)
+    _tmp = formatMeshStr(transformName, meshType, *args)
     for i in range(len(_tmp)):
         if i:
             kargs["add"] = True

@@ -56,39 +56,48 @@ class Rod(mob.MayaObjDescriptor):
         if gearNetwork:
             self.gearNetwork = gearNetwork
 
+        self.setSubdivisionAxis(self.subdivisionsAxis)
+
         self.lockTransform()
 
-    def changeLen(self, newHeight, top=True):
-        selection_bk = pm.ls(sl=True)
-        # pm.select(self.getFacesStr(top))
+    def setSubdivisionAxis(self, subdivisionsAxis):
+        self.subdivisionsAxis = subdivisionsAxis
 
-        helpers.select(self.name, "vertex", *self.getVtxIdx(top))
+        self.topVertex = helpers.formatMeshStr(self.name, "vertex",
+                                               *self.getVtxIdx(top=True))
+        self.botVertex = helpers.formatMeshStr(self.name, "vertex",
+                                               *self.getVtxIdx(top=False))
+
+    def changeLen(self, newHeight, top=True):
 
         currentHeight = self.getLen(top=top)
         delta = newHeight - currentHeight
+        pm.move(
+            0, delta, 0,
+            self.getVertexStr(top),
+            r=True, os=True,
+            wd=True)  # moveY=True)  # TODO: TO CHANGE IF MUTLIPLE ORIENTATION.
 
-        pm.move(0, delta, 0, r=True, os=True, wd=True)
+        # selection_bk = pm.ls(sl=True)
+        # pm.select(self.getFacesStr(top))
+
+        # helpers.select(self.name, "vertex", *self.getVtxIdx(top))
+
+        # pm.move(0, delta, 0, r=True, os=True, wd=True)
         # TODO : checks keyswords.
-        pm.select(clear=True)
-        pm.select(selection_bk)
-
-    def getFacesStr(self, top=True):
-        faces_idx = {
-            True: self.getTopFacesIdx,
-            False: self.getBotFacesIdx
-        }[top]()
-        return "{}.f[{}:{}]".format(self.name, faces_idx[0], faces_idx[1])
-
-    def getTopFacesIdx(self):
-        return (self.subdivisionsAxis * 2, self.subdivisionsAxis * 3 - 1)
-
-    def getBotFacesIdx(self):
-        return (self.subdivisionsAxis, self.subdivisionsAxis * 2 - 1)
+        # pm.select(clear=True)
+        # pm.select(selection_bk)
 
     def getVtxIdx(self, top=True):
         return {
             True: ((self.subdivisionsAxis, self.subdivisionsAxis * 2 - 1),),
             False: ((0, self.subdivisionsAxis - 1),)
+        }[top]
+
+    def getVertexStr(self, top=True):
+        return {
+            True: self.topVertex,
+            False: self.botVertex
         }[top]
 
     # TODO : store at init. DO NOT CHANGE UNLESS BEVEL.

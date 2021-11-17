@@ -34,7 +34,7 @@ class MayaObjDescriptor():
     def __init__(self, objTransform, objConstructor, _class=None, name=None):
         self.objTransform = objTransform
         self.objConstructor = objConstructor
-        self.name = name or self.genAutoName()
+        self.name = name or str(objTransform)
         self.parentConstraints = []
 
         for attrName in pm.listAttr(self.objConstructor):
