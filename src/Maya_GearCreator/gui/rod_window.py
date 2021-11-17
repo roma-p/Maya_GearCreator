@@ -47,7 +47,7 @@ class RodWidget(QtWidgets.QWidget):
             "radius",
             min=0.1,
             max=self.rod.getMaxRadius(),
-            step=0.05,
+            step=0.005,
             getter=_getRadius,
             setter=_setRadius)
         self.layout.addWidget(self.radiusSlider, 1, 0)

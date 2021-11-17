@@ -137,8 +137,8 @@ class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
                 _min = _tmp_min
             if not _max or _tmp_max < _max:
                 _max = _tmp_max
-        if not _min and not _max:
-            return 0, 1000
+        if _min is None and _max is None:
+            return 0, 1
         return _min, _max
 
     def listRod(self):
