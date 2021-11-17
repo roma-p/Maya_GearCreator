@@ -32,7 +32,7 @@ class RodWidget(QtWidgets.QWidget):
 
 
         self.addGearBtn = QtWidgets.QPushButton("Add Gear")
-        self.layout.addWidget(self.addGearBtn, 2, 0)
+        self.layout.addWidget(self.addGearBtn, 4, 0)
 
     def populate(self, rod):
 
@@ -47,8 +47,23 @@ class RodWidget(QtWidgets.QWidget):
             getter=_getRadius,
             setter=_setRadius)
         self.layout.addWidget(self.radiusSlider, 1, 0)
-
         self.radiusSlider.populate()
+
+        def _getTop(): return self.rod.getLen(top=True)
+        def _setTop(val): self.changeLen(val, top=True)
+
+        def _getTopMin(): return self.rod.getMinMaxTop()[0] # make two functions....
+        def _getTopMax(): return self.rod.getMinMaxTop()[1] # make two functions....
+
+        # create slider.
+
+        def _getBot(): return - self.rod.getLen(top=False)
+        def _setBot(val): self.changeLen(-val, top=False)
+
+        def _getBotMin(): return self.rod.getMinMaxBot()[0] # make two functions.... # PEUT ËTRE INVERSE MIN / MAX.
+        def _getBotMax(): return self.rod.getMinMaxBot()[1] # make two functions.... # PEUT ËTRE INVERSE MIN / MAX.
+
+        # create other slider.
 
         try : self.addGearBtn.clicked.disconnect()
         except Exception: pass

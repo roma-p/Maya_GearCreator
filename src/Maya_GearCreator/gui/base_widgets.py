@@ -1,4 +1,6 @@
 import logging
+import numbers
+import types
 from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
 
 log = logging.getLogger(__name__)
@@ -133,6 +135,7 @@ class MoveAlongWidget(QtWidgets.QWidget):
 class EnhancedSlider(QtWidgets.QWidget):
 
     SLIDER_STEP = 1
+    MIN_MAX_FUNC_PREFIX = "calculate_"
 
     def __init__(
             self, label,
@@ -142,9 +145,12 @@ class EnhancedSlider(QtWidgets.QWidget):
 
         super(EnhancedSlider, self).__init__()
 
-        self.min = min
-        self.max = max
-        self.step = step
+        self.label = label
+
+        # TODO : if min or max ar functions: populate will be different !!!!!
+        # automatically handled.
+
+        self._setMinMaxStep(min, max, step)
 
         self.ratio = 0
         self.sliderMin = 0
@@ -153,7 +159,6 @@ class EnhancedSlider(QtWidgets.QWidget):
 
         self._calculateData()
 
-        self.label = label
         self.getter = getter
         self.setter = setter
 
@@ -180,30 +185,76 @@ class EnhancedSlider(QtWidgets.QWidget):
         self.val_bk = currentVal
         self.numberEdit.setText(self._convToNumberEdit(currentVal))
 
+        self._calculateData()
+
         self.slider.setMinimum(self.sliderMin)
         self.slider.setMaximum(self.sliderMax)
 
         self.slider.setValue(self._convToSlider(currentVal))
 
+        # but if already connected? 
         self.numberEdit.returnPressed.connect(
             lambda: self._callback_numberEdit())
         self.slider.valueChanged.connect(
             lambda value: self._callback_slider(value))
 
-    def changeMinMaxStep(self, min=None, max=None, step=None):
-        if min is not None: self.min = min
-        if max is not None: self.max = max
-        if step is not None: self.step = step
+    # Handling min max that can be either be number of func to calculate it.
+    # *************************************************************************
+
+    def _getMinMaxFuncName(arg):
+        if arg not in ("min", "max"):
+            return
+        return EnhancedSlider.MIN_MAX_FUNC_PREFIX + arg
+
+    def _getMinMaxFunc(self, arg):
+        if arg not in ("min", "max"):
+            return
+        attrName = EnhancedSlider._getMinMaxFuncName(arg)
+        if not hasattr(self, attrName):
+            setattr(self, attrName, None)
+        return getattr(self, attrName)
+
+    def _setMinMaxStep(self, min=None, max=None, step=None):
+        if step:
+            self.step = step
+        for argName, argValue in {
+                "min": min,
+                "max": max}.items():
+            if argValue is None:
+                pass
+            elif isinstance(argValue, types.FunctionType):
+                setattr(self,
+                        EnhancedSlider._getMinMaxFuncName(argName),
+                        argValue)
+            elif isinstance(argValue, numbers.Number):
+                setattr(self, argName, argValue)
+            else:
+                log.error("{} is neither a number nor a function".format(
+                    argName))
+
+    def setMinMaxStep(self, min=None, max=None, step=None):
+        self._setMinMaxStep(min, max, step)
         self._calculateData()
 
+    def _calculateMinMaxFunc(self):
+        for arg in ("min", "max"):
+            func = self._getMinMaxFunc(arg)
+            if func:
+                setattr(self, arg, func())
+
+    # Actual calculation ******************************************************
     # TODO : BUG HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     def _calculateData(self):
+
+        self._calculateMinMaxFunc()
 
         step_number = (self.max - self.min) / self.step
 
         self.ratio = EnhancedSlider.SLIDER_STEP / step_number
         self.sliderMin = 0
         self.sliderMax = (self.max - self.min) / self.ratio
+
+    # Callbacks ***************************************************************
 
     def _callback_numberEdit(self):
         value = self.numberEdit.text()
@@ -230,6 +281,8 @@ class EnhancedSlider(QtWidgets.QWidget):
         self.numberEdit.setText(self._convToNumberEdit(value))
         self.setter(value)
         self.val_bk = value
+
+    # Conversion **************************************************************
 
     def _convToSlider(self, val):
         return (val - self.min) * self.ratio

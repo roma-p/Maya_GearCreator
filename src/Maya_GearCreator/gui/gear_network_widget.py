@@ -80,9 +80,14 @@ class GearChainWidget(QtWidgets.QWidget):
 
         def _getHeight(): return self.gearChain.height
         def _setHeight(val): self.gearChain.changeHeight(val)
+        def _getMinHeight(): return self.gearChain.calculateMinMaxHeight()[0]
+        def _getMaxHeight(): return self.gearChain.calculateMinMaxHeight()[1]
 
         self.heightslider = base_widgets.EnhancedSlider(
-            "height", 0, 1, 0.05,
+            "height",
+            min=_getMinHeight,
+            max=_getMaxHeight,
+            step=0.05,
             getter=_getHeight,
             setter=_setHeight)
         self.layout.addWidget(self.heightslider, 2, 1)
@@ -103,6 +108,6 @@ class GearChainWidget(QtWidgets.QWidget):
 
         self.heightslider.setVisible(show)
         if show:
-            _min, _max = self.gearChain.calculateMinMaxHeight()
-            self.heightslider.changeMinMaxStep(min=_min, max=_max)
+            # _min, _max = self.gearChain.calculateMinMaxHeight()
+            # self.heightslider.changeMinMaxStep(min=_min, max=_max)
             self.heightslider.populate()

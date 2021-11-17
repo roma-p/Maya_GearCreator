@@ -81,10 +81,47 @@ class Rod(mob.MayaObjDescriptor):
         height = point_pos[1]  # TODO: to change if multiple orientation.
         return height
 
+    LEN_MARGIN = 3
+
+    def getMinMaxTop(self):
+        gearList = self.getGears()
+        topHeight = self.getLen(top=True)
+        _max = topHeight + Rod.LEN_MARGIN
+        if not gearList:
+            _min = self.height / 2
+            return _min, _max
+        else:
+            _min = None
+            for g in self.getGears():
+                pos = g.translate[1]
+                # TODO : Depends on orientation. !!!!!!!!!
+                height = pos + g.height / 2
+                if not _min or height > _min:
+                    _min = height
+        return _min, _max
+
+    # INVERTED! so factor in slider shall be negative! probably in setter/getter !!!
+    def getMinMaxBot(self):
+        gearList = self.getGears()
+        botHeight = self.getLen(top=False)
+        _max = botHeight - Rod.LEN_MARGIN
+        if not gearList:
+            _min = self.height / 2
+            return _min, _max
+        else:
+            _min = None
+            for g in self.getGears():
+                pos = g.translate[1]
+                # TODO : Depends on orientation. !!!!!!!!!
+                height = pos - g.height / 2
+                if not _min or height < _min:
+                    _min = height
+        return _min, _max
+
     def changeRadius(self, newRadius):
         # CHECKERS....
         self.radius = newRadius
-        for g in self.gearNetwork.getGearsFromRod(self):
+        for g in self.getGears():
             g.internalRadius = newRadius
 
     def _lockChain_recc(self, rootGear, lock=True):
@@ -92,7 +129,7 @@ class Rod(mob.MayaObjDescriptor):
             True: mob.MayaObjDescriptor.activateParentConstraint,
             False: mob.MayaObjDescriptor.desactivateParentConstraint
         }
-        gears = [g for g in self.gearNetwork.getGearsFromRod(self)
+        gears = [g for g in self.getGears()
                     if g != rootGear]
         for g in gears:
             g.lockTransform(not lock)
@@ -100,3 +137,6 @@ class Rod(mob.MayaObjDescriptor):
         for g in gears:
             new_gears, new_rod = g._find_children(self)
             g._lockChain_recc(*new_gears, lock=lock, rod=new_rod)
+
+    def getGears(self):
+        return self.gearNetwork.getGearsFromRod(self)
