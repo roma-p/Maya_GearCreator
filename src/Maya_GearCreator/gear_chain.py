@@ -127,11 +127,11 @@ class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
             gear = self.gearNetwork.getGearFromRodOnChain(rod, self)
 
             pos = rod.translate[1]  # TODO : Depends on orientation. !!!!!!!!!
-            _rodDelta = rod.height / 2
+            # _rodDelta = rod.height / 2
             _gearDelta = gear.height / 2
 
-            _tmp_min = pos - _rodDelta + _gearDelta
-            _tmp_max = pos + _rodDelta - _gearDelta
+            _tmp_min = rod.getLen(top=False) + _gearDelta
+            _tmp_max = rod.getLen(top=True) - _gearDelta
 
             if not _min or _tmp_min > _min:
                 _min = _tmp_min

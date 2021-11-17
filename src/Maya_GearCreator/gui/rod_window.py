@@ -42,28 +42,47 @@ class RodWidget(QtWidgets.QWidget):
 
         def _getRadius(): return self.rod.radius
         def _setRadius(val): self.rod.changeRadius(val)
+
         self.radiusSlider = base_widgets.EnhancedSlider(
-            "radius", 0, 1, 0.05,
+            "radius",
+            min=0.1,
+            max=self.rod.getMaxRadius(),
+            step=0.05,
             getter=_getRadius,
             setter=_setRadius)
         self.layout.addWidget(self.radiusSlider, 1, 0)
         self.radiusSlider.populate()
 
         def _getTop(): return self.rod.getLen(top=True)
-        def _setTop(val): self.changeLen(val, top=True)
-
+        def _setTop(val): self.rod.changeLen(val, top=True)
         def _getTopMin(): return self.rod.getMinMaxTop()[0] # make two functions....
         def _getTopMax(): return self.rod.getMinMaxTop()[1] # make two functions....
 
+
         # create slider.
+        self.topSlider = base_widgets.EnhancedSlider(
+            "top",
+            min=_getTopMin,
+            max=_getTopMax,
+            step=0.05,
+            getter=_getTop,
+            setter=_setTop)
+        self.layout.addWidget(self.topSlider, 2, 0)
 
         def _getBot(): return - self.rod.getLen(top=False)
-        def _setBot(val): self.changeLen(-val, top=False)
-
+        def _setBot(val): self.rod.changeLen(val, top=False)
         def _getBotMin(): return self.rod.getMinMaxBot()[0] # make two functions.... # PEUT ËTRE INVERSE MIN / MAX.
         def _getBotMax(): return self.rod.getMinMaxBot()[1] # make two functions.... # PEUT ËTRE INVERSE MIN / MAX.
 
         # create other slider.
+        self.botSlider = base_widgets.EnhancedSlider(
+            "bot",
+            min=_getBotMin,
+            max=_getBotMax,
+            step=0.05,
+            getter=_getBot,
+            setter=_setBot)
+        self.layout.addWidget(self.botSlider, 3, 0)
 
         try : self.addGearBtn.clicked.disconnect()
         except Exception: pass

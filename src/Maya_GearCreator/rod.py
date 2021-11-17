@@ -2,9 +2,11 @@ import pymel.core as pm
 import importlib
 
 from Maya_GearCreator.misc import maya_obj_descriptor as mob
+from Maya_GearCreator.misc import helpers
 from Maya_GearCreator import consts
 
 importlib.reload(mob)
+importlib.reload(helpers)
 importlib.reload(consts)
 
 
@@ -28,6 +30,7 @@ class Rod(mob.MayaObjDescriptor):
 
     rodIdx = 0
     DEFAULT_PREFIX = "rod"
+    ROD_GEAR_OFFSET = 0.3
 
     def __init__(
             self, name=None,
@@ -57,17 +60,24 @@ class Rod(mob.MayaObjDescriptor):
 
     def changeLen(self, newHeight, top=True):
         selection_bk = pm.ls(sl=True)
-        pm.select(self.getFacesStr(top))
-        pm.move(0, newHeight, 0, r=True, os=True, wd=True)  # TODO : checks keyswords.
+        # pm.select(self.getFacesStr(top))
+
+        helpers.select(self.name, "vertex", *self.getVtxIdx(top))
+
+        currentHeight = self.getLen(top=top)
+        delta = newHeight - currentHeight
+
+        pm.move(0, delta, 0, r=True, os=True, wd=True)
+        # TODO : checks keyswords.
         pm.select(clear=True)
-        pm.select(selection_bk)  # ??
+        pm.select(selection_bk)
 
     def getFacesStr(self, top=True):
         faces_idx = {
-            True: self.getTopFaces,
-            False: self.getBotFaces
+            True: self.getTopFacesIdx,
+            False: self.getBotFacesIdx
         }[top]()
-        return "{}.f{}".format(self.name, list(faces_idx))
+        return "{}.f[{}:{}]".format(self.name, faces_idx[0], faces_idx[1])
 
     def getTopFacesIdx(self):
         return (self.subdivisionsAxis * 2, self.subdivisionsAxis * 3 - 1)
@@ -75,11 +85,23 @@ class Rod(mob.MayaObjDescriptor):
     def getBotFacesIdx(self):
         return (self.subdivisionsAxis, self.subdivisionsAxis * 2 - 1)
 
+    def getVtxIdx(self, top=True):
+        return {
+            True: ((self.subdivisionsAxis, self.subdivisionsAxis * 2 - 1),),
+            False: ((0, self.subdivisionsAxis - 1),)
+        }[top]
+
+    # TODO : store at init. DO NOT CHANGE UNLESS BEVEL.
     def getLen(self, top=True):
-        faces = pm.ls(self.getFacesStr(top))
-        point_pos = faces[0].getPoints()[0]
-        height = point_pos[1]  # TODO: to change if multiple orientation.
+
+        vtxs = helpers.ls(self.name, "vertex", *self.getVtxIdx(top))
+        # TODO: to change if multiple orientation.
+        height = vtxs[0].getPosition(space="world")[1]
         return height
+
+        # faces = pm.ls(self.getFacesStr(top))
+        # point_pos = faces[0].getPoints()[0]
+        # height = point_pos[1] + self.translate[1]
 
     LEN_MARGIN = 3
 
@@ -123,6 +145,12 @@ class Rod(mob.MayaObjDescriptor):
         self.radius = newRadius
         for g in self.getGears():
             g.internalRadius = newRadius
+
+    def getMaxRadius(self):
+        max = min([g.radius - Rod.ROD_GEAR_OFFSET for g in self.getGears()])
+        if not max:
+            max = 1
+        return max
 
     def _lockChain_recc(self, rootGear, lock=True):
         func = {

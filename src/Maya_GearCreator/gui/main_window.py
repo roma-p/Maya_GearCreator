@@ -1,5 +1,6 @@
 import logging
 import importlib
+import collections
 from functools import partial
 #
 import pymel.core as pm
@@ -15,6 +16,7 @@ from Maya_GearCreator.gui import gear_window
 from Maya_GearCreator.gui import rod_window
 from Maya_GearCreator.gui import gear_networks_window
 from Maya_GearCreator import consts
+from Maya_GearCreator.misc import helpers
 
 importlib.reload(gear_network)
 importlib.reload(base_widgets)
@@ -22,6 +24,7 @@ importlib.reload(gear_window)
 importlib.reload(rod_window)
 importlib.reload(consts)
 importlib.reload(gear_networks_window)
+importlib.reload(helpers)
 
 log = logging.getLogger("GearCreatorUI")
 log.setLevel(logging.DEBUG)
@@ -136,13 +139,12 @@ class GearCreatorUI(QtWidgets.QWidget):
     #  TODO: IF SELECTION IS THE SAME OBJECT, DONT POPULATE....
 
     def selectCallback(*args):
-
         # -- setting original shader for colored gears --
         if args[0].previousGear:
             for n in args[0].previousGear.listNeigbours():
                 n.restorShader()
         selected = pm.selected()
-        if len(selected) == 1:
+        if len(selected) == 1 and helpers.hashable(selected[0]):
             gear = args[0].getGearFromTransform(selected[0])
             # -- if gear selected. --
             if gear:

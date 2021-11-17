@@ -57,3 +57,48 @@ def delTag(obj, tagName):
 def safeAddAttr(obj, attrName, attributeType, keyable=True,):
     if not obj.hasAttr(attrName):
         obj.addAttr(attrName, attributeType=attributeType, keyable=keyable)
+
+
+def hashable(v):
+    """Determine whether `v` can be hashed."""
+    try:
+        hash(v)
+    except TypeError:
+        return False
+    return True
+
+
+def _formatMeshStr(transformName, meshType, *args):
+    meshTypeDict = {
+        "face": "f",
+        "vertex": "vtx",
+        "edge": "e"
+    }
+    str_list = []
+    for arg in args:
+        if type(arg) in (set, list, tuple):
+            str_list.append("{}.{}[{}:{}]".format(
+                transformName, meshTypeDict[meshType],
+                arg[0], arg[1]))
+        elif isinstance(arg, int):
+            str_list.append("{}.{}[{}]".format(
+                transformName, meshTypeDict[meshType], arg))
+    return str_list
+
+
+def ls(transformName, meshType, *args, **kargs):
+    ret = []
+    strs = _formatMeshStr(transformName, meshType, *args)
+    for _tmp in strs:
+        _ret = pm.ls(_tmp, **kargs)
+        if _ret:
+            ret += _ret
+    return ret
+
+
+def select(transformName, meshType, *args, **kargs):
+    _tmp = _formatMeshStr(transformName, meshType, *args)
+    for i in range(len(_tmp)):
+        if i:
+            kargs["add"] = True
+        pm.select(_tmp[i], **kargs)
