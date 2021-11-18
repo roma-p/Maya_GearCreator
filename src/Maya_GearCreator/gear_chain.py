@@ -4,7 +4,7 @@ import logging
 from Maya_GearCreator.gears import gear_basic
 from Maya_GearCreator.gears import gear
 from Maya_GearCreator import consts
-from Maya_GearCreator.misc import helpers
+from Maya_GearCreator.misc import maya_helpers
 from Maya_GearCreator.misc import children_manager
 from Maya_GearCreator.misc import maya_grp_descriptor
 
@@ -13,7 +13,7 @@ importlib.reload(gear)
 importlib.reload(consts)
 importlib.reload(children_manager)
 importlib.reload(maya_grp_descriptor)
-importlib.reload(helpers)
+importlib.reload(maya_helpers)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -38,8 +38,8 @@ class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
 
 #        self.height = 0
 
-        helpers.safeAddAttr(self.group, "tWidth", "float", True)
-        helpers.safeAddAttr(self.group, "height", "float", True)
+        maya_helpers.safeAddAttr(self.group, "tWidth", "float", True)
+        maya_helpers.safeAddAttr(self.group, "height", "float", True)
 
         if tWidth:
             self.tWidth = tWidth

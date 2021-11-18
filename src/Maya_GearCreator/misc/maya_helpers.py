@@ -59,15 +59,6 @@ def safeAddAttr(obj, attrName, attributeType, keyable=True,):
         obj.addAttr(attrName, attributeType=attributeType, keyable=keyable)
 
 
-def hashable(v):
-    """Determine whether `v` can be hashed."""
-    try:
-        hash(v)
-    except TypeError:
-        return False
-    return True
-
-
 def formatMeshStr(transformName, meshType, *args):
     meshTypeDict = {
         "face": "f",

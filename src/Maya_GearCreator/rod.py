@@ -2,11 +2,11 @@ import pymel.core as pm
 import importlib
 
 from Maya_GearCreator.misc import maya_obj_descriptor as mob
-from Maya_GearCreator.misc import helpers
+from Maya_GearCreator.misc import maya_helpers
 from Maya_GearCreator import consts
 
 importlib.reload(mob)
-importlib.reload(helpers)
+importlib.reload(maya_helpers)
 importlib.reload(consts)
 
 
@@ -62,9 +62,9 @@ class Rod(mob.MayaObjDescriptor):
     def setSubdivisionAxis(self, subdivisionsAxis):
         self.subdivisionsAxis = subdivisionsAxis
 
-        self.topVertex = helpers.formatMeshStr(self.name, "vertex",
+        self.topVertex = maya_helpers.formatMeshStr(self.name, "vertex",
                                                *self.getVtxIdx(top=True))
-        self.botVertex = helpers.formatMeshStr(self.name, "vertex",
+        self.botVertex = maya_helpers.formatMeshStr(self.name, "vertex",
                                                *self.getVtxIdx(top=False))
 
     def changeLen(self, newHeight, top=True):
@@ -80,7 +80,7 @@ class Rod(mob.MayaObjDescriptor):
         # selection_bk = pm.ls(sl=True)
         # pm.select(self.getFacesStr(top))
 
-        # helpers.select(self.name, "vertex", *self.getVtxIdx(top))
+        # maya_helpers.select(self.name, "vertex", *self.getVtxIdx(top))
 
         # pm.move(0, delta, 0, r=True, os=True, wd=True)
         # TODO : checks keyswords.
@@ -102,7 +102,7 @@ class Rod(mob.MayaObjDescriptor):
     # TODO : store at init. DO NOT CHANGE UNLESS BEVEL.
     def getLen(self, top=True):
 
-        vtxs = helpers.ls(self.name, "vertex", *self.getVtxIdx(top))
+        vtxs = maya_helpers.ls(self.name, "vertex", *self.getVtxIdx(top))
         # TODO: to change if multiple orientation.
         height = vtxs[0].getPosition(space="world")[1]
         return height

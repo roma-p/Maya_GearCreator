@@ -3,9 +3,9 @@ import collections
 import pymel.core as pm
 import importlib
 
-from Maya_GearCreator.misc import helpers
+from Maya_GearCreator.misc import maya_helpers
 
-importlib.reload(helpers)
+importlib.reload(maya_helpers)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -30,12 +30,12 @@ class ChildrenManager(collections.MutableSet):
 
     def add(self, obj):
 
-        helpers.addTag(obj, self.childrenTag)
+        maya_helpers.addTag(obj, self.childrenTag)
         pm.parent(obj, self.parentObj)
 
     def discard(self, obj):
         if obj in self:
-            helpers.delTag(self.childrenTag)
+            maya_helpers.delTag(self.childrenTag)
             pm.parent(obj, world=True)
 
     # PRIVATE -----------------------------------------------------------------

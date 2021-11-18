@@ -65,18 +65,22 @@ class GearChainWidget(QtWidgets.QWidget):
         self.layout = QtWidgets.QGridLayout(self)
 
         self.modifiableName = base_widgets.ModifiableName("", None)
-        self.layout.addWidget(self.modifiableName, 0, 0, 1, 2)
+        self.layout.addWidget(self.modifiableName, 0, 0, 1, 1)
 
         # TODO : ADD SET SOLO.
         # TODO : chnge slider with EnhancedSlider
 
-        self.slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
-        self.slider.setMinimum(0)
-        self.slider.setMaximum(1)
-        self.slider.valueChanged.connect(
-            lambda value: self.gearChain.changeTWidth(
-                value / self.T_WIDTH_SLIDER_FACTOR))
-        self.layout.addWidget(self.slider, 1, 1)
+        def _getTWidth(): return self.gearChain.tWidth
+        def _setTWidth(val): return self.gearChain.changeTWidth(val)
+
+        self.tWidthSlider = base_widgets.EnhancedSlider(
+            "Teeth Width",
+            min=self.gearChain.calculateMinTWidth,
+            max=self.gearChain.calculateMaxTWidth,
+            step=0.05,
+            getter=_getTWidth,
+            setter=_setTWidth)
+        self.layout.addWidget(self.tWidthSlider, 1, 1, 1, 1)
 
         def _getHeight(): return self.gearChain.height
         def _setHeight(val): self.gearChain.changeHeight(val)
@@ -90,19 +94,14 @@ class GearChainWidget(QtWidgets.QWidget):
             step=0.05,
             getter=_getHeight,
             setter=_setHeight)
-        self.layout.addWidget(self.heightslider, 2, 1)
+        self.layout.addWidget(self.heightslider, 2, 1, 1, 1)
         self.heightslider.setVisible(False)
 
     def populate(self):
         self.modifiableName.set(self.gearChain.name,
                                 self.gearChain.setName)
-        self.slider.setValue(self.gearChain.tWidth
-            * self.T_WIDTH_SLIDER_FACTOR)
-        self.slider.setMinimum(self.gearChain.calculateMinTWidth()
-            * self.T_WIDTH_SLIDER_FACTOR)
-        self.slider.setMaximum(self.gearChain.calculateMaxTWidth()
-            * self.T_WIDTH_SLIDER_FACTOR)
-
+        self.tWidthSlider.populate()
+        self.heightslider.populate()
         if self.gearChain.listRod(): show = True
         else: show = False
 

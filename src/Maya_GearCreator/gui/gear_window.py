@@ -98,7 +98,7 @@ class GearWidget(QtWidgets.QWidget):
         for sectionId in gear.GUI_ATTRIBUTES.keys():
             self.layout.addWidget(
                 GearSubSectionWidget(self.gear, sectionId),
-                i, 0)
+                i, 0, 1, 3)
             i = i + 1
 
         for neighbour in self.gear.listNeigbours():
@@ -106,7 +106,7 @@ class GearWidget(QtWidgets.QWidget):
             neighbour.setTmpShader(sg)
             widget = base_widgets.MoveAlongWidget(self.gear, neighbour,
                                                   colorRGB)
-            self.layout.addWidget(widget, i, 0)
+            self.layout.addWidget(widget, i, 0, 2, 2)
             i = i + 1
 
     def changeRadiusCallback(value, gearWidget=None):
@@ -153,7 +153,7 @@ class GearSubSectionWidget(QtWidgets.QWidget):
     def buildUI(self):
 
         self.layout = QtWidgets.QGridLayout(self)
-        self.layout.addWidget(QtWidgets.QLabel(self.sectionId), 0, 0)
+        self.layout.addWidget(QtWidgets.QLabel(self.sectionId), 0, 0, 2, 3)
 
         i = 1
         for name, data in self.gear.GUI_ATTRIBUTES[self.sectionId].items():
@@ -170,7 +170,7 @@ class GearSubSectionWidget(QtWidgets.QWidget):
                 self.gear, name,
                 min, max, step,
                 numberEditMax)
-            self.layout.addWidget(gearSlider, i, 0)
+            self.layout.addWidget(gearSlider, i, 0, 2, 3)
             self.sliders.append(gearSlider)
             i = i + 1
 

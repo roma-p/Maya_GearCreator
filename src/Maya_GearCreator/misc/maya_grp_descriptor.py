@@ -3,10 +3,10 @@ import importlib
 import pymel.core as pm
 
 
-from Maya_GearCreator.misc import helpers
+from Maya_GearCreator.misc import maya_helpers
 from Maya_GearCreator.misc import children_manager as childrenM
 
-importlib.reload(helpers)
+importlib.reload(maya_helpers)
 importlib.reload(childrenM)
 
 log = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ class MayaGrpDescriptor():
             self.name = str(group)
         else:
             name = name or self.genAutoName()
-            self.group = helpers.createGroup(name, parentObj)
+            self.group = maya_helpers.createGroup(name, parentObj)
             self.name = name
 
     def createGrpChildrenM(self, tag):

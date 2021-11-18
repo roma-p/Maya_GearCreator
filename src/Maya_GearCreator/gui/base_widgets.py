@@ -1,10 +1,15 @@
 import logging
 import numbers
-import types
+import importlib
+
 from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
+from Maya_GearCreator.misc import py_helpers
+
+importlib.reload(py_helpers)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
+
 
 # TODO : BACKUP NAME!
 # IF NAME EMPTY -> cancel
@@ -157,7 +162,7 @@ class EnhancedSlider(QtWidgets.QWidget):
         self.sliderMax = 0
         self.numberEditMax = numberEditMax
 
-        self._calculateData()
+        #self._calculateData()
 
         self.getter = getter
         self.setter = setter
@@ -182,21 +187,28 @@ class EnhancedSlider(QtWidgets.QWidget):
 
     def populate(self):
         currentVal = self.getter()
-        self.val_bk = currentVal
-        self.numberEdit.setText(self._convToNumberEdit(currentVal))
-
         self._calculateData()
-
         self.slider.setMinimum(self.sliderMin)
         self.slider.setMaximum(self.sliderMax)
 
+        self.val_bk = currentVal
+        self.numberEdit.setText(self._convToNumberEdit(currentVal))
+
         self.slider.setValue(self._convToSlider(currentVal))
 
-        # but if already connected? 
+        # but if already connected?
+        EnhancedSlider.disconnectSignals(
+            self.numberEdit.returnPressed,
+            self.slider.valueChanged)
         self.numberEdit.returnPressed.connect(
             lambda: self._callback_numberEdit())
         self.slider.valueChanged.connect(
             lambda value: self._callback_slider(value))
+
+    def delete(self):  # TODO: why not __del__
+        self.setParent(None)
+        self.setVisible(False)
+        self.deleteLater()
 
     # Handling min max that can be either be number of func to calculate it.
     # *************************************************************************
@@ -222,7 +234,7 @@ class EnhancedSlider(QtWidgets.QWidget):
                 "max": max}.items():
             if argValue is None:
                 pass
-            elif isinstance(argValue, types.FunctionType):
+            elif py_helpers.isFuncOrMethod(argValue):
                 setattr(self,
                         EnhancedSlider._getMinMaxFuncName(argName),
                         argValue)
@@ -241,6 +253,11 @@ class EnhancedSlider(QtWidgets.QWidget):
             func = self._getMinMaxFunc(arg)
             if func:
                 setattr(self, arg, func())
+
+    def disconnectSignals(*signals):
+        for sig in signals:
+            try : sig.disconnect()
+            except Exception: pass
 
     # Actual calculation ******************************************************
     # TODO : BUG HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -285,7 +302,7 @@ class EnhancedSlider(QtWidgets.QWidget):
     # Conversion **************************************************************
 
     def _convToSlider(self, val):
-        return (val - self.min) * self.ratio
+        return (val - self.min) / self.ratio
 
     def _convFromSlider(self, val):
         return round(((val * self.ratio) + self.min), 2)

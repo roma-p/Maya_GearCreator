@@ -43,6 +43,9 @@ class RodWidget(QtWidgets.QWidget):
         def _getRadius(): return self.rod.radius
         def _setRadius(val): self.rod.changeRadius(val)
 
+        for widget in self.findChildren(base_widgets.EnhancedSlider):
+            widget.delete()
+
         self.radiusSlider = base_widgets.EnhancedSlider(
             "radius",
             min=0.1,
@@ -71,8 +74,8 @@ class RodWidget(QtWidgets.QWidget):
 
         def _getBot(): return - self.rod.getLen(top=False)
         def _setBot(val): self.rod.changeLen(val, top=False)
-        def _getBotMin(): return self.rod.getMinMaxBot()[0] # make two functions.... # PEUT ËTRE INVERSE MIN / MAX.
-        def _getBotMax(): return self.rod.getMinMaxBot()[1] # make two functions.... # PEUT ËTRE INVERSE MIN / MAX.
+        def _getBotMin(): return self.rod.getMinMaxBot()[0] # make two functions....
+        def _getBotMax(): return self.rod.getMinMaxBot()[1] # make two functions....
 
         # create other slider.
         self.botSlider = base_widgets.EnhancedSlider(

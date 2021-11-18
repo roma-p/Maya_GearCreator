@@ -20,10 +20,10 @@ if DEBUG_PATH:
 from Maya_GearCreator.gui import main_window
 from Maya_GearCreator import parser
 from Maya_GearCreator import consts
-from Maya_GearCreator.misc import helpers
+from Maya_GearCreator.misc import maya_helpers
 
 importlib.reload(main_window)
-importlib.reload(helpers)
+importlib.reload(maya_helpers)
 importlib.reload(parser)
 importlib.reload(consts)
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     log = logging.getLogger("GearCreator")
     log.setLevel(logging.DEBUG)
 
-    helpers.TAG_CATEGORY = consts.TAG_CATEGORY
+    maya_helpers.TAG_CATEGORY = consts.TAG_CATEGORY
 
     ui = main_window.GearCreatorUI(dock=False)
     ui.addExistingGearNetwork(*parser.parse())

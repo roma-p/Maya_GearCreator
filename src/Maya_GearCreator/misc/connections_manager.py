@@ -3,11 +3,11 @@ import pymel.core as pm
 import importlib
 
 from Maya_GearCreator.misc import maya_obj_descriptor
-from Maya_GearCreator.misc import helpers
+from Maya_GearCreator.misc import maya_helpers
 
 
 importlib.reload(maya_obj_descriptor)
-importlib.reload(helpers)
+importlib.reload(maya_helpers)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -22,7 +22,7 @@ class ConnectionsManager():
         for obj in (objDescriptorA, objDescriptorB):
             constructor = obj.objConstructor
             self.const2Descriptor[constructor] = obj
-            helpers.addTag(constructor, self.connection_name)
+            maya_helpers.addTag(constructor, self.connection_name)
         pm.connectAttr(self._formatConnection(objDescriptorB),
                        self._formatConnection(objDescriptorA))
         return True
@@ -33,7 +33,7 @@ class ConnectionsManager():
         pm.disconnectAttr(self._formatConnection(objDescriptorA),
                           self._formatConnection(objDescriptorB))
         for obj in (objDescriptorA, objDescriptorB):
-            helpers.delTag(obj, self.connection_name)
+            maya_helpers.delTag(obj, self.connection_name)
 
     def isConnected(self, objDescriptorA, objDescriptorB):
         connections = self.listConnections(objDescriptorA)
