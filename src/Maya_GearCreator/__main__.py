@@ -85,6 +85,8 @@ prio list:
 * not used str on transform so can have multiple gears with same name.
 
 
-
+* better if new gears don't collide with other gears....
+easy to do for rode. 
+* On exit: change back colors... maybe on del? 
 
 """

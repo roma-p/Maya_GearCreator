@@ -30,7 +30,6 @@ class Rod(mob.MayaObjDescriptor):
 
     rodIdx = 0
     DEFAULT_PREFIX = "rod"
-    ROD_GEAR_OFFSET = 0.3
 
     def __init__(
             self, name=None,
@@ -156,7 +155,7 @@ class Rod(mob.MayaObjDescriptor):
             g.internalRadius = newRadius
 
     def getMaxRadius(self):
-        max = min([g.radius - Rod.ROD_GEAR_OFFSET for g in self.getGears()])
+        max = min([g.radius - consts.ROD_GEAR_OFFSET for g in self.getGears()])
         print("coucou")
         print(max)
         if max is None:

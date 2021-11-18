@@ -181,11 +181,17 @@ class GearAbstract(mob.MayaObjDescriptor):
         # self.lockChain(*[g for g in self.listNeigbours() if g != self], lock=False)
         self.lockTransform()
 
-    def calculateMoveAlong(self):
-        radius = self.radius + self.gearOffset / 2
-        perimeter = 2 * math.pi * radius
-        return perimeter
+    def calculateMoveAlong(self, rootGear):
+        constraintsCircle = self.getRelatedConstraintCircle(rootGear)
+        return 2 * math.pi * constraintsCircle.radius
+
+        #TODO : radius du circle COnstraint espece de débile.
+        #radius = self.radius + self.gearOffset / 2
+        #perimeter = 2 * math.pi * radius
+        #return perimeter
         # calculate radius + Tlen / 2 -> perimeter: max distance
+
+
 
     def moveAlong_Slider(self, distance):
         newZ = distance - self.currentPos
