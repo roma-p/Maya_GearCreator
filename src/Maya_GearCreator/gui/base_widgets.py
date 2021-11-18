@@ -190,11 +190,6 @@ class EnhancedSlider(QtWidgets.QWidget):
         self.slider.setMinimum(self.sliderMin)
         self.slider.setMaximum(self.sliderMax)
 
-        print("uuuuuuuuuuuuuuuuuuuu")
-        print(currentVal)
-        print(self._convToSlider(currentVal))
-        print("uuuuuuuuuuuuuuuuuuuu")
-
         self.slider.setValue(self._convToSlider(currentVal))
 
         # but if already connected? 

@@ -252,7 +252,6 @@ class Gear():
 
     def moveAlong_Slider(self, distance):
         newZ = distance - self.currentPos
-        print(newZ)
         if distance < self.currentPos:
             newZ = - newZ
         pm.move(self.gearTransform, [0, 0, newZ],
