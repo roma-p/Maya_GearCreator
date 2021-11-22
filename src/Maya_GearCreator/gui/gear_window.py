@@ -40,9 +40,15 @@ class GearWidget(QtWidgets.QWidget):
     def buildUI(self):
         self.layout = QtWidgets.QGridLayout(self)
 
+        self.addGearBtn = QtWidgets.QPushButton("Add Gear")
+        self.layout.addWidget(self.addGearBtn, 0, 0)
+
+        self.addRodBtn = QtWidgets.QPushButton("Add Rod")
+        self.layout.addWidget(self.addRodBtn, 0, 1)
+
         # NAME ----------------------------------------------------------------
-        self.modifiableName = base_widgets.ModifiableName("", None)
-        self.layout.addWidget(self.modifiableName, 0, 0, 1, 2)
+        self.modifiableName = base_widgets.ModifiableName(None, None)
+        self.layout.addWidget(self.modifiableName, 1, 0, 1, 2)
 
         # Resize --------------------------------------------------------------
 
@@ -50,16 +56,10 @@ class GearWidget(QtWidgets.QWidget):
         self.resizeSlider.setMinimum(GearWidget.convertRadiusToSlider(0.5))
         self.resizeSlider.setMaximum(GearWidget.convertRadiusToSlider(15))
 
-        self.layout.addWidget(self.resizeSlider, 1, 0, 1, 2)
+        self.layout.addWidget(self.resizeSlider, 2, 0, 1, 2)
 
         self.resizeMode = QtWidgets.QCheckBox("resize neighbours")
-        self.layout.addWidget(self.resizeMode, 1, 2)
-
-        self.addGearBtn = QtWidgets.QPushButton("Add Gear")
-        self.layout.addWidget(self.addGearBtn, 2, 0)
-
-        self.addRodBtn = QtWidgets.QPushButton("Add Rod")
-        self.layout.addWidget(self.addRodBtn, 2, 1)
+        self.layout.addWidget(self.resizeMode, 2, 2)
 
     def populate(self, gear):
 
@@ -69,7 +69,7 @@ class GearWidget(QtWidgets.QWidget):
 
         self.gear = gear
 
-        self.modifiableName.set(gear.name,
+        self.modifiableName.set(gear.getName,
                                 gear.setName)
 
         try : self.resizeSlider.valueChanged.disconnect()
@@ -106,7 +106,7 @@ class GearWidget(QtWidgets.QWidget):
             neighbour.setTmpShader(sg)
             widget = base_widgets.MoveAlongWidget(self.gear, neighbour,
                                                   colorRGB)
-            self.layout.addWidget(widget, i, 0, 2, 2)
+            self.layout.addWidget(widget, i, 0, 1, 2)
             i = i + 1
 
     def changeRadiusCallback(value, gearWidget=None):

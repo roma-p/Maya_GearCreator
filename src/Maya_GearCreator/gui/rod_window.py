@@ -27,7 +27,7 @@ class RodWidget(QtWidgets.QWidget):
 
     def buildUI(self):
         self.layout = QtWidgets.QGridLayout(self)
-        self.modifiableName = base_widgets.ModifiableName("", None)
+        self.modifiableName = base_widgets.ModifiableName(None, None)
         self.layout.addWidget(self.modifiableName, 0, 0, 1, 2)
 
 
@@ -37,7 +37,7 @@ class RodWidget(QtWidgets.QWidget):
     def populate(self, rod):
 
         self.rod = rod
-        self.modifiableName.set(rod.name,
+        self.modifiableName.set(rod.getName,
                                 rod.setName)
 
         def _getRadius(): return self.rod.radius
@@ -58,8 +58,8 @@ class RodWidget(QtWidgets.QWidget):
 
         def _getTop(): return self.rod.getLen(top=True)
         def _setTop(val): self.rod.changeLen(val, top=True)
-        def _getTopMin(): return self.rod.getMinMaxTop()[0] # make two functions....
-        def _getTopMax(): return self.rod.getMinMaxTop()[1] # make two functions....
+        def _getTopMin(): return self.rod.getMinMaxTop()[0]
+        def _getTopMax(): return self.rod.getMinMaxTop()[1]
 
 
         # create slider.
@@ -74,8 +74,8 @@ class RodWidget(QtWidgets.QWidget):
 
         def _getBot(): return - self.rod.getLen(top=False)
         def _setBot(val): self.rod.changeLen(val, top=False)
-        def _getBotMin(): return self.rod.getMinMaxBot()[0] # make two functions....
-        def _getBotMax(): return self.rod.getMinMaxBot()[1] # make two functions....
+        def _getBotMin(): return self.rod.getMinMaxBot()[0]
+        def _getBotMax(): return self.rod.getMinMaxBot()[1]
 
         # create other slider.
         self.botSlider = base_widgets.EnhancedSlider(

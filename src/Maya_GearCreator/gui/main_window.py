@@ -132,7 +132,7 @@ class GearCreatorUI(QtWidgets.QWidget):
         self.parent().layout().addWidget(self)
         if not dock: parent.show()
 
-        self.previousGear = None
+        self.previousGear = []
 
     def populate(self): pass
     def buildUI(self): pass
@@ -143,20 +143,20 @@ class GearCreatorUI(QtWidgets.QWidget):
     def selectCallback(*args):
         # -- setting original shader for colored gears --
         if args[0].previousGear:
-            for n in args[0].previousGear.listNeigbours():
-                n.restorShader()
+            for g in args[0].previousGear:
+                for n in g.listNeigbours():
+                    n.restorShader()
         selected = pm.selected()
         if len(selected) == 1 and py_helpers.hashable(selected[0]):
             gear = args[0].getGearFromTransform(selected[0])
             # -- if gear selected. --
             if gear:
                 args[0].displayGear(True, gear)
-                args[0].previousGear = gear
+                args[0].previousGear = [gear]
                 return
             rod = args[0].getRodFromTransform(selected[0])
             if rod:
                 args[0].displayRod(True, rod)
-                args[0].previousGear = gear
                 return
         # -- if no gear selected. --
         args[0].displayGN(True)

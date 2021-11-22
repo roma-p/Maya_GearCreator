@@ -18,16 +18,16 @@ if DEBUG_PATH:
     addToPyPath(os.path.dirname(DEBUG_PATH))
 
 from Maya_GearCreator.gui import main_window
+from Maya_GearCreator.gui import main_window_v2
 from Maya_GearCreator import parser
 from Maya_GearCreator import consts
 from Maya_GearCreator.misc import maya_helpers
 
 importlib.reload(main_window)
+importlib.reload(main_window_v2)
 importlib.reload(maya_helpers)
 importlib.reload(parser)
 importlib.reload(consts)
-
-
 
 # def registerPlugin(): pass
 # def unRegisterPlugin(): pass
@@ -42,7 +42,9 @@ if __name__ == "__main__":
 
     maya_helpers.TAG_CATEGORY = consts.TAG_CATEGORY
 
-    ui = main_window.GearCreatorUI(dock=False)
+    # ui = main_window.GearCreatorUI(dock=False)
+    ui = main_window_v2.GearCreatorUI(dock=False)
+    print(parser.parse())
     ui.addExistingGearNetwork(*parser.parse())
 
 """

@@ -1,6 +1,8 @@
 import logging
 import numbers
 import importlib
+import weakref
+from collections import defaultdict
 
 from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
 from Maya_GearCreator.misc import py_helpers
@@ -20,10 +22,12 @@ log.setLevel(logging.DEBUG)
 
 class ModifiableName(QtWidgets.QWidget):
 
-    def __init__(self, name, func):
+    def __init__(self, getter, setter):
         super(ModifiableName, self).__init__()
-        self.name = name
-        self.func = func
+
+        self.getter = getter
+        self.setter = setter
+
         self.buildUI()
         self.populate()
 
@@ -38,40 +42,39 @@ class ModifiableName(QtWidgets.QWidget):
 
         self.nameEdit = QtWidgets.QLineEdit()
         self.layout.addWidget(self.nameEdit, 0, 1)
-        self.nameSave = QtWidgets.QPushButton("Save")
-        self.layout.addWidget(self.nameSave, 0, 3, 0, 1)
-        self.nameSave.clicked.connect(
-            lambda value: self._saveNewName(value))
+        self.nameEdit.returnPressed.connect(self._saveNewName)
 
         self._showEditable(False)
 
     def populate(self):
-        self.nameButton.setText(self.name)
+        if self.getter:
+            txt = self.getter()
+        else:
+            txt = "default"
+        self.nameButton.setText(txt)
 
-    def set(self, name, func):
-        try : self.nameSave.clicked.disconnect()
-        except Exception: pass
+    def set(self, getter, setter):
 
-        self.name = name
-        self.func = func
+        py_helpers.disconnectSignals(self.nameEdit.returnPressed)
+
+        self.setter = setter
+        self.getter = getter
         self.populate()
+        self.nameEdit.returnPressed.connect(self._saveNewName)
 
-        self.nameSave.clicked.connect(self._saveNewName)
-
-    def _saveNewName(self, value):
-        self.name = self.nameEdit.text()
-        self.func(self.name)
-        self.nameButton.setText(self.name)
-        self.nameEdit.setText(self.name)
+    def _saveNewName(self):
+        name = self.nameEdit.text()
+        self.setter(name)
+        self.nameButton.setText(name)
+        self.nameEdit.setText(name)
         self._showEditable(False)
 
     def _editName(self, value):
-        self.nameEdit.setText(self.name)
+        self.nameEdit.setText(self.getter())
         self._showEditable(True)
 
     def _showEditable(self, bool):
         self.nameEdit.setVisible(bool)
-        self.nameSave.setVisible(bool)
         self.nameButton.setVisible(not bool)
 
 class MoveAlongWidget(QtWidgets.QWidget):
@@ -196,10 +199,10 @@ class EnhancedSlider(QtWidgets.QWidget):
 
         self.slider.setValue(self._convToSlider(currentVal))
 
-        # but if already connected?
-        EnhancedSlider.disconnectSignals(
+        py_helpers.disconnectSignals(
             self.numberEdit.returnPressed,
             self.slider.valueChanged)
+
         self.numberEdit.returnPressed.connect(
             lambda: self._callback_numberEdit())
         self.slider.valueChanged.connect(
@@ -326,3 +329,82 @@ class GearSlider(EnhancedSlider):
             min, max, step,
             getter, setter,
             numberEditMax)
+
+class ItemWidget(QtWidgets.QWidget):
+
+    _instancesByType = defaultdict(set)
+
+    def __init__(
+            self,
+            itemType,
+            objDescriptor):
+        super(ItemWidget, self).__init__()
+        self.__class__._instancesByType[itemType].add(weakref.ref(self))
+        self.itemType = itemType
+        self.objDescriptor = objDescriptor
+        self.buildUI()
+        self.populate()
+
+    def buildUI(self):
+
+        self.layout = QtWidgets.QHBoxLayout(self)
+        self.modifiableName = ModifiableName(
+            self.objDescriptor.getName,
+            self.objDescriptor.setName)
+        self.layout.addWidget(self.modifiableName)
+
+        self.visibleBtn = QtWidgets.QCheckBox("visible")
+        self.layout.addWidget(self.visibleBtn)
+
+        self.soloBtn = QtWidgets.QPushButton("solo")
+        self.soloBtn.setCheckable(True)
+        self._connectSolo()
+        self.layout.addWidget(self.soloBtn)
+
+        self.visibleBtn.toggled.connect(self._setObjVisible)
+
+    def populate(self):
+        self.visibleBtn.setChecked(self.objDescriptor.visibility)
+
+    def delete(self):  # TODO: why not __del__
+        self.setParent(None)
+        self.setVisible(False)
+        self.deleteLater()
+
+    def _setSolo(self, visibility):
+
+        if not visibility:
+            self._safeSetVisibility(True)
+            for itemWidget in self._listInstanceByItemType():
+                if itemWidget != self:
+                    itemWidget._safeSetVisibility(False)
+        else:
+            for itemWidget in self._listInstanceByItemType():
+                itemWidget._safeSetVisibility(True)
+
+    def _safeSetVisibility(self, visibility):
+        self.objDescriptor.visibility = visibility
+        py_helpers.disconnectSignals(self.visibleBtn.toggled)
+        self.visibleBtn.setChecked(visibility)
+        self.visibleBtn.toggled.connect(self._setObjVisible)
+
+        if not visibility:
+            self._safedesactivateSolo()
+
+    def _setObjVisible(self, val):
+        if val:
+            for widget in self._listInstanceByItemType():
+                widget._safedesactivateSolo()
+        self.objDescriptor.visibility = val
+
+    def _safedesactivateSolo(self):
+        py_helpers.disconnectSignals(self.soloBtn.toggled)
+        self.soloBtn.setChecked(False)
+        self._connectSolo()
+
+    def _connectSolo(self):
+        self.soloBtn.toggled.connect(
+            lambda val: self._setSolo(not val))
+
+    def _listInstanceByItemType(self):
+        return [r() for r in ItemWidget._instancesByType[self.itemType]]

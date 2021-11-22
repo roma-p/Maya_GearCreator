@@ -85,6 +85,9 @@ class MayaObjDescriptor():
     def setName(self, name):
         self.name = name
 
+    def getName(self):
+        return self.name
+
     # GLOBAL SETTER -----------------------------------------------------------
 
     def setAttr(self, *kargs):

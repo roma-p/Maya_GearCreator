@@ -18,3 +18,9 @@ def isFuncOrMethod(obj):
             types.BuiltinFunctionType,
             types.MethodType,
             types.BuiltinMethodType))
+
+
+def disconnectSignals(*signals):
+    for sig in signals:
+        try : sig.disconnect()
+        except Exception: pass

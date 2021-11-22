@@ -26,7 +26,7 @@ class GearNetworksWidget(QtWidgets.QWidget):
         self.scrollArea = QtWidgets.QScrollArea()
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setWidget(self.scrollWidget)
-        self.layout.addWidget(self.scrollArea, 1, 0, 1, 3)
+        self.layout.addWidget(self.scrollArea, 1, 0, 3, 5)
 
     def populate(self):
         for widget in self.findChildren(gear_network_widget.GearNetworkWidget):

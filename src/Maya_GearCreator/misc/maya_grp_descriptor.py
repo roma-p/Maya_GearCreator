@@ -28,7 +28,7 @@ class MayaGrpDescriptor():
 
         if groupExists:
             self.group = group
-            self.name = str(group)
+            # self.name = str(group)
         else:
             name = name or self.genAutoName()
             self.group = maya_helpers.createGroup(name, parentObj)
@@ -51,6 +51,9 @@ class MayaGrpDescriptor():
     def setName(self, name):
         self.name = name
 
+    def getName(self):
+        return self.name
+
     @property
     def name(self):
         return str(self.group)
@@ -58,3 +61,12 @@ class MayaGrpDescriptor():
     @name.setter
     def name(self, name):
         pm.rename(self.group, name)
+
+# TMP ------------------------------------------------------------------------
+    @property
+    def visibility(self):
+        return self.group.visibility.get()
+
+    @visibility.setter
+    def visibility(self, val):
+        self.group.visibility.set(val)
