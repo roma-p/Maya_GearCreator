@@ -1,5 +1,6 @@
 import types
 
+# PURE PYTHON HELPERS *********************************************************
 
 def hashable(v):
     """Determine whether `v` can be hashed."""
@@ -20,7 +21,19 @@ def isFuncOrMethod(obj):
             types.BuiltinMethodType))
 
 
+# QT HELPERS ******************************************************************
+
 def disconnectSignals(*signals):
     for sig in signals:
-        try : sig.disconnect()
-        except Exception: pass
+        try:
+            sig.disconnect()
+        except Exception:
+            pass
+
+
+def deleteSubWidgetByType(parentWidget, *widgetTypes):
+    for widgetType in widgetTypes:
+        for widget in parentWidget.findChildren(widgetType):
+            widget.setParent(None)
+            widget.setVisible(False)
+            widget.deleteLater()

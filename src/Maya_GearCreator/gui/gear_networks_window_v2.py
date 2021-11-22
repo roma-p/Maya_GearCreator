@@ -1,5 +1,6 @@
 import logging
 import importlib
+import pymel.core as pm
 #
 from Maya_GearCreator.Qt import QtWidgets
 #
@@ -7,11 +8,13 @@ from Maya_GearCreator import consts
 from Maya_GearCreator import gear_network
 from Maya_GearCreator.gui import gear_network_widget
 from Maya_GearCreator.gui import base_widgets
+from Maya_GearCreator.misc import py_helpers
 
 importlib.reload(consts)
 importlib.reload(gear_network)
 importlib.reload(gear_network_widget)
 importlib.reload(base_widgets)
+importlib.reload(py_helpers)
 
 log = logging.getLogger("gearWidget")
 log.setLevel(logging.DEBUG)
@@ -45,8 +48,7 @@ class GearNetworksWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.addNetworkButton, 0, 0, 1, 1)
 
     def populate(self):
-        for widget in self.findChildren(base_widgets.ItemWidget):
-            widget.delete()
+        py_helpers.deleteSubWidgetByType(self, base_widgets.ItemWidget)
         for gn in self.gearNetworks:
             self.scrollLayout.addWidget(
                 base_widgets.ItemWidget("gearNetwork", gn))

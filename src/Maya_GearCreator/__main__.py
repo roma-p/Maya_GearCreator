@@ -44,7 +44,6 @@ if __name__ == "__main__":
 
     # ui = main_window.GearCreatorUI(dock=False)
     ui = main_window_v2.GearCreatorUI(dock=False)
-    print(parser.parse())
     ui.addExistingGearNetwork(*parser.parse())
 
 """

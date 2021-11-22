@@ -7,10 +7,12 @@ from Maya_GearCreator.Qt import QtWidgets
 from Maya_GearCreator.gui import base_widgets
 from Maya_GearCreator.misc import color_shader
 from Maya_GearCreator import consts
+from Maya_GearCreator.misc import py_helpers
 
 importlib.reload(base_widgets)
 importlib.reload(color_shader)
 importlib.reload(consts)
+importlib.reload(py_helpers)
 
 log = logging.getLogger("gearWidget")
 log.setLevel(logging.DEBUG)
@@ -43,8 +45,7 @@ class RodWidget(QtWidgets.QWidget):
         def _getRadius(): return self.rod.radius
         def _setRadius(val): self.rod.changeRadius(val)
 
-        for widget in self.findChildren(base_widgets.EnhancedSlider):
-            widget.delete()
+        py_helpers.deleteSubWidgetByType(self, base_widgets.EnhancedSlider)
 
         self.radiusSlider = base_widgets.EnhancedSlider(
             "radius",

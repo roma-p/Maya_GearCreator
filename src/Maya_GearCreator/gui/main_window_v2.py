@@ -10,25 +10,29 @@ from maya import OpenMaya as om
 from Maya_GearCreator.Qt import QtWidgets
 from Maya_GearCreator import Qt
 #
+from Maya_GearCreator import consts
+from Maya_GearCreator import rod
 from Maya_GearCreator import gear_network
+from Maya_GearCreator.misc import maya_helpers
+from Maya_GearCreator.misc import py_helpers
 from Maya_GearCreator.gui import base_widgets
 from Maya_GearCreator.gui import gear_window
 from Maya_GearCreator.gui import rod_window
 from Maya_GearCreator.gui import gear_networks_window
 from Maya_GearCreator.gui import gear_networks_window_v2
-from Maya_GearCreator import consts
-from Maya_GearCreator.misc import maya_helpers
-from Maya_GearCreator.misc import py_helpers
+from Maya_GearCreator.gui import gear_chains_window_v2
 
+importlib.reload(consts)
+importlib.reload(rod)
 importlib.reload(gear_network)
 importlib.reload(base_widgets)
 importlib.reload(gear_window)
 importlib.reload(rod_window)
-importlib.reload(consts)
 importlib.reload(gear_networks_window)
 importlib.reload(gear_networks_window_v2)
 importlib.reload(maya_helpers)
 importlib.reload(py_helpers)
+importlib.reload(gear_chains_window_v2)
 
 log = logging.getLogger("GearCreatorUI")
 log.setLevel(logging.DEBUG)
@@ -105,14 +109,17 @@ class GearCreatorUI(QtWidgets.QWidget):
             if self.selectionCallbackIdx is not None:
                 om.MMessage.removeCallback(self.selectionCallbackIdx)
                 self.selectionCallbackIdx = None
+            self.restoreShader()
         parent.closeEvent = closeEvent
+        # TODO : backup shader.
 
         self.parent().layout().addWidget(self)
         if not dock:
             parent.show()
 
-        self.gearTorestore = []
+        self.gearToRestore = []
         self.currentItemPage = None
+        self.currentItem = None
 
         self.buildUI()
         self.populate()
@@ -124,17 +131,17 @@ class GearCreatorUI(QtWidgets.QWidget):
 
         self.homeButton = QtWidgets.QPushButton("Home")
         self.layout.addWidget(self.homeButton, 0, 1)
-        self.homeButton.clicked.connect(self.home)
+        self.homeButton.clicked.connect(self.homeClicked)
 
-        self.networkButton = QtWidgets.QPushButton("Gear Network")
-        self.layout.addWidget(self.networkButton, 0, 2)
-        self.networkButton.setVisible(False)
+        self.gearChains = QtWidgets.QPushButton("Gear Chains")
+        self.layout.addWidget(self.gearChains, 0, 2)
+        self.gearChains.setVisible(False)
+        self.gearChains.clicked.connect(self.gearChainsPageClicked)
 
         self.currentItemButton = QtWidgets.QPushButton("caca")
         self.layout.addWidget(self.currentItemButton, 0, 3)
         self.currentItemButton.setVisible(False)
-        self.currentItemButton.clicked.connect(
-            lambda: self.stackedWidget.setCurrentWidget(self.currentItemPage))
+        self.currentItemButton.clicked.connect(self.gearPageClicked)
 
         self.stackedWidget = QtWidgets.QStackedWidget()
         self.layout.addWidget(self.stackedWidget, 1, 0, 1, 3)
@@ -148,6 +155,9 @@ class GearCreatorUI(QtWidgets.QWidget):
         self.rodPage = rod_window.RodWidget()
         self.stackedWidget.addWidget(self.rodPage)
 
+        self.gearChainsPage = gear_chains_window_v2.GearChainsWidget(None)
+        self.stackedWidget.addWidget(self.gearChainsPage)
+
         self.stackedWidget.setCurrentWidget(self.networksPage)
 
     def populate(self):
@@ -158,30 +168,37 @@ class GearCreatorUI(QtWidgets.QWidget):
         self.populate()
 
     def selectCallback(self, *args):
-        if self.gearTorestore:
-            for g in self.gearTorestore:
-                g.restorShader()
 
+        self.restoreShader()
         selected = pm.selected()
         if len(selected) == 1 and py_helpers.hashable(selected[0]):
-            gear = self.getGearFromTransform(selected[0])
-            # -- if gear selected. --
-            if gear:
-                self.gearTorestore += gear.listNeigbours()
-                self.gearItemSelected(gear, "gear")
+            # -- is gear selected? --
+            g = self.getGearFromTransform(selected[0])
+            if g:
+                self.gearItemSelected(g, "gear")
+                self.setGearsToRestore()
                 return
+            # -- is rod selected? --
             r = self.getRodFromTransform(selected[0])
             if r:
                 self.gearItemSelected(r, "rod")
+                self.setGearsToRestore()
                 return
-        # -- if no gear selected. --
+        # -- if neihter gear nor rod selected. --
         self.currentItemPage = None
-        self.home()
+        self.currentItem = None
+        self.homeClicked()
 
     def gearItemSelected(self, objDescriptor, objType):
+        self.currentItem = objDescriptor
         self.currentItemButton.setText(objType)
-        self.networkButton.setVisible(True)
+        self.gearChains.setVisible(True)
         self.currentItemButton.setVisible(True)
+
+        if objType == "gear":
+            self.gearChainsPage.gearNetwork = objDescriptor.gearChain.gearNetwork
+        elif objType == "rod":
+            self.gearChainsPage.gearNetwork = objDescriptor.gearNetwork
         page = {
             "gear": self.gearPage,
             "rod": self.rodPage
@@ -190,11 +207,23 @@ class GearCreatorUI(QtWidgets.QWidget):
         page.populate(objDescriptor)
         self.currentItemPage = page
 
-    def home(self):
+    def homeClicked(self):
+        self.restoreShader()
         if not self.currentItemPage:
-            self.networkButton.setVisible(False)
+            self.gearChains.setVisible(False)
             self.currentItemButton.setVisible(False)
         self.stackedWidget.setCurrentWidget(self.networksPage)
+
+    def gearPageClicked(self):
+        self.restoreShader()
+        self.setGearsToRestore()
+        self.stackedWidget.setCurrentWidget(self.currentItemPage)
+
+    def gearChainsPageClicked(self):
+        self.restoreShader()
+        self.setGearsToRestore(allNetwork=True)
+        self.gearChainsPage.populate()
+        self.stackedWidget.setCurrentWidget(self.gearChainsPage)
 
     def getGearFromTransform(self, objTransform):
         for network in self.networksPage.gearNetworks:
@@ -209,3 +238,22 @@ class GearCreatorUI(QtWidgets.QWidget):
             if rod:
                 return rod
         return None
+
+    def restoreShader(self):
+        if self.gearToRestore:
+            for g in self.gearToRestore:
+                g.restorShader()
+
+    def setGearsToRestore(self, allNetwork=False):
+        if not self.currentItem:
+            return
+        elif isinstance(self.currentItem, rod.Rod):
+            if allNetwork:
+                self.gearToRestore = self.currentItem.gearNetwork.listGears()
+        # else : is gear.
+        else:
+            if allNetwork:
+                gearNetwork = self.currentItem.gearChain.gearNetwork
+                self.gearToRestore = gearNetwork.listGears()
+            else:
+                self.gearToRestore = self.currentItem.listNeigbours()

@@ -124,6 +124,11 @@ class MoveAlongWidget(QtWidgets.QWidget):
         self.previousCursorVal = 0
         self.slider.setValue(0)
 
+        py_helpers.disconnectSignals(
+            self.slider.sliderPressed,
+            self.slider.sliderReleased,
+            self.slider.valueChanged)
+
         self.slider.sliderPressed.connect(
             lambda: self.gearToMove.activateMoveMode(self.gearToMoveAlong))
         self.slider.sliderReleased.connect(

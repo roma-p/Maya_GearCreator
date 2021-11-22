@@ -9,6 +9,7 @@ from Maya_GearCreator.gui import gear_window
 from Maya_GearCreator.gui import rod_window
 from Maya_GearCreator.misc import color_shader
 from Maya_GearCreator import consts
+from Maya_GearCreator.misc import py_helpers
 
 importlib.reload(gear_network)
 importlib.reload(base_widgets)
@@ -16,19 +17,20 @@ importlib.reload(gear_window)
 importlib.reload(rod_window)
 importlib.reload(color_shader)
 importlib.reload(consts)
+importlib.reload(py_helpers)
 
 log = logging.getLogger("GearCreatorUI")
 log.setLevel(logging.DEBUG)
 
 
-class GearNetworkWidget(QtWidgets.QWidget):
+class GearChainsWidget(QtWidgets.QWidget):
 
     def __init__(self, gearNetwork):
-        super(GearNetworkWidget, self).__init__()
+        super(GearChainsWidget, self).__init__()
         self.gearNetwork = gearNetwork
-        self.gearChainDict = {}
+        # self.gearChainDict = {}
         self.buildUI()
-        self.populate()
+        # self.populate()
 
     def buildUI(self):
 
@@ -36,22 +38,29 @@ class GearNetworkWidget(QtWidgets.QWidget):
         self.modifiableName = base_widgets.ModifiableName(None, None)
         self.layout.addWidget(self.modifiableName)
 
+        self.scrollWidget = QtWidgets.QWidget()
+        self.scrollLayout = QtWidgets.QVBoxLayout(self.scrollWidget)
+        self.scrollArea = QtWidgets.QScrollArea()
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setWidget(self.scrollWidget)
+        self.layout.addWidget(self.scrollArea)
+
     def populate(self):
 
-        self.modifiableName.set(self.gearNetwork.getName,
-                                self.gearNetwork.setName)
+        py_helpers.deleteSubWidgetByType(self, GearChainWidget)
+        if self.gearNetwork:
+            for gearChain in self.gearNetwork.chainManager:
+                self.scrollLayout.addWidget(GearChainWidget(gearChain))
+            self.modifiableName.set(self.gearNetwork.getName,
+                                    self.gearNetwork.setName)
 
-        for gearChain in self.gearNetwork.chainManager:
-            if gearChain not in self.gearChainDict.keys():
-                widget = GearChainWidget(gearChain)
-                self.layout.addWidget(widget)
-                self.gearChainDict[gearChain] = widget
-            self.gearChainDict[gearChain].populate()
+        # for gearChain in self.gearNetwork.chainManager:
+        #     if gearChain not in self.gearChainDict.keys():
+        #         widget = GearChainWidget(gearChain)
+        #         self.layout.addWidget(widget)
+        #         self.gearChainDict[gearChain] = widget
+        #     self.gearChainDict[gearChain].populate()
 
-    def delete(self):  # TODO: why not __del__
-        self.setParent(None)
-        self.setVisible(False)
-        self.deleteLater()
 
 class GearChainWidget(QtWidgets.QWidget):
 
@@ -79,7 +88,6 @@ class GearChainWidget(QtWidgets.QWidget):
         # self.layout.addWidget(self.modifiableName, 0, 1, 1, 2)
         self.layout.addWidget(self.gearChainName, 0, 1, 1, 2)
 
-        # TODO : ADD SET SOLO.
         # TODO : chnge slider with EnhancedSlider
 
         def _getTWidth(): return self.gearChain.tWidth
@@ -121,8 +129,8 @@ class GearChainWidget(QtWidgets.QWidget):
         pixmap = QtGui.QPixmap(15, 15)
         pixmap.fill(QtGui.QColor(*colorRGB))
         self.btNew.setIcon(QtGui.QIcon(pixmap))
-        #for g in self.gearChain.gearList:
-        #    g.setTmpShader(sg)
+        for g in self.gearChain.gearList:
+            g.setTmpShader(sg)
 
         self.heightslider.setVisible(show)
         if show:
