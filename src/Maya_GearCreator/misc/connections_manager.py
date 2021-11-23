@@ -20,9 +20,9 @@ class ConnectionsManager():
 
     def connect(self, objDescriptorA, objDescriptorB):
         for obj in (objDescriptorA, objDescriptorB):
-            constructor = obj.objConstructor
-            self.const2Descriptor[constructor] = obj
-            maya_helpers.addTag(constructor, self.connection_name)
+            transform = obj.objTransform
+            self.const2Descriptor[transform] = obj
+            maya_helpers.addTag(transform, self.connection_name)
         pm.connectAttr(self._formatConnection(objDescriptorB),
                        self._formatConnection(objDescriptorA))
         return True
@@ -47,11 +47,11 @@ class ConnectionsManager():
         return [self.const2Descriptor[c] for c in connected_constr]
 
     def _formatConnection(self, objDescriptor):
-        return "{}.{}".format(str(objDescriptor.objConstructor),
+        return "{}.{}".format(str(objDescriptor.objTransform),
                               self.connection_name)
 
     def _checkHasTag(self, objDescriptor):
-        return objDescriptor.objConstructor.hasAttr(self.connection_name)
+        return objDescriptor.objTransform.hasAttr(self.connection_name)
 
     def hasConnection(self, objDescriptor):
         if self.listConnections(objDescriptor):
@@ -59,18 +59,18 @@ class ConnectionsManager():
         else:
             return False
 
-    def _hasConstructorConnection(self, constructor):
-        if not constructor.hasAttr(self.connection_name):
+    def _hasConstructorConnection(self, transform):
+        if not transform.hasAttr(self.connection_name):
             return False
         connectionList = pm.listConnections("{}.{}".format(
-            str(constructor), self.connection_name))
+            str(transform), self.connection_name))
         return bool(connectionList)
 
-    def getDescriptor(self, constructor):
-        if constructor in self.const2Descriptor:
-            return self.const2Descriptor[constructor]
+    def getDescriptor(self, transform):
+        if transform in self.const2Descriptor:
+            return self.const2Descriptor[transform]
 
     def parse(self, *objDescriptors):
         for objDescr in objDescriptors:
-            if self._hasConstructorConnection(objDescr.objConstructor):
-                self.const2Descriptor[objDescr.objConstructor] = objDescr
+            if self._hasConstructorConnection(objDescr.objTransform):
+                self.const2Descriptor[objDescr.objTransform] = objDescr
