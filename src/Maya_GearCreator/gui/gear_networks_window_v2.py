@@ -48,7 +48,7 @@ class GearNetworksWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.addNetworkButton, 0, 0, 1, 1)
 
     def populate(self):
-        py_helpers.deleteSubWidgetByType(self, base_widgets.ItemWidget)
+        base_widgets.ItemWidget.cleanByType("gearNetwork")
         for gn in self.gearNetworks:
             self.scrollLayout.addWidget(
                 base_widgets.ItemWidget("gearNetwork", gn))

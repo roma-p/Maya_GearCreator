@@ -34,7 +34,7 @@ class GearChainsWidget(QtWidgets.QWidget):
 
     def buildUI(self):
 
-        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout = QtWidgets.QGridLayout(self)
         self.modifiableName = base_widgets.ModifiableName(None, None)
         self.layout.addWidget(self.modifiableName)
 
@@ -46,7 +46,7 @@ class GearChainsWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.scrollArea)
 
     def populate(self):
-
+        base_widgets.ItemWidget.cleanByType("gearChain")
         py_helpers.deleteSubWidgetByType(self, GearChainWidget)
         if self.gearNetwork:
             for gearChain in self.gearNetwork.chainManager:
@@ -120,6 +120,7 @@ class GearChainWidget(QtWidgets.QWidget):
     def populate(self):
         # self.modifiableName.set(self.gearChain.getName,
         #                         self.gearChain.setName)
+
         self.tWidthSlider.populate()
         self.heightslider.populate()
         if self.gearChain.listRod(): show = True

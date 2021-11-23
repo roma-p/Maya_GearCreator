@@ -29,12 +29,14 @@ class RodWidget(QtWidgets.QWidget):
 
     def buildUI(self):
         self.layout = QtWidgets.QGridLayout(self)
-        self.modifiableName = base_widgets.ModifiableName(None, None)
-        self.layout.addWidget(self.modifiableName, 0, 0, 1, 2)
-
 
         self.addGearBtn = QtWidgets.QPushButton("Add Gear")
-        self.layout.addWidget(self.addGearBtn, 4, 0)
+        self.layout.addWidget(self.addGearBtn, 0, 0, 1, 1)
+
+        self.modifiableName = base_widgets.ModifiableName(None, None)
+        self.layout.addWidget(self.modifiableName, 1, 0, 1, 2)
+
+
 
     def populate(self, rod):
 
@@ -54,7 +56,7 @@ class RodWidget(QtWidgets.QWidget):
             step=0.005,
             getter=_getRadius,
             setter=_setRadius)
-        self.layout.addWidget(self.radiusSlider, 1, 0)
+        self.layout.addWidget(self.radiusSlider, 2, 0)
         self.radiusSlider.populate()
 
         def _getTop(): return self.rod.getLen(top=True)
@@ -71,7 +73,7 @@ class RodWidget(QtWidgets.QWidget):
             step=0.05,
             getter=_getTop,
             setter=_setTop)
-        self.layout.addWidget(self.topSlider, 2, 0)
+        self.layout.addWidget(self.topSlider, 3, 0)
 
         def _getBot(): return - self.rod.getLen(top=False)
         def _setBot(val): self.rod.changeLen(val, top=False)
@@ -86,7 +88,7 @@ class RodWidget(QtWidgets.QWidget):
             step=0.05,
             getter=_getBot,
             setter=_setBot)
-        self.layout.addWidget(self.botSlider, 3, 0)
+        self.layout.addWidget(self.botSlider, 4, 0)
 
         try : self.addGearBtn.clicked.disconnect()
         except Exception: pass

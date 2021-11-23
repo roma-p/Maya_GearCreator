@@ -1,7 +1,6 @@
 import logging
 import numbers
 import importlib
-import weakref
 from collections import defaultdict
 
 from Maya_GearCreator.Qt import QtWidgets, QtCore, QtGui
@@ -17,8 +16,6 @@ log.setLevel(logging.DEBUG)
 # IF NAME EMPTY -> cancel
 # IF TRANSFORM WITH THIS NAME ALREADY EXISTS SAME.
 # HOOVER.
-
-# TODO ! RATHER THAN SAvE BUTTON : ENTER SIGNAL !!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 class ModifiableName(QtWidgets.QWidget):
 
@@ -94,11 +91,6 @@ class MoveAlongWidget(QtWidgets.QWidget):
 
         self.buildUI()
         self.populate()
-
-    def delete(self):  # TODO: why not __del__
-        self.setParent(None)
-        self.setVisible(False)
-        self.deleteLater()
 
     def buildUI(self):
         layout = QtWidgets.QHBoxLayout(self)
@@ -212,11 +204,6 @@ class EnhancedSlider(QtWidgets.QWidget):
             lambda: self._callback_numberEdit())
         self.slider.valueChanged.connect(
             lambda value: self._callback_slider(value))
-
-    def delete(self):  # TODO: why not __del__
-        self.setParent(None)
-        self.setVisible(False)
-        self.deleteLater()
 
     # Handling min max that can be either be number of func to calculate it.
     # *************************************************************************
@@ -344,7 +331,7 @@ class ItemWidget(QtWidgets.QWidget):
             itemType,
             objDescriptor):
         super(ItemWidget, self).__init__()
-        self.__class__._instancesByType[itemType].add(weakref.ref(self))
+        self.__class__._instancesByType[itemType].add(self)
         self.itemType = itemType
         self.objDescriptor = objDescriptor
         self.buildUI()
@@ -370,11 +357,6 @@ class ItemWidget(QtWidgets.QWidget):
 
     def populate(self):
         self.visibleBtn.setChecked(self.objDescriptor.visibility)
-
-    def delete(self):  # TODO: why not __del__
-        self.setParent(None)
-        self.setVisible(False)
-        self.deleteLater()
 
     def _setSolo(self, visibility):
 
@@ -408,8 +390,21 @@ class ItemWidget(QtWidgets.QWidget):
         self._connectSolo()
 
     def _connectSolo(self):
-        self.soloBtn.toggled.connect(
-            lambda val: self._setSolo(not val))
+        try:
+            self.soloBtn.toggled.connect(
+                lambda val: self._setSolo(not val))
+        except Exception:
+            pass
+
+    def listInstanceByItemType(itemType):
+        return ItemWidget._instancesByType[itemType]
 
     def _listInstanceByItemType(self):
-        return [r() for r in ItemWidget._instancesByType[self.itemType]]
+        return ItemWidget.listInstanceByItemType(self.itemType)
+
+    def cleanByType(itemType):
+        for instance in ItemWidget._instancesByType[itemType]:
+            instance.setParent(None)
+            instance.setVisible(False)
+            instance.deleteLater()
+        ItemWidget._instancesByType[itemType] = set()
