@@ -10,23 +10,27 @@ from maya import OpenMaya as om
 from Maya_GearCreator.Qt import QtWidgets
 from Maya_GearCreator import Qt
 #
+from Maya_GearCreator import consts
+from Maya_GearCreator import rod
 from Maya_GearCreator import gear_network
+from Maya_GearCreator.misc import maya_helpers
+from Maya_GearCreator.misc import py_helpers
 from Maya_GearCreator.gui import base_widgets
 from Maya_GearCreator.gui import gear_window
 from Maya_GearCreator.gui import rod_window
 from Maya_GearCreator.gui import gear_networks_window
-from Maya_GearCreator import consts
-from Maya_GearCreator.misc import maya_helpers
-from Maya_GearCreator.misc import py_helpers
+from Maya_GearCreator.gui import gear_chains_window
 
+importlib.reload(consts)
+importlib.reload(rod)
 importlib.reload(gear_network)
 importlib.reload(base_widgets)
 importlib.reload(gear_window)
 importlib.reload(rod_window)
-importlib.reload(consts)
 importlib.reload(gear_networks_window)
 importlib.reload(maya_helpers)
 importlib.reload(py_helpers)
+importlib.reload(gear_chains_window)
 
 log = logging.getLogger("GearCreatorUI")
 log.setLevel(logging.DEBUG)
@@ -71,6 +75,7 @@ def deleteDock(name="GearCreatorDock"):
     if pm.workspaceControl(name, query=True, exists=True):
         pm.deleteUI(name)
 
+
 # MAIN UI ---------------------------------------------------------------------
 
 class GearCreatorUI(QtWidgets.QWidget):
@@ -91,128 +96,162 @@ class GearCreatorUI(QtWidgets.QWidget):
             parent.setWindowTitle("Gear Creator")
             layout = QtWidgets.QVBoxLayout(parent)  #???, useless?
 
-            self.selectionCallbackIdx = om.MEventMessage.addEventCallback(
-                "SelectionChanged",
-                partial(GearCreatorUI.selectCallback, self))
-
-            def closeEvent(QWidget):
-                if self.selectionCallbackIdx is not None:
-                    om.MMessage.removeCallback(self.selectionCallbackIdx)
-                    self.selectionCallbackIdx = None
-            parent.closeEvent = closeEvent
-
         super(GearCreatorUI, self).__init__(parent)
 
         self.layout = QtWidgets.QGridLayout(self)
 
-        self.newGearNetwork = QtWidgets.QPushButton("new gear network")
-        self.layout.addWidget(self.newGearNetwork, 0, 0)
-        self.newGearNetwork.clicked.connect(
-            partial(GearCreatorUI.addGearNetwork, self))
+        self.selectionCallbackIdx = om.MEventMessage.addEventCallback(
+            "SelectionChanged", self.selectCallback)
 
-        # hidden gear widget.
-        self.gearWidget = gear_window.GearWidget()
-        self.layout.addWidget(self.gearWidget, 1, 0)
-        self.gearWidget.setVisible(False)
+        def closeEvent(QWidget):
+            if self.selectionCallbackIdx is not None:
+                om.MMessage.removeCallback(self.selectionCallbackIdx)
+                self.selectionCallbackIdx = None
+            self.restoreShader()
+        parent.closeEvent = closeEvent
+        # TODO : backup shader.
 
-        # hidden rod widget
-        self.rodWidget = rod_window.RodWidget()
-        self.layout.addWidget(self.rodWidget, 1, 0)
-        self.rodWidget.setVisible(False)
+        self.parent().layout().addWidget(self)
+        if not dock:
+            parent.show()
 
-        # visible (default) rod gearNetworksWidget
-        self.gearNetworksWidget = gear_networks_window.GearNetworksWidget()
-        self.layout.addWidget(self.gearNetworksWidget, 1, 0)
-        self.gearNetworksWidget.setVisible(True)
-
-        self.gearNetworkList = []
+        self.gearToRestore = []
+        self.currentItemPage = None
+        self.currentItem = None
 
         self.buildUI()
         self.populate()
-        self.parent().layout().addWidget(self)
-        if not dock: parent.show()
 
-        self.previousGear = []
+    def buildUI(self):
 
-    def populate(self): pass
-    def buildUI(self): pass
+        pluginLabel = QtWidgets.QLabel("Gear Creator V1")
+        self.layout.addWidget(pluginLabel, 0, 0)
 
-    #  TODO : LIST ALL TRANSFORM IN A SINGLE TABLE TO BE FASTER?
-    #  TODO: IF SELECTION IS THE SAME OBJECT, DONT POPULATE....
+        self.homeButton = QtWidgets.QPushButton("Home")
+        self.layout.addWidget(self.homeButton, 0, 1)
+        self.homeButton.clicked.connect(self.homeClicked)
 
-    def selectCallback(*args):
-        # -- setting original shader for colored gears --
-        if args[0].previousGear:
-            for g in args[0].previousGear:
-                for n in g.listNeigbours():
-                    n.restorShader()
+        self.gearChains = QtWidgets.QPushButton("Gear Chains")
+        self.layout.addWidget(self.gearChains, 0, 2)
+        self.gearChains.setVisible(False)
+        self.gearChains.clicked.connect(self.gearChainsPageClicked)
+
+        self.currentItemButton = QtWidgets.QPushButton("caca")
+        self.layout.addWidget(self.currentItemButton, 0, 3)
+        self.currentItemButton.setVisible(False)
+        self.currentItemButton.clicked.connect(self.gearPageClicked)
+
+        self.stackedWidget = QtWidgets.QStackedWidget()
+        self.layout.addWidget(self.stackedWidget, 1, 0, 1, 3)
+
+        self.networksPage = gear_networks_window.GearNetworksWidget()
+        self.stackedWidget.addWidget(self.networksPage)
+
+        self.gearPage = gear_window.GearWidget()
+        self.stackedWidget.addWidget(self.gearPage)
+
+        self.rodPage = rod_window.RodWidget()
+        self.stackedWidget.addWidget(self.rodPage)
+
+        self.gearChainsPage = gear_chains_window_v2.GearChainsWidget(None)
+        self.stackedWidget.addWidget(self.gearChainsPage)
+
+        self.stackedWidget.setCurrentWidget(self.networksPage)
+
+    def populate(self):
+        self.networksPage.populate()
+
+    def addExistingGearNetwork(self, *gearNetworks):
+        self.networksPage.addGearNetworks(*gearNetworks)
+        self.populate()
+
+    def selectCallback(self, *args):
+
+        self.restoreShader()
         selected = pm.selected()
         if len(selected) == 1 and py_helpers.hashable(selected[0]):
-            gear = args[0].getGearFromTransform(selected[0])
-            # -- if gear selected. --
-            if gear:
-                args[0].displayGear(True, gear)
-                args[0].previousGear = [gear]
+            # -- is gear selected? --
+            g = self.getGearFromTransform(selected[0])
+            if g:
+                self.gearItemSelected(g, "gear")
+                self.setGearsToRestore()
                 return
-            rod = args[0].getRodFromTransform(selected[0])
-            if rod:
-                args[0].displayRod(True, rod)
+            # -- is rod selected? --
+            r = self.getRodFromTransform(selected[0])
+            if r:
+                self.gearItemSelected(r, "rod")
+                self.setGearsToRestore()
                 return
-        # -- if no gear selected. --
-        args[0].displayGN(True)
+        # -- if neihter gear nor rod selected. --
+        self.currentItemPage = None
+        self.currentItem = None
+        self.homeClicked()
+
+    def gearItemSelected(self, objDescriptor, objType):
+        self.currentItem = objDescriptor
+        self.currentItemButton.setText(objType)
+        self.gearChains.setVisible(True)
+        self.currentItemButton.setVisible(True)
+
+        if objType == "gear":
+            self.gearChainsPage.gearNetwork = objDescriptor.gearChain.gearNetwork
+        elif objType == "rod":
+            self.gearChainsPage.gearNetwork = objDescriptor.gearNetwork
+        page = {
+            "gear": self.gearPage,
+            "rod": self.rodPage
+        }[objType]
+        self.stackedWidget.setCurrentWidget(page)
+        page.populate(objDescriptor)
+        self.currentItemPage = page
+
+    def homeClicked(self):
+        self.restoreShader()
+        if not self.currentItemPage:
+            self.gearChains.setVisible(False)
+            self.currentItemButton.setVisible(False)
+        self.stackedWidget.setCurrentWidget(self.networksPage)
+
+    def gearPageClicked(self):
+        self.restoreShader()
+        self.setGearsToRestore()
+        self.stackedWidget.setCurrentWidget(self.currentItemPage)
+
+    def gearChainsPageClicked(self):
+        self.restoreShader()
+        self.setGearsToRestore(allNetwork=True)
+        self.gearChainsPage.populate()
+        self.stackedWidget.setCurrentWidget(self.gearChainsPage)
 
     def getGearFromTransform(self, objTransform):
-        for network in self.gearNetworkList:
+        for network in self.networksPage.gearNetworks:
             gear = network.getGearFromTransform(objTransform)
             if gear:
                 return gear
         return None
 
     def getRodFromTransform(self, objTransform):
-        for network in self.gearNetworkList:
+        for network in self.networksPage.gearNetworks:
             rod = network.getRodFromTransform(objTransform)
             if rod:
                 return rod
         return None
 
-    def displayGear(self, bool, gear=None):
-        if bool:
-            self.gearWidget.populate(gear)
-        self.gearWidget.setVisible(bool)
-        self.gearNetworksWidget.setVisible(not bool)
-        self.rodWidget.setVisible(not bool)
+    def restoreShader(self):
+        if self.gearToRestore:
+            for g in self.gearToRestore:
+                g.restorShader()
 
-    def displayRod(self, bool, rod=None):
-        if bool:
-            self.rodWidget.populate(rod)
-        self.rodWidget.setVisible(bool)
-        self.gearNetworksWidget.setVisible(not bool)
-        self.gearWidget.setVisible(not bool)
-
-    def displayGN(self, bool):
-        if bool:
-            self.gearNetworksWidget.populate()
-        self.rodWidget.setVisible(not bool)
-        self.gearWidget.setVisible(not bool)
-        self.gearNetworksWidget.setVisible(bool)
-
-    def addGearNetwork(*args):
-        gearNetwork = gear_network.GearNetwork()
-        gearChain = gearNetwork.addChain()
-
-        gear = gearNetwork.addGear(
-            gearChain,
-            radius=consts.DEFAULT_RADIUS,
-            gearOffset=consts.DEFAULT_GEAR_OFFESET,
-            linkedGear=None)
-
-        args[0].gearNetworksWidget.addGearNetwork(gearNetwork)
-        args[0].gearNetworkList.append(gearNetwork)
-
-        pm.select(clear=True)
-        pm.select(gear.objTransform)
-
-    def addExistingGearNetwork(self, *gearNetworks):
-        for gearNetwork in gearNetworks:
-            self.gearNetworksWidget.addGearNetwork(gearNetwork)
-            self.gearNetworkList.append(gearNetwork)
+    def setGearsToRestore(self, allNetwork=False):
+        if not self.currentItem:
+            return
+        elif isinstance(self.currentItem, rod.Rod):
+            if allNetwork:
+                self.gearToRestore = self.currentItem.gearNetwork.listGears()
+        # else : is gear.
+        else:
+            if allNetwork:
+                gearNetwork = self.currentItem.gearChain.gearNetwork
+                self.gearToRestore = gearNetwork.listGears()
+            else:
+                self.gearToRestore = self.currentItem.listNeigbours()
