@@ -73,7 +73,7 @@ class GearWidget(QtWidgets.QWidget):
         try : self.resizeSlider.valueChanged.disconnect()
         except Exception: pass
         sliderVal = GearWidget.convertRadiusToSlider(
-            self.gear.radius)
+            self.gear.gear.radius)
         self.resizeSlider.setValue(sliderVal)
         self.resizeMode.setChecked(False)
 

@@ -107,7 +107,7 @@ class MoveAlongWidget(QtWidgets.QWidget):
 
     def populate(self):
 
-        stepNumber = self.gearToMoveAlong.sides
+        stepNumber = self.gearToMoveAlong.gear.sides
         max_distance = self.gearToMove.calculateMoveAlong(self.gearToMoveAlong)
         # FIXME! NO REASON FOR THAT *2
         self.ratio = max_distance / stepNumber
@@ -313,8 +313,8 @@ class GearSlider(EnhancedSlider):
             min, max, step,
             numberEditMax=None):
 
-        def getter(): return getattr(gear, attributeName)
-        def setter(value): setattr(gear, attributeName, value)
+        def getter(): return getattr(gear.gear, attributeName)
+        def setter(value): setattr(gear.gear, attributeName, value)
 
         super(GearSlider, self).__init__(
             attributeName,

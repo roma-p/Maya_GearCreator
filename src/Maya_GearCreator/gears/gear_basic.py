@@ -40,25 +40,28 @@ class GearBasic(gear_abstract.GearAbstract):
             gearChain=None,
             linkedRod=None,
             gearExists=False,
-            gearData=None):
+            gearTransform=None):
 
-        if gearExists:
-            gear_transform, gear_construct = gearData
+        if not gearExists:
+            gearTransform, gearConstruct = GearBasic.instantiateGear()
         else:
-            gear_transform, gear_construct = GearBasic.instantiateGear()
+            gearConstruct = None
 
         super().__init__(
-            gear_transform, gear_construct,
+            gearTransform, gearConstruct,
             name, radius,
             tWidth, gearOffset,
             linkedGear, gearChain,
             linkedRod,
-            _class=GearBasic)
+            _class=GearBasic,
+            objExists=gearExists)
 
     def changeRadius(self, radius, resizeNeighbour=False):
         adjustedRadius = self.calculateAdjustedRadius(radius)
-        self.radius = adjustedRadius
-        self.sides = GearBasic.calculateTNumber(self.tWidth, adjustedRadius)
+        self.gear.radius = adjustedRadius
+        self.gear.sides = GearBasic.calculateTNumber(
+            self.tWidth,
+            adjustedRadius)
 
         if resizeNeighbour:
             pass

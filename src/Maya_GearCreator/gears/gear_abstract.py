@@ -31,7 +31,7 @@ def transform(f):
         return ret
     return wrapper
 
-class GearAbstract(mob.MayaObjDescriptor):
+class GearAbstract(mob2.MayaObjDescriptor):
 
     gearIdx = 0
     DEFAULT_PREFIX = "gear"
@@ -44,7 +44,7 @@ class GearAbstract(mob.MayaObjDescriptor):
     def __init__(
             self,
             gear_shape,
-            gear_construct,
+            gear_construct=None,
             name=None,
             radius=consts.DEFAULT_RADIUS,
             tWidth=consts.DEFAULT_TWIDTH,
@@ -52,22 +52,35 @@ class GearAbstract(mob.MayaObjDescriptor):
             linkedGear=None,
             gearChain=None,
             linkedRod=None,
-            _class=None):
+            _class=None,
+            objExists=False):
 
         _class = _class or GearAbstract
 
         super().__init__(
-            gear_shape,
-            gear_construct,
-            _class,
-            name)
+            objTransform=gear_shape,
+            name=name,
+            _class=_class,
+            objExists=objExists)
+
+        if not objExists:
+            self.addInput(gear_construct, "gear")
+
+        # TODO : NOT objExists????
+
+        # super().__init__(
+        #     gear_shape,
+        #     gear_construct,
+        #     _class,
+        #     name)
 
         self.shader_bk = None
 
         # ADJUSTING SHAPE -----------------------------------------------------
-        self.radius = radius - gearOffset
-        self.gearOffset = gearOffset
-        self.sides = GearAbstract.calculateTNumber(tWidth, self.radius)
+        self.gear.radius = radius - gearOffset
+        self.gear.gearOffset = gearOffset
+        self.gear.sides = GearAbstract.calculateTNumber(tWidth,
+                                                        self.gear.radius)
 
         # HANDLNING NEIGHBOURS ------------------------------------------------
         self.circleConstraints = []
@@ -116,12 +129,12 @@ class GearAbstract(mob.MayaObjDescriptor):
     # CALCULATION -------------------------------------------------------------
 
     def calculateConstraintRadius(parentGear, childGear):
-        return parentGear.radius + (parentGear.gearOffset / 2) \
-            + childGear.radius + (childGear.gearOffset / 2)
+        return parentGear.gear.radius + (parentGear.gear.gearOffset / 2) \
+            + childGear.gear.radius + (childGear.gear.gearOffset / 2)
 
     def calculateAdjustedRadius(self, radius):
-        radius = radius or self.radius
-        return radius - self.gearOffset
+        radius = radius or self.gear.radius
+        return radius - self.gear.gearOffset
 
     def calculateTNumber(tWidth, radius):
         tNumber = int(radius * math.pi / tWidth)
@@ -156,7 +169,8 @@ class GearAbstract(mob.MayaObjDescriptor):
     # MODIFY ------------------------------------------------------------------
 
     def changeTWidth(self, tWidth):
-        self.sides = GearAbstract.calculateTNumber(tWidth, self.radius)
+        self.gear.sides = GearAbstract.calculateTNumber(tWidth,
+                                                        self.gear.radius)
 
     def changeRadius(self, radius):
         raise NotImplementedError()
@@ -219,7 +233,7 @@ class GearAbstract(mob.MayaObjDescriptor):
         # TODO : checks.
         r = self.gearChain.gearNetwork.getRodFromGear(self)
         if not r:
-            self.internalRadius = newRadius
+            self.gear.internalRadius = newRadius
         else:
             r.changeRadius(newRadius)
 

@@ -107,7 +107,7 @@ class GearNetwork(maya_grp_descriptor.MayaGrpDescriptor):
         if not self.hasRod(gear):
             r = rod.Rod(
                 linkedGear=gear,
-                radius=gear.internalRadius,
+                radius=gear.gear.internalRadius,
                 gearNetwork=self)
             self.connectRod(r, gear)
             self.rodChildrenManager.add(r)

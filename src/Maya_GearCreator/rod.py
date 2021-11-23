@@ -132,7 +132,7 @@ class Rod(mob.MayaObjDescriptor):
             for g in self.getGears():
                 pos = g.translate[1]
                 # TODO : Depends on orientation. !!!!!!!!!
-                height = pos + g.height / 2
+                height = pos + g.gear.height / 2
                 if not _min or height > _min:
                     _min = height
         return _min, _max
@@ -150,7 +150,7 @@ class Rod(mob.MayaObjDescriptor):
             for g in self.getGears():
                 pos = g.translate[1]
                 # TODO : Depends on orientation. !!!!!!!!!
-                height = pos - g.height / 2
+                height = pos - g.gear.height / 2
                 if not _min or height < _min:
                     _min = height
         return _min, _max
@@ -159,10 +159,11 @@ class Rod(mob.MayaObjDescriptor):
         # CHECKERS....
         self.cylinder.radius = newRadius
         for g in self.getGears():
-            g.internalRadius = newRadius
+            g.gear.internalRadius = newRadius
 
     def getMaxRadius(self):
-        max = min([g.radius - consts.ROD_GEAR_OFFSET for g in self.getGears()])
+        max = min([g.gear.radius - consts.ROD_GEAR_OFFSET 
+                    for g in self.getGears()])
         if max is None:
             max = 1
         return max

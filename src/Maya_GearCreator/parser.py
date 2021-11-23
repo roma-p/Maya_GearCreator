@@ -94,7 +94,7 @@ def parseSingleGear(gearChain, gearTransform):
         gearOffset=gearInput.gearOffset.get(),
         gearChain=gearChain,
         gearExists=True,
-        gearData=(gearTransform, gearInput))
+        gearTransform=gearTransform)
     circleList = []
     for circleTransform in getCircleTransforms(gear):
         circleList.append(parseSingleCircle(gear, circleTransform))
