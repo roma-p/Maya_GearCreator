@@ -8,6 +8,7 @@ from Maya_GearCreator.misc import maya_helpers
 from Maya_GearCreator.maya_wrapper import children_manager as childrenM
 from Maya_GearCreator.maya_wrapper import connections_manager as connectionM
 from Maya_GearCreator.misc import maya_grp_descriptor
+from Maya_GearCreator.maya_wrapper import maya_obj_descriptor
 
 importlib.reload(gear_chain)
 importlib.reload(rod)
@@ -40,20 +41,34 @@ class GearNetwork(maya_grp_descriptor.MayaGrpDescriptor):
         self.chainManager = self.createGrpChildrenM(consts.TAG_GEARCHAIN)
 
         # rods subgroup and rods handler.
-
         if networkExists:
             rodGroup = maya_helpers.getGroup(
                 consts.ROD_SUBGROUP,
                 self.group)
-            self.rodsDescriptor = maya_grp_descriptor.MayaGrpDescriptor(
+            # self.rodsDescriptor = maya_grp_descriptor.MayaGrpDescriptor(
+            #     name=consts.ROD_SUBGROUP,
+            #     parentObj=self.group,
+            #     groupExists=True,
+            #     group=rodGroup)
+
+            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+            print(rodGroup)
+            self.rodsDescriptor = maya_obj_descriptor.MayaObjDescriptor(
+                name=consts.ROD_SUBGROUP,
+                parentTransform=self.group,
+                group=True,
+                objTransform=rodGroup,
+                objExists=True)
+            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        else:
+
+            self.rodsDescriptor = maya_obj_descriptor.MayaObjDescriptor(
                 name=consts.ROD_SUBGROUP,
                 parentObj=self.group,
-                groupExists=True,
-                group=rodGroup)
-        else:
-            self.rodsDescriptor = maya_grp_descriptor.MayaGrpDescriptor(
-                name=consts.ROD_SUBGROUP,
-                parentObj=self.group)
+                group=True)
+            # self.rodsDescriptor = maya_grp_descriptor.MayaGrpDescriptor(
+            #     name=consts.ROD_SUBGROUP,
+            #     parentObj=self.group)
         self.rodChildrenManager = self.rodsDescriptor.createObjChildrenM(
             tag=consts.TAG_ROD)
         self.rodConnectManager = connectionM.ConnectionsManager(

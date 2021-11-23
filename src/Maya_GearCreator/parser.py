@@ -152,7 +152,9 @@ def getCircleTransforms(gear):
 
 def getRodTransforms(gearNetwork):
     rodTransforms = []
-    for child in pm.listRelatives(gearNetwork.rodsDescriptor.group, c=True):
+    for child in pm.listRelatives(
+            gearNetwork.rodsDescriptor.objTransform,
+            c=True):
         if child.hasAttr(consts.TAG_ROD):
             rodTransforms.append(child)
     return rodTransforms

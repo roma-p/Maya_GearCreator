@@ -49,10 +49,10 @@ class MayaObjDescriptor():
         for attrName in MayaObjDescriptor.TRANSFORM_PRP_WHITE_LIST:
             self._addTransformProperty(attrName, _class)
 
-        if objExists:
+        if objExists and not group:
             self.parseInput()
 
-        if parentTransform:
+        if parentTransform and not objExists:
             pm.parent(self.objTransform, parentTransform)
 
     def _addTransformProperty(self, attrName, _class=None):
