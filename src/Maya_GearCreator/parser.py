@@ -9,6 +9,7 @@ from Maya_GearCreator.gears import gear_basic
 from Maya_GearCreator.gears import gear_abstract
 from Maya_GearCreator.misc import circle_descriptor
 from Maya_GearCreator import rod
+from Maya_GearCreator.maya_wrapper import maya_obj_descriptor as mob2
 
 importlib.reload(gear_network)
 importlib.reload(gear_chain)
@@ -17,6 +18,7 @@ importlib.reload(gear_basic)
 importlib.reload(gear_abstract)
 importlib.reload(circle_descriptor)
 importlib.reload(rod)
+importlib.reload(mob2)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -101,11 +103,7 @@ def parseSingleGear(gearChain, gearTransform):
 
 
 def parseSingleCircle(gear, circleTransform):
-    circleInput = getInputs(circleTransform,
-                            inputType=pm.nodetypes.MakeNurbCircle)[0]
-    return circle_descriptor.CircleDescriptor(
-        circleExists=True,
-        circleData=(circleTransform, circleInput))
+    return mob2.MayaObjDescriptor(circleTransform, objExists=True)
 
 
 def parseSingleRod(gearNetwork, rodTransform):

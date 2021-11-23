@@ -44,7 +44,12 @@ class Rod(mob.MayaObjDescriptor):
         if not objExists:
             objTransform, rodConstruct = pm.polyCylinder()
 
-        super(Rod, self).__init__(objTransform, name, objExists)
+        super(Rod, self).__init__(
+            objTransform,
+            name,
+            objExists,
+            _class=Rod)
+        print(self.__dict__)
 
         if not objExists:
             self.addInput(rodConstruct, "cylinder")

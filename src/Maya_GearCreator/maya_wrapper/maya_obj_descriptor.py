@@ -31,20 +31,22 @@ class MayaObjDescriptor():
             self,
             objTransform,
             name=None,
-            objExists=False):
+            objExists=False,
+            _class=None):
 
         self.objTransform = objTransform
         self.name = name or str(objTransform)
         self.parentConstraints = []
 
         for attrName in MayaObjDescriptor.TRANSFORM_PRP_WHITE_LIST:
-            self._addTransformProperty(attrName)
+            self._addTransformProperty(attrName, _class)
 
         if objExists:
             self.parseInput()
 
-    def _addTransformProperty(self, attrName):
-        if hasattr(MayaObjDescriptor, attrName):
+    def _addTransformProperty(self, attrName, _class=None):
+        _class = _class or MayaObjDescriptor
+        if hasattr(_class, attrName):
             return
 
         def getter(self):
@@ -52,7 +54,7 @@ class MayaObjDescriptor():
 
         def setter(self, value):
             self.objTransform.setAttr(attrName, value)
-        setattr(MayaObjDescriptor, attrName, property(getter, setter))
+        setattr(_class, attrName, property(getter, setter))
 
     # HANDLING NAME -----------------------------------------------------------
 

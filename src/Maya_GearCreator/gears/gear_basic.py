@@ -79,8 +79,8 @@ class GearBasic(gear_abstract.GearAbstract):
                 new_radius = GearBasic.calculateConstraintRadius(
                     self, neighbour)
 
-                neighbour.getRelatedConstraintCircle(self).radius = new_radius
-                self.getRelatedConstraintCircle(neighbour).radius = new_radius
+                neighbour.getRelatedConstraintCircle(self).circle.radius = new_radius
+                self.getRelatedConstraintCircle(neighbour).circle.radius = new_radius
 
                 # if only one neighbour, more handy to move current gear.
                 # if multiple neighbours, not possible.

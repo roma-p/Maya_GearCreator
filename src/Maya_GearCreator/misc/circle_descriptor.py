@@ -2,13 +2,13 @@ import logging
 import pymel.core as pm
 import importlib
 
-from Maya_GearCreator.misc import maya_obj_descriptor
-importlib.reload(maya_obj_descriptor)
+from Maya_GearCreator.maya_wrapper import maya_obj_descriptor as mob
+importlib.reload(mob)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
-class CircleDescriptor(maya_obj_descriptor.MayaObjDescriptor):
+class CircleDescriptor(mob.MayaObjDescriptor):
 
     DEFAULT_PREFIX = "circle"
     gearIdx = 0
@@ -17,15 +17,14 @@ class CircleDescriptor(maya_obj_descriptor.MayaObjDescriptor):
             self,
             nr=None,
             radius=None,
-            circleExists=False,
-            circleData=None):
+            objExists=False,
+            objTransform=None):
 
-        if circleExists:
-            circle_transform, circle_construct = circleData
-        else:
-            circle_transform, circle_construct = pm.circle(
-                radius=radius, nr=nr)
-        super(CircleDescriptor, self).__init__(
-            circle_transform,
-            circle_construct,
-            CircleDescriptor)
+        if not objExists:
+            objTransform, objConstructor = pm.circle(radius=radius, nr=nr)
+        super(CircleDescriptor, self).__init__(objTransform,
+                                               objExists=objExists)
+        if not objExists:
+            self.addInput(objConstructor, "circle")
+
+        print(self.__dict__)

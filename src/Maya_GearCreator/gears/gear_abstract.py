@@ -8,6 +8,7 @@ from Maya_GearCreator import gear_chain
 from Maya_GearCreator.misc import circle_descriptor
 from Maya_GearCreator.misc import connections_manager
 from Maya_GearCreator.misc import maya_obj_descriptor as mob
+from Maya_GearCreator.maya_wrapper import maya_obj_descriptor as mob2
 from Maya_GearCreator.misc import children_manager
 
 importlib.reload(consts)
@@ -15,6 +16,7 @@ importlib.reload(gear_chain)
 importlib.reload(circle_descriptor)
 importlib.reload(connections_manager)
 importlib.reload(mob)
+importlib.reload(mob2)
 importlib.reload(children_manager)
 
 log = logging.getLogger(__name__)
@@ -183,7 +185,7 @@ class GearAbstract(mob.MayaObjDescriptor):
 
     def calculateMoveAlong(self, rootGear):
         constraintsCircle = self.getRelatedConstraintCircle(rootGear)
-        return 2 * math.pi * constraintsCircle.radius
+        return 2 * math.pi * constraintsCircle.circle.radius
 
         #TODO : radius du circle COnstraint espece de débile.
         #radius = self.radius + self.gearOffset / 2
@@ -225,17 +227,16 @@ class GearAbstract(mob.MayaObjDescriptor):
 
     @transform
     def initCircleConstraint(self, neighbourGear):
-        circle = circle_descriptor.CircleDescriptor(
-            nr=(0, 1, 0),
-            # axis is X-Y TODO: to update when multiple orientation implemented
-            radius=GearAbstract.calculateConstraintRadius(self, neighbourGear))
-        pm.move(circle.objTransform, neighbourGear.translate)
-        circle.visibility = False
-
-        self.addConstraintCircle(neighbourGear, circle)
-
+        # axis is X-Y TODO: to update when multiple orientation implemented
+        objTransform, objConstructor = pm.circle(
+            radius=GearAbstract.calculateConstraintRadius(self, neighbourGear),
+            nr=(0, 1, 0))
+        c = mob2.MayaObjDescriptor(objTransform)
+        c.addInput(objConstructor, "circle")
+        c.visibility = False
+        self.addConstraintCircle(neighbourGear, c)
         pm.parentConstraint(neighbourGear.objTransform,
-                            circle.objTransform)
+                            c.objTransform)
 
     @transform
     def activateCircleConstraint(self, neighbourGear):
