@@ -60,7 +60,7 @@ def parseSingleGearNetwork(gearNetworkGroup):
         rodList.append(parseSingleRod(gearNetwork, rodTransform))
     gearNetwork.rodChildrenManager.parse(*rodList)
     gearNetwork.rodConnectManager.parse(*rodList + gearNetwork.listGears())
-    #gearNetwork.rodConnectManager.parse(*rodList)
+    # gearNetwork.rodConnectManager.parse(*rodList)
     return gearNetwork
 
 
@@ -109,13 +109,13 @@ def parseSingleCircle(gear, circleTransform):
 
 
 def parseSingleRod(gearNetwork, rodTransform):
-    rodInput = getInputs(rodTransform, pm.nodetypes.PolyCylinder)[0]
-    radius = rodInput.radius.get()
+    # rodInput = getInputs(rodTransform, pm.nodetypes.PolyCylinder)[0]
+    # radius = rodInput.radius.get()
     r = rod.Rod(
         gearNetwork=gearNetwork,
-        rodExists=True,
-        rodData=(rodTransform, rodInput))
-    r.radius = radius
+        objExists=True,
+        objTransform=rodTransform)
+    # r.cylinder.radius = radius
     return r
 
 # LISTING GROUPS --------------------------------------------------------------

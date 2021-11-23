@@ -44,7 +44,7 @@ class RodWidget(QtWidgets.QWidget):
         self.modifiableName.set(rod.getName,
                                 rod.setName)
 
-        def _getRadius(): return self.rod.radius
+        def _getRadius(): return self.rod.cylinder.radius
         def _setRadius(val): self.rod.changeRadius(val)
 
         py_helpers.deleteSubWidgetByType(self, base_widgets.EnhancedSlider)

@@ -1,7 +1,8 @@
 import pymel.core as pm
 import importlib
 
-from Maya_GearCreator.misc import maya_obj_descriptor as mob
+from Maya_GearCreator.maya_wrapper import maya_obj_descriptor as mob
+# from Maya_GearCreator.misc import maya_obj_descriptor as mob
 from Maya_GearCreator.misc import maya_helpers
 from Maya_GearCreator import consts
 
@@ -37,30 +38,30 @@ class Rod(mob.MayaObjDescriptor):
             height=consts.DEFAULT_ROD_LEN,
             linkedGear=None,
             gearNetwork=None,
-            rodExists=False,
-            rodData=None):
+            objExists=False,
+            objTransform=None):
 
-        if rodExists:
-            rod_transform, rode_construct = rodData
-        else:
-            rod_transform, rode_construct = pm.polyCylinder()
+        if not objExists:
+            objTransform, rodConstruct = pm.polyCylinder()
 
-        super(Rod, self).__init__(rod_transform, rode_construct, Rod, name)
+        super(Rod, self).__init__(objTransform, name, objExists)
 
-        self.radius = radius
-        self.height = height
+        if not objExists:
+            self.addInput(rodConstruct, "cylinder")
+            self.cylinder.radius = radius
+            self.cylinder.height = height
 
         if linkedGear:
             self.translate = linkedGear.translate
         if gearNetwork:
             self.gearNetwork = gearNetwork
 
-        self.setSubdivisionAxis(self.subdivisionsAxis)
+        self.setSubdivisionAxis(self.cylinder.subdivisionsAxis)
 
         self.lockTransform()
 
     def setSubdivisionAxis(self, subdivisionsAxis):
-        self.subdivisionsAxis = subdivisionsAxis
+        self.cylinder.subdivisionsAxis = subdivisionsAxis
 
         self.topVertex = maya_helpers.formatMeshStr(self.name, "vertex",
                                                *self.getVtxIdx(top=True))
@@ -89,8 +90,9 @@ class Rod(mob.MayaObjDescriptor):
 
     def getVtxIdx(self, top=True):
         return {
-            True: ((self.subdivisionsAxis, self.subdivisionsAxis * 2 - 1),),
-            False: ((0, self.subdivisionsAxis - 1),)
+            True: ((self.cylinder.subdivisionsAxis,
+                    self.cylinder.subdivisionsAxis * 2 - 1),),
+            False: ((0, self.cylinder.subdivisionsAxis - 1),)
         }[top]
 
     def getVertexStr(self, top=True):
@@ -118,7 +120,7 @@ class Rod(mob.MayaObjDescriptor):
         topHeight = self.getLen(top=True)
         _max = topHeight + Rod.LEN_MARGIN
         if not gearList:
-            _min = self.height / 2
+            _min = self.cylinder.height / 2
             return _min, _max
         else:
             _min = None
@@ -136,7 +138,7 @@ class Rod(mob.MayaObjDescriptor):
         botHeight = self.getLen(top=False)
         _max = botHeight - Rod.LEN_MARGIN
         if not gearList:
-            _min = self.height / 2
+            _min = self.cylinder.height / 2
             return _min, _max
         else:
             _min = None
@@ -150,7 +152,7 @@ class Rod(mob.MayaObjDescriptor):
 
     def changeRadius(self, newRadius):
         # CHECKERS....
-        self.radius = newRadius
+        self.cylinder.radius = newRadius
         for g in self.getGears():
             g.internalRadius = newRadius
 

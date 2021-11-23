@@ -82,15 +82,15 @@ class GearNetwork(maya_grp_descriptor.MayaGrpDescriptor):
             radius=consts.DEFAULT_RADIUS,
             gearOffset=consts.DEFAULT_GEAR_OFFESET):
 
-        if rod.radius > radius + gearOffset + consts.ROD_GEAR_OFFSET:
-            radius = rod.radius + gearOffset + consts.ROD_GEAR_OFFSET
+        if rod.cylinder.radius > radius + gearOffset + consts.ROD_GEAR_OFFSET:
+            radius = rod.cylinder.radius + gearOffset + consts.ROD_GEAR_OFFSET
 
         gear = gearChain.addGear(
             name=name,
             radius=radius,
             gearOffset=gearOffset,
             linkedRod=rod)
-        gear.internalRadius = rod.radius
+        gear.internalRadius = rod.cylinder.radius
         self.connectRod(rod, gear)
         return gear
 
