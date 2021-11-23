@@ -7,7 +7,6 @@ from Maya_GearCreator import gear_chain
 from Maya_GearCreator import consts
 from Maya_GearCreator.gears import gear_basic
 from Maya_GearCreator.gears import gear_abstract
-from Maya_GearCreator.misc import circle_descriptor
 from Maya_GearCreator import rod
 from Maya_GearCreator.maya_wrapper import maya_obj_descriptor as mob2
 
@@ -16,7 +15,6 @@ importlib.reload(gear_chain)
 importlib.reload(consts)
 importlib.reload(gear_basic)
 importlib.reload(gear_abstract)
-importlib.reload(circle_descriptor)
 importlib.reload(rod)
 importlib.reload(mob2)
 

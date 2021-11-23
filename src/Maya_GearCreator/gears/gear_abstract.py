@@ -5,17 +5,13 @@ import importlib
 
 from Maya_GearCreator import consts
 from Maya_GearCreator import gear_chain
-from Maya_GearCreator.misc import circle_descriptor
 from Maya_GearCreator.maya_wrapper import connections_manager
-from Maya_GearCreator.misc import maya_obj_descriptor as mob
-from Maya_GearCreator.maya_wrapper import maya_obj_descriptor as mob2
+from Maya_GearCreator.maya_wrapper import maya_obj_descriptor as mob
 
 importlib.reload(consts)
 importlib.reload(gear_chain)
-importlib.reload(circle_descriptor)
 importlib.reload(connections_manager)
 importlib.reload(mob)
-importlib.reload(mob2)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -29,7 +25,7 @@ def transform(f):
         return ret
     return wrapper
 
-class GearAbstract(mob2.MayaObjDescriptor):
+class GearAbstract(mob.MayaObjDescriptor):
 
     gearIdx = 0
     DEFAULT_PREFIX = "gear"
@@ -243,7 +239,7 @@ class GearAbstract(mob2.MayaObjDescriptor):
         objTransform, objConstructor = pm.circle(
             radius=GearAbstract.calculateConstraintRadius(self, neighbourGear),
             nr=(0, 1, 0))
-        c = mob2.MayaObjDescriptor(objTransform)
+        c = mob.MayaObjDescriptor(objTransform)
         c.addInput(objConstructor, "circle")
         c.visibility = False
         self.addConstraintCircle(neighbourGear, c)

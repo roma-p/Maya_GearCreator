@@ -95,13 +95,8 @@ class MayaObjDescriptor():
 
     # CHILDREN MANAGEMENT------------------------------------------------------
 
-    # TODO : TO MERGE INTO ONE.
-
-    def createGrpChildrenM(self, tag):
-        return childrenM.ChildrenManager_GrpDescriptor(self.objTransform, tag)
-
     def createObjChildrenM(self, tag):
-        return childrenM.ChildrenManager_ObjDescriptor(self.objTransform, tag)
+        return childrenM.ChildrenManager(self.objTransform, tag)
 
     # MODIFY ------------------------------------------------------------------
 

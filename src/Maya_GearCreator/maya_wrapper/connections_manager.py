@@ -2,11 +2,8 @@ import logging
 import pymel.core as pm
 import importlib
 
-from Maya_GearCreator.misc import maya_obj_descriptor
 from Maya_GearCreator.misc import maya_helpers
 
-
-importlib.reload(maya_obj_descriptor)
 importlib.reload(maya_helpers)
 
 log = logging.getLogger(__name__)
