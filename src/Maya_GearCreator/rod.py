@@ -49,7 +49,6 @@ class Rod(mob.MayaObjDescriptor):
             name,
             objExists,
             _class=Rod)
-        print(self.__dict__)
 
         if not objExists:
             self.addInput(rodConstruct, "cylinder")
@@ -83,16 +82,6 @@ class Rod(mob.MayaObjDescriptor):
             r=True, os=True,
             wd=True)  # moveY=True)  # TODO: TO CHANGE IF MUTLIPLE ORIENTATION.
 
-        # selection_bk = pm.ls(sl=True)
-        # pm.select(self.getFacesStr(top))
-
-        # maya_helpers.select(self.name, "vertex", *self.getVtxIdx(top))
-
-        # pm.move(0, delta, 0, r=True, os=True, wd=True)
-        # TODO : checks keyswords.
-        # pm.select(clear=True)
-        # pm.select(selection_bk)
-
     def getVtxIdx(self, top=True):
         return {
             True: ((self.cylinder.subdivisionsAxis,
@@ -113,10 +102,6 @@ class Rod(mob.MayaObjDescriptor):
         # TODO: to change if multiple orientation.
         height = vtxs[0].getPosition(space="world")[1]
         return height
-
-        # faces = pm.ls(self.getFacesStr(top))
-        # point_pos = faces[0].getPoints()[0]
-        # height = point_pos[1] + self.translate[1]
 
     LEN_MARGIN = 3
 

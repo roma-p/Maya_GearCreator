@@ -31,13 +31,9 @@ class GearChain(maya_obj_descriptor.MayaObjDescriptor):
             chainExists=False,
             chainGroup=None):
 
-#        super(GearChain, self).__init__(
-#            name=name, parentObj=gearNetwork.group,
-#            groupExists=chainExists, group=chainGroup)
-
         super(GearChain, self).__init__(
             name=name,
-            parentTransform=gearNetwork.group,
+            parentTransform=gearNetwork.objTransform,
             objExists=chainExists,
             objTransform=chainGroup,
             group=True,

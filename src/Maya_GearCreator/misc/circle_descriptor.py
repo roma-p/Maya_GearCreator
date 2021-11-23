@@ -26,5 +26,3 @@ class CircleDescriptor(mob.MayaObjDescriptor):
                                                objExists=objExists)
         if not objExists:
             self.addInput(objConstructor, "circle")
-
-        print(self.__dict__)

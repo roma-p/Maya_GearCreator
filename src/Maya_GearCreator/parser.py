@@ -48,7 +48,7 @@ def parseSingleGearNetwork(gearNetworkGroup):
     parentGroup = pm.listRelatives(gearNetworkGroup, parent=True) or None
     gearNetwork = gear_network.GearNetwork(
         name=str(gearNetworkGroup),
-        parentObj=parentGroup,
+        parentTransform=parentGroup,
         networkExists=True,
         networkGroup=gearNetworkGroup)
     # 2 parsing and referencing gear chains
@@ -128,7 +128,7 @@ def getGearNetworksGroups():
 
 def getGearChainsGroups(gearNetwork):
     gearChainGroups = []
-    for child in pm.listRelatives(gearNetwork.group, c=True):
+    for child in pm.listRelatives(gearNetwork.objTransform, c=True):
         if child.hasAttr(consts.TAG_GEARCHAIN):
             gearChainGroups.append(child)
     return gearChainGroups

@@ -10,6 +10,7 @@ from Maya_GearCreator.maya_wrapper import connections_manager as connectionM
 from Maya_GearCreator.misc import maya_grp_descriptor
 from Maya_GearCreator.maya_wrapper import maya_obj_descriptor
 
+
 importlib.reload(gear_chain)
 importlib.reload(rod)
 importlib.reload(consts)
@@ -22,20 +23,24 @@ log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
 
-class GearNetwork(maya_grp_descriptor.MayaGrpDescriptor):
+class GearNetwork(maya_obj_descriptor.MayaObjDescriptor):
 
     DEFAULT_PREFIX = "gearNetwork"
     groupIdx = 0
 
     def __init__(
             self,
-            name=None, parentObj=None,
+            name=None, parentTransform=None,
             networkExists=False,
             networkGroup=None):
 
         super(GearNetwork, self).__init__(
-            name=name, parentObj=parentObj,
-            groupExists=networkExists, group=networkGroup)
+            name=name,
+            parentTransform=parentTransform,
+            objExists=networkExists,
+            group=True,
+            objTransform=networkGroup,
+            _class=GearNetwork)
 
         # gear chain handler.
         self.chainManager = self.createObjChildrenM(consts.TAG_GEARCHAIN)
@@ -44,16 +49,11 @@ class GearNetwork(maya_grp_descriptor.MayaGrpDescriptor):
         if networkExists:
             rodGroup = maya_helpers.getGroup(
                 consts.ROD_SUBGROUP,
-                self.group)
-            # self.rodsDescriptor = maya_grp_descriptor.MayaGrpDescriptor(
-            #     name=consts.ROD_SUBGROUP,
-            #     parentObj=self.group,
-            #     groupExists=True,
-            #     group=rodGroup)
+                self.objTransform)
 
             self.rodsDescriptor = maya_obj_descriptor.MayaObjDescriptor(
                 name=consts.ROD_SUBGROUP,
-                parentTransform=self.group,
+                parentTransform=self.objTransform,
                 group=True,
                 objTransform=rodGroup,
                 objExists=True)
@@ -61,18 +61,16 @@ class GearNetwork(maya_grp_descriptor.MayaGrpDescriptor):
 
             self.rodsDescriptor = maya_obj_descriptor.MayaObjDescriptor(
                 name=consts.ROD_SUBGROUP,
-                parentTransform=self.group,
+                parentTransform=self.objTransform,
                 group=True)
-            # self.rodsDescriptor = maya_grp_descriptor.MayaGrpDescriptor(
-            #     name=consts.ROD_SUBGROUP,
-            #     parentObj=self.group)
+
         self.rodChildrenManager = self.rodsDescriptor.createObjChildrenM(
             tag=consts.TAG_ROD)
         self.rodConnectManager = connectionM.ConnectionsManager(
             consts.TAG_CONNECT_ROD)
 
         # adding Tag tag
-        maya_helpers.addTag(self.group, consts.TAG_GEARNETWORK)
+        maya_helpers.addTag(self.objTransform, consts.TAG_GEARNETWORK)
 
     def addChain(self, tWidth=0.3, name=None):
         chain = gear_chain.GearChain(self, tWidth=tWidth, name=name)
