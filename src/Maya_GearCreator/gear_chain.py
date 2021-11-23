@@ -6,6 +6,7 @@ from Maya_GearCreator.gears import gear
 from Maya_GearCreator import consts
 from Maya_GearCreator.misc import maya_helpers
 from Maya_GearCreator.maya_wrapper import children_manager
+from Maya_GearCreator.maya_wrapper import maya_obj_descriptor
 from Maya_GearCreator.misc import maya_grp_descriptor
 
 importlib.reload(gear_basic)
@@ -14,11 +15,12 @@ importlib.reload(consts)
 importlib.reload(children_manager)
 importlib.reload(maya_grp_descriptor)
 importlib.reload(maya_helpers)
+importlib.reload(maya_obj_descriptor)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
-class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
+class GearChain(maya_obj_descriptor.MayaObjDescriptor):
 
     DEFAULT_PREFIX = "gearChain"
     groupIdx = 0
@@ -29,17 +31,25 @@ class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
             chainExists=False,
             chainGroup=None):
 
+#        super(GearChain, self).__init__(
+#            name=name, parentObj=gearNetwork.group,
+#            groupExists=chainExists, group=chainGroup)
+
         super(GearChain, self).__init__(
-            name=name, parentObj=gearNetwork.group,
-            groupExists=chainExists, group=chainGroup)
+            name=name,
+            parentTransform=gearNetwork.group,
+            objExists=chainExists,
+            objTransform=chainGroup,
+            group=True,
+            _class=GearChain)
 
         self.gearList = self.createObjChildrenM(tag=consts.TAG_GEAR)
         # TODO : change name. -> gearManager.
 
 #        self.height = 0
 
-        maya_helpers.safeAddAttr(self.group, "tWidth", "float", True)
-        maya_helpers.safeAddAttr(self.group, "height", "float", True)
+        maya_helpers.safeAddAttr(self.objTransform, "tWidth", "float", True)
+        maya_helpers.safeAddAttr(self.objTransform, "height", "float", True)
 
         if tWidth:
             self.tWidth = tWidth
@@ -50,11 +60,11 @@ class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
 
     @property
     def tWidth(self):
-        return self.group.tWidth.get()
+        return self.objTransform.tWidth.get()
 
     @tWidth.setter
     def tWidth(self, tWidth):
-        self.group.tWidth.set(tWidth)
+        self.objTransform.tWidth.set(tWidth)
 
     # TODO : CANCELLED WHEN CHANGING RADIUS OF A GEAR.... HEIN?
     def changeTWidth(self, tWidth):
@@ -64,17 +74,17 @@ class GearChain(maya_grp_descriptor.MayaGrpDescriptor):
 
     @tWidth.setter
     def tWidth(self, tWidth):
-        self.group.tWidth.set(tWidth)
+        self.objTransform.tWidth.set(tWidth)
 
     # Height ------------------------------------------------------------------
 
     @property
     def height(self):
-        return self.group.height.get()
+        return self.objTransform.height.get()
 
     @height.setter
     def height(self, height):
-        self.group.height.set(height)
+        self.objTransform.height.set(height)
 
     def changeHeight(self, height):
         if not self.listRod():

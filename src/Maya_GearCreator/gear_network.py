@@ -38,7 +38,7 @@ class GearNetwork(maya_grp_descriptor.MayaGrpDescriptor):
             groupExists=networkExists, group=networkGroup)
 
         # gear chain handler.
-        self.chainManager = self.createGrpChildrenM(consts.TAG_GEARCHAIN)
+        self.chainManager = self.createObjChildrenM(consts.TAG_GEARCHAIN)
 
         # rods subgroup and rods handler.
         if networkExists:
@@ -51,20 +51,17 @@ class GearNetwork(maya_grp_descriptor.MayaGrpDescriptor):
             #     groupExists=True,
             #     group=rodGroup)
 
-            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-            print(rodGroup)
             self.rodsDescriptor = maya_obj_descriptor.MayaObjDescriptor(
                 name=consts.ROD_SUBGROUP,
                 parentTransform=self.group,
                 group=True,
                 objTransform=rodGroup,
                 objExists=True)
-            print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
         else:
 
             self.rodsDescriptor = maya_obj_descriptor.MayaObjDescriptor(
                 name=consts.ROD_SUBGROUP,
-                parentObj=self.group,
+                parentTransform=self.group,
                 group=True)
             # self.rodsDescriptor = maya_grp_descriptor.MayaGrpDescriptor(
             #     name=consts.ROD_SUBGROUP,

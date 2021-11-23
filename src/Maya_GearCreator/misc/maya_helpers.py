@@ -31,7 +31,8 @@ def getGroup(groupName, parentObj=None):
 
 def createGroup(groupName, parentObj=None):
     group = pm.group(em=True, name=groupName)
-    pm.parent(group, parentObj)
+    if parentObj:
+        pm.parent(group, parentObj)
     return group
 
 

@@ -41,10 +41,13 @@ class MayaObjDescriptor():
         self.parentConstraints = []
 
         # if descriptor is a group which does not exist: we create it.
-        if group and not objExists:
-            self.objTransform = maya_helpers.createGroup(name)
+        # name = name or str(objTransform) or self.genAutoName()
 
-        self.name = name or str(objTransform)
+        if group and not objExists:
+            name = name or self.genAutoName()
+            self.objTransform = maya_helpers.createGroup(
+                name,
+                parentTransform)
 
         for attrName in MayaObjDescriptor.TRANSFORM_PRP_WHITE_LIST:
             self._addTransformProperty(attrName, _class)

@@ -136,7 +136,7 @@ def getGearChainsGroups(gearNetwork):
 
 def getGearTransforms(gearChain):
     gearTransform = []
-    for child in pm.listRelatives(gearChain.group, c=True):
+    for child in pm.listRelatives(gearChain.objTransform, c=True):
         if child.hasAttr(consts.TAG_GEAR):
             gearTransform.append(child)
     return gearTransform
