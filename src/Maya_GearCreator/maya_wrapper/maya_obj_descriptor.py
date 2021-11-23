@@ -3,7 +3,7 @@ import importlib
 import pymel.core as pm
 
 from Maya_GearCreator import consts
-from Maya_GearCreator.misc import children_manager as childrenM
+from Maya_GearCreator.maya_wrapper import children_manager as childrenM
 from Maya_GearCreator.misc import maya_helpers
 
 importlib.reload(childrenM)
@@ -12,6 +12,7 @@ importlib.reload(consts)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
+
 
 class MayaObjDescriptor():
 
@@ -29,20 +30,30 @@ class MayaObjDescriptor():
 
     def __init__(
             self,
-            objTransform,
+            objTransform=None,
             name=None,
             objExists=False,
-            _class=None):
+            _class=None,
+            group=False,
+            parentTransform=None):
 
         self.objTransform = objTransform
-        self.name = name or str(objTransform)
         self.parentConstraints = []
+
+        # if descriptor is a group which does not exist: we create it.
+        if group and not objExists:
+            self.objTransform = maya_helpers.createGroup(name)
+
+        self.name = name or str(objTransform)
 
         for attrName in MayaObjDescriptor.TRANSFORM_PRP_WHITE_LIST:
             self._addTransformProperty(attrName, _class)
 
         if objExists:
             self.parseInput()
+
+        if parentTransform:
+            pm.parent(self.objTransform, parentTransform)
 
     def _addTransformProperty(self, attrName, _class=None):
         _class = _class or MayaObjDescriptor
@@ -131,6 +142,7 @@ class MayaObjDescriptor():
             if attrList:
                 attrName = attrList[0].attrName()
                 self.addInput(inputNode, attrName)
+
 
 class InputDescriptor():
 

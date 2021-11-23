@@ -5,8 +5,8 @@ from Maya_GearCreator import gear_chain
 from Maya_GearCreator import rod
 from Maya_GearCreator import consts
 from Maya_GearCreator.misc import maya_helpers
-from Maya_GearCreator.misc import children_manager as childrenM
-from Maya_GearCreator.misc import connections_manager as connectionM
+from Maya_GearCreator.maya_wrapper import children_manager as childrenM
+from Maya_GearCreator.maya_wrapper import connections_manager as connectionM
 from Maya_GearCreator.misc import maya_grp_descriptor
 
 importlib.reload(gear_chain)

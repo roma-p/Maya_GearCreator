@@ -6,10 +6,9 @@ import importlib
 from Maya_GearCreator import consts
 from Maya_GearCreator import gear_chain
 from Maya_GearCreator.misc import circle_descriptor
-from Maya_GearCreator.misc import connections_manager
+from Maya_GearCreator.maya_wrapper import connections_manager
 from Maya_GearCreator.misc import maya_obj_descriptor as mob
 from Maya_GearCreator.maya_wrapper import maya_obj_descriptor as mob2
-from Maya_GearCreator.misc import children_manager
 
 importlib.reload(consts)
 importlib.reload(gear_chain)
@@ -17,7 +16,6 @@ importlib.reload(circle_descriptor)
 importlib.reload(connections_manager)
 importlib.reload(mob)
 importlib.reload(mob2)
-importlib.reload(children_manager)
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)

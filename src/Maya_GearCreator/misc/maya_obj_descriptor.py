@@ -2,7 +2,7 @@ import logging
 import importlib
 import pymel.core as pm
 
-from Maya_GearCreator.misc import children_manager as childrenM
+from Maya_GearCreator.maya_wrapper import children_manager as childrenM
 
 importlib.reload(childrenM)
 

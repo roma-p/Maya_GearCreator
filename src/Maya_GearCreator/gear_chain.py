@@ -5,7 +5,7 @@ from Maya_GearCreator.gears import gear_basic
 from Maya_GearCreator.gears import gear
 from Maya_GearCreator import consts
 from Maya_GearCreator.misc import maya_helpers
-from Maya_GearCreator.misc import children_manager
+from Maya_GearCreator.maya_wrapper import children_manager
 from Maya_GearCreator.misc import maya_grp_descriptor
 
 importlib.reload(gear_basic)
