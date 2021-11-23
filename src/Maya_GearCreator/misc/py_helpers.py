@@ -22,6 +22,26 @@ def isFuncOrMethod(obj):
             types.BuiltinMethodType))
 
 
+# ** Intervals helpers **
+
+def sortIntervalBySize(*intervalSize):
+    return sorted(
+            intervalSize,
+            key=lambda x: abs(x[1] - x[0]),
+            reverse=True)
+
+def canContainInterval(intervalToContain, *intervals):
+
+    def getIntervalSize(interval):
+        return abs(interval[1] - interval[0])
+    size = getIntervalSize(intervalToContain)
+    ret = []
+    for interval in intervals:
+        if getIntervalSize(interval) >= size:
+            ret.append(interval)
+    return ret
+
+
 # QT HELPERS ******************************************************************
 
 def disconnectSignals(*signals):

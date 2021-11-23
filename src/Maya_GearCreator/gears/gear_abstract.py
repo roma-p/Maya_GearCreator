@@ -134,6 +134,12 @@ class GearAbstract(mob.MayaObjDescriptor):
         tNumber = int(radius * math.pi / tWidth)
         return tNumber
 
+    # TODO : depends on orientation.
+    def calculateExtremum(self):
+        delta = self.gear.height / 2
+        center = self.translate[1]
+        return center - delta, center + delta
+
     # MANAGE NEIGHBOURS -------------------------------------------------------
     def listNeigbours(self):
         return GearAbstract.neighManager.listConnections(self)

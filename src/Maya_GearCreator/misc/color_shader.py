@@ -43,8 +43,8 @@ class ColorAutoShader():
         if sg: return sg
 
         material = pm.shadingNode("lambert",
-                                   name=materialName,
-                                   asShader=True)
+            name=materialName,
+            asShader=True)
         material.color.set(ColorAutoShader._convRGB(*color))
         sg = pm.sets(name=sgName,
                      empty=True,

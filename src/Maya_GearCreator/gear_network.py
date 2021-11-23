@@ -84,7 +84,9 @@ class GearNetwork(maya_obj_descriptor.MayaObjDescriptor):
         return gear
 
     def addGearOnRod(
-            self, rod, gearChain, name=None,
+            self, rod,
+            gearChain,
+            name=None,
             radius=consts.DEFAULT_RADIUS,
             gearOffset=consts.DEFAULT_GEAR_OFFESET):
 
@@ -97,7 +99,11 @@ class GearNetwork(maya_obj_descriptor.MayaObjDescriptor):
             gearOffset=gearOffset,
             linkedRod=rod)
         gear.internalRadius = rod.cylinder.radius
+        print("aaaaaaaaaaaaaaaaaa")
+        height = rod.chooseHeight(gear)
+        print(height)
         self.connectRod(rod, gear)
+        gearChain.changeHeight(height)
         return gear
 
     def getGearFromTransform(self, transform):

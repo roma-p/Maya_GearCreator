@@ -5,10 +5,12 @@ from Maya_GearCreator.maya_wrapper import maya_obj_descriptor as mob
 # from Maya_GearCreator.misc import maya_obj_descriptor as mob
 from Maya_GearCreator.misc import maya_helpers
 from Maya_GearCreator import consts
+from Maya_GearCreator.misc import py_helpers
 
 importlib.reload(mob)
 importlib.reload(maya_helpers)
 importlib.reload(consts)
+importlib.reload(py_helpers)
 
 
 # TODO : CHANGING INTERNAL RADIUS of a gear ->
@@ -169,3 +171,40 @@ class Rod(mob.MayaObjDescriptor):
 
     def getGears(self):
         return self.gearNetwork.getGearsFromRod(self)
+
+    def findFreeInterval(self):
+
+        occupied_intervals = []
+        _top = self.getLen(top=True)
+        _bot = self.getLen(top=False)
+
+        for gear in self.getGears():
+            occupied_intervals.append(gear.calculateExtremum())
+        occupied_intervals = sorted(occupied_intervals)
+
+        freeInterverals = []
+        _min = _bot
+        for interval in occupied_intervals:
+            local_min, local_max = interval
+            if local_min > _min:
+                freeInterverals.append((_min, local_min))
+            if local_max < _top:
+                _min = local_max
+        if _min < _top:
+            freeInterverals.append((_min, _top))
+
+        sortedFreeIntervals = py_helpers.sortIntervalBySize(*freeInterverals)
+
+        return sortedFreeIntervals
+
+    def chooseHeight(self, gear):
+        freeInterverals = self.findFreeInterval()
+        print(freeInterverals)
+        canContainIntervals = py_helpers.canContainInterval(
+            gear.calculateExtremum(),
+            *freeInterverals)
+        print(canContainIntervals)
+        # if we can, trying to put new gear at the maximum top position.
+        chosen_interval = max(canContainIntervals)
+        print(chosen_interval)
+        return chosen_interval[0] + gear.gear.height / 2
