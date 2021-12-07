@@ -10,12 +10,10 @@ The plugin is still in early alpha.
 - download the src folder and copy/paste it either: 
 	+ in your Maya installation scripts folder. 
 	+ in a custom folder
-- if you copy the sources in a custom folder, you need to define it in settings.json:
+- if you copy the sources in a custom folder, you need to define it in __main__.py:
   eg for windows:
-  ```json
-  {
-  	"installation_folder": "D:/custom_scripts/"
-  }
+  ```python
+  CUSTOM_PATH = "D:/maya_scripts/"
   ```
 - using the maya script editor, launch "__main__.py"
 
