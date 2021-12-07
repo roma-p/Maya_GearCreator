@@ -50,7 +50,7 @@ Some of the parameter are not configurable for individual gear but for the overa
 - As long as no element of a gear network is selected, only the "gear networks" page is accessible
 - Once you selected an object of the network:
 	+ the "object" page will be shown.
-	+ gear "chains page" will be accessible.
+	+ the "gear chains" page will be accessible.
 
 You can quit the plugin, the scene and maya safely! All gear creator infos are stored inside the scene, so you can edit your networks later using the plugin.
 (at least you should)
