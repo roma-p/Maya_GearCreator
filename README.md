@@ -34,7 +34,7 @@ Rather than creating a gear at a time and then positionning manually, the philos
 Some of the parameter are not configurable for individual gear but for the overall gear chain:
 - Teeth Number:
 	+ You can't set the number of teeth for an individual gear
-	+ Rather, you can set the width of the teeth for the overall chain
+	+ Rather, you can set the teeth width for the overall chain
 	+ Teeth number is then automatically calculated for each gear so that they can all fit into each other.
 - Height:
 	+ The height of the gears can be changed at the chain level
@@ -42,15 +42,15 @@ Some of the parameter are not configurable for individual gear but for the overa
 
 ![Alt text](etc/gear_sc_2.png?raw=true "gear_chain_edition")
 
-- Once the plugin is launched, the gear creator IHM will pop, you can dock it if you want to.
-- IHM consists of three pages:
-	+ **gear networks page**: list all the network of the scene, you can rename / hide them.
-	+ **gear chains page**: list all the chains of the current network, will also temporarily color them for a better comprehension of the network. You can rename / hide / edit the chains from here.
-	+ **object page (either gear or rod)**: from here you can rename / hide / edit the current object. Neighbour gears will also be temporarily colored.
-- As long as no element of a gear network is selected, only the "gear networks" page is accessible
+- Once the plugin is launched, the gear creator HMI will pop, you can dock it if you want to.
+- HMI consists of three tabs:
+	+ **gear networks tab**: list all the network of the scene, you can rename / hide them.
+	+ **gear chains tab**: list all the chains of the current network, will also temporarily color them for a better comprehension of the network. You can rename / hide / edit the chains from here.
+	+ **object tab (either gear or rod)**: from here you can rename / hide / edit the current object. Neighbour gears will also be temporarily colored.
+- As long as no element of a gear network is selected, only the "gear networks" tab is accessible
 - Once you selected an object of the network:
-	+ the "object" page will be shown.
-	+ the "gear chains" page will be accessible.
+	+ the "object" tab will be shown.
+	+ the "gear chains" tab will be accessible.
 
 You can quit the plugin, the scene and maya safely! All gear creator infos are stored inside the scene, so you can edit your networks later using the plugin.
 (at least you should)

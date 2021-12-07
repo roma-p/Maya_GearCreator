@@ -13,9 +13,6 @@ def addToPyPath(path):
         sys.path.append(path)
     return True
 
-def parseJson(path):
-
-
 if CUSTOM_PATH:
     addToPyPath(os.path.dirname(CUSTOM_PATH))
 
