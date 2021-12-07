@@ -22,11 +22,10 @@ The plugin is still in early alpha.
 ## Usage
 
 Rather than creating a gear at a time and then positionning manually, the philosophy of this plugin is not so much of creating individual gears but complete gear networks. Therefore:
-
-	- Gears are created from a parent gear, they can't be created freely.
-	- Their placement is automatic: 
-		+ they can only be rotated around neighour gears
-		+ changing the radius / internal radius will adjust position for current gear / rest of the network
+- Gears are created from a parent gear, they can't be created freely.
+- Their placement is automatic: 
+	+ they can only be rotated around neighour gears
+	+ changing the radius / internal radius will adjust position for current gear / rest of the network
 
 ![Alt text](etc/gear_sc_1.png?raw=true "single_gear_edition")
 
