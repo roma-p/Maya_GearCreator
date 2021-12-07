@@ -30,8 +30,8 @@ Rather than creating a gear at a time and then positionning manually, the philos
 ![Alt text](etc/gear_sc_1.png?raw=true "single_gear_edition")
 
 
-- A *gear chain* is a ensemble of gears directly conncected to each other.
-- A *gear network* consists of multiple gear chains linked each other by rods.
+- A **gear chain** is a ensemble of gears directly conncected to each other.
+- A **gear network** consists of multiple gear chains linked each other by rods.
 
 Some of the parameter are not configurable for individual gear but for the overall gear chain:
 - Teeth Number:
