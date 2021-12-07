@@ -8,8 +8,8 @@ The plugin is still in early alpha.
 ## Installation
 
 - download the src folder and copy/paste it either: 
-		* in your Maya installation scripts folder. 
-		* in a custom folder
+	+ in your Maya installation scripts folder. 
+	+ in a custom folder
 - if you copy the sources in a custom folder, you need to define it in settings.json:
   eg for windows:
   ```json
@@ -22,6 +22,7 @@ The plugin is still in early alpha.
 ## Usage
 
 Rather than creating a gear at a time and then positionning manually, the philosophy of this plugin is not so much of creating individual gears but complete gear networks. Therefore:
+
 	- Gears are created from a parent gear, they can't be created freely.
 	- Their placement is automatic: 
 		+ they can only be rotated around neighour gears
@@ -30,8 +31,8 @@ Rather than creating a gear at a time and then positionning manually, the philos
 ![Alt text](etc/gear_sc_1.png?raw=true "single_gear_edition")
 
 
-A *gear chain* is a ensemble of gears directly conncected to each other.
-A *gear network* consists of multiple gear chains linked each other by rods.
+- A *gear chain* is a ensemble of gears directly conncected to each other.
+- A *gear network* consists of multiple gear chains linked each other by rods.
 
 Some of the parameter are not configurable for individual gear but for the overall gear chain:
 - Teeth Number:
