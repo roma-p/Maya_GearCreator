@@ -4,7 +4,9 @@ import logging
 import importlib
 
 DEBUG_PATH = "D:/dev/Maya_GearCreator/src/"
-
+# NONAKSJAKSJAK
+# kjdkajd=d;kjzeklfje
+# NON DANS FICHIER    A PARET!!!!
 
 def addToPyPath(path):
     if not os.path.exists(path):

@@ -35,7 +35,7 @@ class GearChain(maya_obj_descriptor.MayaObjDescriptor):
             group=True,
             _class=GearChain)
 
-        self.gearList = self.createObjChildrenM(tag=consts.TAG_GEAR)
+        self.gearList = self.createChildrenM(tag=consts.TAG_GEAR)
         # TODO : change name. -> gearManager.
 
 #        self.height = 0

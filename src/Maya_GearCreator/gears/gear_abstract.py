@@ -80,7 +80,7 @@ class GearAbstract(mob.MayaObjDescriptor):
         self.circleConstraints = []
 
         # HANDLING CONSTRAINT_CIRCLES
-        self.cCirclesChildrenManager = self.createObjChildrenM(
+        self.cCirclesChildrenManager = self.createChildrenM(
             tag=consts.TAG_CONSTRAINTS_C)
 
         if linkedGear:

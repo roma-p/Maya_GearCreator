@@ -95,7 +95,7 @@ class MayaObjDescriptor():
 
     # CHILDREN MANAGEMENT------------------------------------------------------
 
-    def createObjChildrenM(self, tag):
+    def createChildrenM(self, tag):
         return childrenM.ChildrenManager(self.objTransform, tag)
 
     # MODIFY ------------------------------------------------------------------

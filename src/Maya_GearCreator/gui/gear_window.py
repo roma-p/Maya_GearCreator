@@ -63,7 +63,8 @@ class GearWidget(QtWidgets.QWidget):
         py_helpers.deleteSubWidgetByType(self,
             base_widgets.MoveAlongWidget,
             base_widgets.EnhancedSlider,
-            GearSubSectionWidget)
+            GearSubSectionWidget,
+            QtWidgets.QLabel)
 
         self.gear = gear
 
@@ -109,6 +110,9 @@ class GearWidget(QtWidgets.QWidget):
                 i, 0, 1, 3)
             i = i + 1
 
+        self.layout.addWidget(QtWidgets.QLabel("Rotate along neighbour gears:"),
+                              i, 0)
+        i = i + 1
         for neighbour in self.gear.listNeigbours():
             colorName, colorRGB, sg = next(self.colorAutoShader)
             neighbour.setTmpShader(sg)

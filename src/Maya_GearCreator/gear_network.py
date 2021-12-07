@@ -39,7 +39,7 @@ class GearNetwork(maya_obj_descriptor.MayaObjDescriptor):
             _class=GearNetwork)
 
         # gear chain handler.
-        self.chainManager = self.createObjChildrenM(consts.TAG_GEARCHAIN)
+        self.chainManager = self.createChildrenM(consts.TAG_GEARCHAIN)
 
         # rods subgroup and rods handler.
         if networkExists:
@@ -60,7 +60,7 @@ class GearNetwork(maya_obj_descriptor.MayaObjDescriptor):
                 parentTransform=self.objTransform,
                 group=True)
 
-        self.rodChildrenManager = self.rodsDescriptor.createObjChildrenM(
+        self.rodChildrenManager = self.rodsDescriptor.createChildrenM(
             tag=consts.TAG_ROD)
         self.rodConnectManager = connectionM.ConnectionsManager(
             consts.TAG_CONNECT_ROD)
