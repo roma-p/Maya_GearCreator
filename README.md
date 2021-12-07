@@ -3,7 +3,7 @@
 Gear Creator is a Maya plugin to easily create / edit complex gear netowks.
 The plugin is still in early alpha.
 
-![Alt text](etc/main_screenshot_1.png?raw=true "gear_creator")
+![Alt text](etc/main_screenshot_1.jpg?raw=true "gear_creator")
 
 ## Installation
 
@@ -14,7 +14,7 @@ The plugin is still in early alpha.
   eg for windows:
   ```json
   {
-  	installation_folder = "D:/custom_scripts/"
+  	"installation_folder": "D:/custom_scripts/"
   }
   ```
 - using the maya script editor, launch "__main__.py"
@@ -26,6 +26,7 @@ Rather than creating a gear at a time and then positionning manually, the philos
 	- Their placement is automatic: 
 		+ they can only be rotated around neighour gears
 		+ changing the radius / internal radius will adjust position for current gear / rest of the network
+
 ![Alt text](etc/gear_sc_1.png?raw=true "single_gear_edition")
 
 
@@ -40,6 +41,7 @@ Some of the parameter are not configurable for individual gear but for the overa
 - Height:
 	+ The height of the gears can be changed at the chain level
 	+ The min / max height is caculated from all the rods present in the chain.
+
 ![Alt text](etc/gear_sc_2.png?raw=true "gear_chain_edition")
 
 - Once the plugin is launched, the gear creator IHM will pop, you can dock it if you want to.
