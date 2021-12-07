@@ -93,7 +93,7 @@ class GearChain(maya_obj_descriptor.MayaObjDescriptor):
     def addGear(
             self, name=None,
             radius=consts.DEFAULT_RADIUS,
-            gearOffset=consts.DEFAULT_GEAR_OFFESET,
+            gearOffset=consts.DEFAULT_GEAR_OFFSET,
             linkedGear=None,
             linkedRod=None):
 

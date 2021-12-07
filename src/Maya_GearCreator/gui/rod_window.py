@@ -36,10 +36,7 @@ class RodWidget(QtWidgets.QWidget):
         self.modifiableName = base_widgets.ModifiableName(None, None)
         self.layout.addWidget(self.modifiableName, 1, 0, 1, 2)
 
-
-
     def populate(self, rod):
-
         self.rod = rod
         self.modifiableName.set(rod.getName,
                                 rod.setName)
@@ -63,7 +60,6 @@ class RodWidget(QtWidgets.QWidget):
         def _setTop(val): self.rod.changeLen(val, top=True)
         def _getTopMin(): return self.rod.getMinMaxTop()[0]
         def _getTopMax(): return self.rod.getMinMaxTop()[1]
-
 
         # create slider.
         self.topSlider = base_widgets.EnhancedSlider(

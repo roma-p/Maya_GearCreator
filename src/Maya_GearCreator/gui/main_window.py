@@ -153,7 +153,7 @@ class GearCreatorUI(QtWidgets.QWidget):
         self.rodPage = rod_window.RodWidget()
         self.stackedWidget.addWidget(self.rodPage)
 
-        self.gearChainsPage = gear_chains_window_v2.GearChainsWidget(None)
+        self.gearChainsPage = gear_chains_window.GearChainsWidget(None)
         self.stackedWidget.addWidget(self.gearChainsPage)
 
         self.stackedWidget.setCurrentWidget(self.networksPage)

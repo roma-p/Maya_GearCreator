@@ -78,7 +78,7 @@ class GearNetwork(maya_obj_descriptor.MayaObjDescriptor):
             gearChain,
             name=None,
             radius=consts.DEFAULT_RADIUS,
-            gearOffset=consts.DEFAULT_GEAR_OFFESET,
+            gearOffset=consts.DEFAULT_GEAR_OFFSET,
             linkedGear=None):
         gear = gearChain.addGear(name, radius, gearOffset, linkedGear)
         return gear
@@ -88,9 +88,13 @@ class GearNetwork(maya_obj_descriptor.MayaObjDescriptor):
             gearChain,
             name=None,
             radius=consts.DEFAULT_RADIUS,
-            gearOffset=consts.DEFAULT_GEAR_OFFESET):
+            gearOffset=consts.DEFAULT_GEAR_OFFSET):
 
-        if rod.cylinder.radius > radius + gearOffset + consts.ROD_GEAR_OFFSET:
+        print(radius)
+        print(rod.cylinder.radius)
+
+        if rod.cylinder.radius > radius:
+            print("nupe")
             radius = rod.cylinder.radius + gearOffset + consts.ROD_GEAR_OFFSET
 
         gear = gearChain.addGear(
@@ -99,9 +103,7 @@ class GearNetwork(maya_obj_descriptor.MayaObjDescriptor):
             gearOffset=gearOffset,
             linkedRod=rod)
         gear.internalRadius = rod.cylinder.radius
-        print("aaaaaaaaaaaaaaaaaa")
         height = rod.chooseHeight(gear)
-        print(height)
         self.connectRod(rod, gear)
         gearChain.changeHeight(height)
         return gear

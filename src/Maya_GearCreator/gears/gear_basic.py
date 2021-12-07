@@ -35,7 +35,7 @@ class GearBasic(gear_abstract.GearAbstract):
             self, name=None,
             radius=consts.DEFAULT_RADIUS,
             tWidth=consts.DEFAULT_TWIDTH,
-            gearOffset=consts.DEFAULT_GEAR_OFFESET,
+            gearOffset=consts.DEFAULT_GEAR_OFFSET,
             linkedGear=None,
             gearChain=None,
             linkedRod=None,
@@ -93,3 +93,9 @@ class GearBasic(gear_abstract.GearAbstract):
                     neighbour.adjustGearToCircleConstraint(self)
                 arg[0].lockChain(rootObj=arg[1], lock=False)
                 # neighbour.lockChain(rootObj=self, lock=False)
+
+    def getInternalRadius(self):
+        return self.gear.internalRadius
+
+    def changeInternalRadius(self, radius):
+        self.gear.internalRadius = radius

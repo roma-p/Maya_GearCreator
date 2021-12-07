@@ -62,7 +62,7 @@ class GearNetworksWidget(QtWidgets.QWidget):
         gear = gearNetwork.addGear(
             gearChain,
             radius=consts.DEFAULT_RADIUS,
-            gearOffset=consts.DEFAULT_GEAR_OFFESET,
+            gearOffset=consts.DEFAULT_GEAR_OFFSET,
             linkedGear=None)
 
         self.gearNetworks.add(gearNetwork)

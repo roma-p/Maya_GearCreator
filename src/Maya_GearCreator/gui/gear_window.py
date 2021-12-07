@@ -49,7 +49,6 @@ class GearWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.modifiableName, 1, 0, 1, 2)
 
         # Resize --------------------------------------------------------------
-
         self.resizeSlider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self.resizeSlider.setMinimum(GearWidget.convertRadiusToSlider(0.5))
         self.resizeSlider.setMaximum(GearWidget.convertRadiusToSlider(15))
@@ -63,6 +62,7 @@ class GearWidget(QtWidgets.QWidget):
 
         py_helpers.deleteSubWidgetByType(self,
             base_widgets.MoveAlongWidget,
+            base_widgets.EnhancedSlider,
             GearSubSectionWidget)
 
         self.gear = gear
@@ -90,8 +90,18 @@ class GearWidget(QtWidgets.QWidget):
         # self.addGearBtn.clicked.connect(partial(GearWidget.addGear, self))
         self.addRodBtn.clicked.connect(lambda: self.addRod())
 
+        # Internal Radius -----------------------------------------------------
+        self.internalRadiusSlider = base_widgets.EnhancedSlider(
+            "internal radius",
+            min=0.1,
+            max=gear.getMaxInternalRadius,
+            step=0.005,
+            getter=gear.getInternalRadius,
+            setter=gear.smartChangeInternalRadius)
+        self.layout.addWidget(self.internalRadiusSlider, 3, 0, 1, 4)
+
         # Calculation of max Radius shall be done at populate since radius could change.
-        i = 3
+        i = 4
 
         for sectionId in gear.GUI_ATTRIBUTES.keys():
             self.layout.addWidget(
@@ -111,8 +121,10 @@ class GearWidget(QtWidgets.QWidget):
         resizeNeighbour = bool(gearWidget.resizeMode.isChecked())
         radius = GearWidget.convertSliderToFactor(value)
         gearWidget.gear.changeRadius(radius, resizeNeighbour)
-        for widget in gearWidget.findChildren(base_widgets.MoveAlongWidget):
-            widget.populate()
+        for widgetType in (base_widgets.MoveAlongWidget, 
+                           base_widgets.EnhancedSlider):
+            for widget in gearWidget.findChildren(widgetType):
+                widget.populate()
 
     def addGear(gearWidget=None):
 
@@ -123,7 +135,7 @@ class GearWidget(QtWidgets.QWidget):
         gear = gearNetwork.addGear(
             gearChain,
             radius=consts.DEFAULT_RADIUS,
-            gearOffset=consts.DEFAULT_GEAR_OFFESET,
+            gearOffset=consts.DEFAULT_GEAR_OFFSET,
             linkedGear=gear)
 
         pm.select(clear=True)

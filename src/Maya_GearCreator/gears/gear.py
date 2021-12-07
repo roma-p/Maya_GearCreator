@@ -19,7 +19,7 @@ class Gear():
 
     DEFAULT_PREFIX = "gear"
     DEFAULT_RADIUS = 1
-    DEFAULT_GEAR_OFFESET = 0.3
+    DEFAULT_GEAR_OFFSET = 0.3
 
     gearIdx = 0
 

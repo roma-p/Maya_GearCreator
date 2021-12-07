@@ -146,11 +146,11 @@ class Rod(mob.MayaObjDescriptor):
         # CHECKERS....
         self.cylinder.radius = newRadius
         for g in self.getGears():
-            g.gear.internalRadius = newRadius
+            g.changeInternalRadius(newRadius)
 
     def getMaxRadius(self):
-        max = min([g.gear.radius - consts.ROD_GEAR_OFFSET 
-                    for g in self.getGears()])
+        max = min([g.getCurrentGearMaxInternalRadius() 
+            for g in self.getGears()])
         if max is None:
             max = 1
         return max
@@ -199,12 +199,9 @@ class Rod(mob.MayaObjDescriptor):
 
     def chooseHeight(self, gear):
         freeInterverals = self.findFreeInterval()
-        print(freeInterverals)
         canContainIntervals = py_helpers.canContainInterval(
             gear.calculateExtremum(),
             *freeInterverals)
-        print(canContainIntervals)
         # if we can, trying to put new gear at the maximum top position.
         chosen_interval = max(canContainIntervals)
-        print(chosen_interval)
         return chosen_interval[0] + gear.gear.height / 2

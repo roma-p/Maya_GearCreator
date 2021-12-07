@@ -42,7 +42,7 @@ class GearAbstract(mob.MayaObjDescriptor):
             name=None,
             radius=consts.DEFAULT_RADIUS,
             tWidth=consts.DEFAULT_TWIDTH,
-            gearOffset=consts.DEFAULT_GEAR_OFFESET,
+            gearOffset=consts.DEFAULT_GEAR_OFFSET,
             linkedGear=None,
             gearChain=None,
             linkedRod=None,
@@ -175,6 +175,30 @@ class GearAbstract(mob.MayaObjDescriptor):
     def changeRadius(self, radius):
         raise NotImplementedError()
 
+    def changeInternalRadius(self, radius):
+        raise NotImplementedError()
+
+    # if rod: change internal radius for all gears on current gear's rod.
+    def smartChangeInternalRadius(self, newRadius):
+        r = self.gearChain.gearNetwork.getRodFromGear(self)
+        if not r:
+            self.gear.internalRadius = newRadius
+        else:
+            r.changeRadius(newRadius)
+
+    def getCurrentGearMaxInternalRadius(self):
+        return self.gear.radius - consts.ROD_GEAR_OFFSET
+
+    def getMaxInternalRadius(self):
+        r = self.gearChain.gearNetwork.getRodFromGear(self)
+        if r:
+            return r.getMaxRadius()
+        else:
+            return self.getCurrentGearMaxInternalRadius()
+
+    def getInternalRadius(self):
+        raise NotImplementedError()
+
     def activateMoveMode(self, rootGear):
         # 1 define constraint to move along root gear
         self.moveMode = rootGear
@@ -207,8 +231,6 @@ class GearAbstract(mob.MayaObjDescriptor):
         #return perimeter
         # calculate radius + Tlen / 2 -> perimeter: max distance
 
-
-
     def moveAlong_Slider(self, distance):
         newZ = distance - self.currentPos
         if distance < self.currentPos:
@@ -228,14 +250,6 @@ class GearAbstract(mob.MayaObjDescriptor):
         x, y, z = self.translate
         self.translate = (x, height, z)
         # TODO : to change when multiple orientaion.
-
-    def changeInternalRadius(self, newRadius):
-        # TODO : checks.
-        r = self.gearChain.gearNetwork.getRodFromGear(self)
-        if not r:
-            self.gear.internalRadius = newRadius
-        else:
-            r.changeRadius(newRadius)
 
     # CONSTRAINTS -------------------------------------------------------------
 
