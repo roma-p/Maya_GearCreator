@@ -47,7 +47,7 @@ Some of the parameter are not configurable for individual gear but for the overa
 - Once the plugin is launched, the gear creator IHM will pop, you can dock it if you want to.
 - IHM consists of three pages:
 	+ **gear networks page**: list all the network of the scene, you can rename / hide them.
-	+ **gear chains page**: list all the chains of the current network, will also temporarily color them for better comprehension of the network. You can rename / hide / edit the chains from here.
+	+ **gear chains page**: list all the chains of the current network, will also temporarily color them for a better comprehension of the network. You can rename / hide / edit the chains from here.
 	+ **object page (either gear or rod)**: from here you can rename / hide / edit the current object. Neighbour gears will also be temporarily colored.
 - As long as no element of a gear network is selected, only the "gear networks" page is accessible
 - Once you selected an object of the network:
