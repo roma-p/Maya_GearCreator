@@ -7,27 +7,10 @@ import pymel.core as pm
 from Maya_GearCreator.maya_wrapper import maya_obj_descriptor as mob
 from Maya_GearCreator.maya_wrapper import connections_manager
 
-DEBUG_PATH = "D:/dev/Maya_GearCreator/src/"
-
-logging.basicConfig()
-log = logging.getLogger("GearCreatorUI")
-log.setLevel(logging.DEBUG)
-
-def addToPyPath(path):
-    if not os.path.exists(path):
-        return False
-    if path not in sys.path:
-        sys.path.append(path)
-    return True
-
-addToPyPath(os.path.dirname(DEBUG_PATH))
-
-
-
 """
     1 Basics ------------------------------------------------------------------
 
-"waya wrapper" library is to easily buildpymel "objTransform" wrappers / descriptors
+"waya wrapper" library is to easily build pymel "objTransform" wrappers / descriptors
 in order to define custom methods / behaviour for those transform inside the wrapper.
 """
 
@@ -47,7 +30,7 @@ Wrapper automatically declares properties for following Transform attributes:
 - scale
 - visibility
 - name
-(since its properties, maya_wrapper does not cache any data, 
+(since they are properties, maya_wrapper does not cache any data, 
  transform attributes are beeing directly accessed / modified)
 '''
 
@@ -67,9 +50,8 @@ sphereWrapper.name = "test0"
 '''
     2 Input nodes. ------------------------------------------------------------
 
-You can add "input nodes" to the wrapper, that will themselves be wrapped in an 
-"input wrapper" object. 
-You will be able to access its the node attributes the same way you did for the
+You can add an "input node" to the wrapper. 
+You will be able to access the node attributes the same way you did for the
 transform node.
 '''
 
@@ -96,14 +78,14 @@ sphereWrapper.addInput(extrudeInput, "extrude")
 sphereWrapper.extrude.localTranslateZ = 0.5
 
 # this is espacially useful when parsing an alreaydy existing scene
-# when you may not have the reference to the input node in your code. 
+# when you may not have easily the reference to the input node in your code. 
 
 
 
 '''
     3 Groups. -----------------------------------------------------------------
 
-you can wrapp groups too. 
+you can wrap groups too. 
 If the group does not yet exist, it can be created automatically.
 '''
 
@@ -142,8 +124,8 @@ currentRadius = sphereWrapper.constructor.radius
 
 '''
     5 inheriting MayaObjDescriptor --------------------------------------------
-you can inherit MayaObjDescriptor to add custom method for a given object 
-transform type to control its allowed modification, to add other properties etc...
+you can inherit MayaObjDescriptor to add custom method for a given 
+transform type, to add other properties etc...
 '''
 
 class SphereWrapper(mob.MayaObjDescriptor):
@@ -204,8 +186,9 @@ sphereTransform = userDefinedParseMethod()
 sphereWrapper = SphereWrapper(objExists=True,
                               sphereTransform=sphereTransform)
 print(sphereWrapper.radius)     # shall be 5
+sphereWrapper.radius = 0
+print(sphereWrapper.radius)     # shall be 1
 print(sphereWrapper.visibility) # shall be True
-
 
 
 '''
@@ -278,10 +261,10 @@ print(sphere3 in myGroup.typeB_Children) # shall be True
 
 '''
     7 Connection Manger -------------------------------------------------------
-maya wrapper libs can also store references between multiple transform nodes.
-(it does so by creating a connection between them).
+maya wrapper lib can also store references between multiple transform nodes.
+(it does so by creating a connection between the nodes).
 This is useful to keep a list a reference between some wrappers
-(a "neighbour list for instance").
+(a "neighbour list" for example).
 '''
 
 # A) Add and use a connectionManager object:
@@ -319,5 +302,5 @@ neighbourManager = connections_manager.ConnectionsManager("NEIGHBOUR")
 neighbourManager.parse(*sphereWrappers)
 
 sphere1 = next((s for s in sphereWrappers
-                if s.name ="sphere1"))
+                if s.name ="sphere1"))  # getting sphere1 wrapper.
 print(neighbourManager.hasConnection(sphere1))  # shall print True
