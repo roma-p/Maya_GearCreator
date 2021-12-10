@@ -64,7 +64,8 @@ class GearWidget(QtWidgets.QWidget):
             base_widgets.MoveAlongWidget,
             base_widgets.EnhancedSlider,
             GearSubSectionWidget,
-            QtWidgets.QLabel)
+            QtWidgets.QLabel,
+            OrientationWidget)
 
         self.gear = gear
 
@@ -119,6 +120,9 @@ class GearWidget(QtWidgets.QWidget):
             widget = base_widgets.MoveAlongWidget(self.gear, neighbour,
                                                   colorRGB)
             self.layout.addWidget(widget, i, 0, 1, 2)
+            #i = i + 1
+            self.layout.addWidget(
+                OrientationWidget(self.gear, neighbour), i, 2)
             i = i + 1
 
     def changeRadiusCallback(value, gearWidget=None):
@@ -193,3 +197,26 @@ class GearSubSectionWidget(QtWidgets.QWidget):
     def populate(self):
         for slider in self.sliders:
             slider.populate()
+
+class OrientationWidget(QtWidgets.QWidget):
+
+    def __init__(self, gear, gearNeighbour):
+        self.gear = gear
+        self.gearNeighbour = gearNeighbour
+        super(OrientationWidget, self).__init__()
+        self.buildUI()
+        self.populate()
+
+    def buildUI(self):
+        self.layout = QtWidgets.QHBoxLayout(self)
+        self.comboBox = QtWidgets.QComboBox()
+        self.layout.addWidget(self.comboBox)
+        for item in (-1, 0, 1):
+            self.comboBox.addItem(str(item))
+        self.comboBox.setCurrentText("0")
+
+    def populate(self):
+        self.comboBox.currentTextChanged.connect(
+            lambda text: self.gear.changeOrientation(
+                int(text),
+                self.gearNeighbour))

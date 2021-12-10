@@ -205,3 +205,14 @@ class Rod(mob.MayaObjDescriptor):
         # if we can, trying to put new gear at the maximum top position.
         chosen_interval = max(canContainIntervals)
         return chosen_interval[0] + gear.gear.height / 2
+
+    def _flipPartOfChain180_recc(self, rootGear, factor):
+        gears = [g for g in self.getGears() if g != rootGear]
+        for g in gears:
+            g.lockTransform(False)
+            pm.rotate(g.objTransform, [factor * 180, 0, 0], os=True, r=True)
+            g.lockTransform(True)
+        for g in gears:
+            new_gears, new_rod = g._find_children(self)
+            g._flipPartOfChain180_recc(factor, *new_gears, rod=new_rod)
+

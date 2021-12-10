@@ -4,7 +4,7 @@ import json
 import logging
 import importlib
 
-CUSTOM_PATH = None
+CUSTOM_PATH = "D:/dev/Maya_GearCreator/src/"
 
 def addToPyPath(path):
     if not os.path.exists(path):
@@ -49,7 +49,7 @@ TODO LIST:
 * resize:
     - resize neigbours fix.
 *!! multi forme. -> différentes formes de gear possibles
-
+- mayaObjDescriptor -> not 'addInput', just 'addRef' (no need for it to be an input?).
 prio list:
 - Comment fr un bon parser automatique? 
 
@@ -57,4 +57,15 @@ prio list:
 * calculate min/max for ihm either from fix values or from function... 
 * On exit: change back colors... maybe on del? 
 
+adjust gear: iteration :
+
+1) current gear -> get all teeth left point 
+find the one closer to the center of parent gear -> "A"
+2) parent gear -> get all hole right point
+find the one closer to "A", "B"
+3) by iretation -> rotate current gear until 
+
+
+- BUTTON "ADJUST ROD": make the rod the smaller possible given the linked gears.
+- WHEN changing radius up: adjusting internal radius too? 
 """
