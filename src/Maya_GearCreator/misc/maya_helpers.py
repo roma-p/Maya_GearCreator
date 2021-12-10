@@ -95,30 +95,3 @@ def select(transformName, meshType, *args, **kargs):
             kargs["add"] = True
         pm.select(_tmp[i], **kargs)
 
-
-# editMode: "translate" or "rotate"
-def editPivot(
-        obj, editMode, vector,
-        scalePivot=False, rotatePivot=False, translatePivot=False,
-        **otherArgs):
-    if not scalePivot and not rotatePivot and not translatePivot:
-        return
-
-    funcDict = {
-        "translate": pm.scale,
-        "rotate": pm.rotate
-    }
-    if editMode not in funcDict.keys():
-        return
-    else:
-        func = funcDict[editMode]
-
-    name = obj.name
-
-    for keyword, arg in {
-                "scalePivot": scalePivot,
-                "rotatePivot": rotatePivot,
-                "translatePivot": translatePivot,
-            }.items():
-        if arg:
-            func("{}.{}".format(name, keyword), vector, **otherArgs)

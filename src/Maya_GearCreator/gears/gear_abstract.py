@@ -80,6 +80,8 @@ class GearAbstract(mob.MayaObjDescriptor):
         self.gearChain = gearChain
         self.tWidth = tWidth
 
+        self.addAttribute("orientation", "char", "x", _class=GearAbstract)
+
         if linkedGear:
             self.addNeighbour(linkedGear)
 
@@ -93,10 +95,16 @@ class GearAbstract(mob.MayaObjDescriptor):
 
     @transform
     def setParrallelAtInit(self, linkedGear):
-        if linkedGear.isParrallelToGnd():
-            return
-        self.rotate = [linkedGear.rotate[0], 0, 90]
-        self.translate = linkedGear.translate
+
+        if linkedGear.orientation == "y":
+            self.rotate = [linkedGear.rotate[0], 0, 90]
+            self.translate = linkedGear.translate
+            self.orientation = "y"
+
+        #if linkedGear.isParrallelToGnd():
+        #    return
+        #self.rotate = [linkedGear.rotate[0], 0, 90]
+        #self.translate = linkedGear.translate
 
     def instantiateGear():
         # pm.polyPipe func buggy : accept no arg and return nothing
@@ -237,9 +245,9 @@ class GearAbstract(mob.MayaObjDescriptor):
     def desactivateMoveMode(self):
         if not self.moveMode: return
         self.desactivateCircleConstraint(self.moveMode)
-        self.lockTransform(False)
-        self.rotate = self.moveMode.rotate
-        self.lockTransform(True)
+        # self.lockTransform(False)
+        # self.rotate = self.moveMode.rotate
+        # self.lockTransform(True)
         self.moveMode = None
         self.lockChain(rootObj=self, lock=False)
         # self.lockChain(*[g for g in self.listNeigbours() if g != self], lock=False)
@@ -305,50 +313,54 @@ class GearAbstract(mob.MayaObjDescriptor):
             self.orienGear(neighbourGear)
         self.lockChain(neighbourGear, lock=True)
         self._setParrallel(neighbourGear)
-        # self.orienGear(neighbourGear)
+        self.orienGear(neighbourGear)
         if orientation == 0:
             self.lockChain(neighbourGear, lock=False)
             return
 
-        if neighbourGear.isParrallelToGnd():
-            pm.rotate(
-                self.objTransform,
-                [0, 0, orientation * 90],
-                os=True, r=True)
-            pm.move(
-                self.objTransform,
-                [
-                    - (self.gear.radius + neighbourGear.gear.height / 2),
-                    -orientation * (self.gear.radius - neighbourGear.gear.gearOffset),
-                    0
-                ],
-                os=True, r=True, wd=True)
-
-        if orientation == - 1:
-            positive = True
-        else:
-            positive = False
+        pm.rotate(
+            self.objTransform,
+            [0, 0, orientation * 90],
+            os=True, r=True)
+        pm.move(
+            self.objTransform,
+            [
+                - (self.gear.radius + neighbourGear.gear.height / 2),
+                -orientation * (self.gear.radius - neighbourGear.gear.gearOffset),
+                0
+            ],
+            os=True, r=True, wd=True)
 
         self.lockChain(neighbourGear, lock=False)
 
         if orientation == -1:
             self.flipPartOfChain180(neighbourGear)
 
+        if orientation == - 1:
+            positive = True
+        else:
+            positive = False
         GearAbstract._shiftCircleConstr(self, neighbourGear, parrallel=False, positive=positive)
         GearAbstract._shiftCircleConstr(neighbourGear, self, parrallel=False, positive=False)
+
+        if neighbourGear.orientation == "x":
+            self.orientation = "y"
+        else:
+            self.orientation = "x"
 
     def _setParrallel(self, neighbourGear):
 
         GearAbstract._shiftCircleConstr(self, neighbourGear, parrallel=True)
         GearAbstract._shiftCircleConstr(neighbourGear, self, parrallel=True)
 
-        if self.isParrallel(neighbourGear):
-            return
+        if self.isParrallel(neighbourGear): return
+
         delta = neighbourGear.translate[1] - self.translate[1]
         if delta > 0:
             orientation = 1
         else:
             orientation = -1
+
         if orientation == 1:
             pm.rotate(self.objTransform, [0, 0, -90], os=True, r=True)
             pm.move(
@@ -373,16 +385,17 @@ class GearAbstract(mob.MayaObjDescriptor):
                     0
                 ],
                 os=True, r=True, wd=True)
+        self.orientation = neighbourGear.orientation
 
     def isParrallel(self, neighbourGear):
 
-        x1, _, z1 = neighbourGear.rotate
-        x2, _, z2 = self.rotate
-
-        if int(x1 - x2) // 180 == 0 and int(z1 - z2) // 180 == 0:
-            return True
-        else:
-            return False
+        return neighbourGear.orientation == self.orientation
+        #x1, _, z1 = neighbourGear.rotate
+        #x2, _, z2 = self.rotate
+        #if int(x1 - x2) // 180 == 0 and int(z1 - z2) // 180 == 0:
+        #    return True
+        #else:
+        #    return False
 
     # GEAR CHAIN RELATION MANAGER TAG -> "X" ou "Z" ET PIS VOILA.
 

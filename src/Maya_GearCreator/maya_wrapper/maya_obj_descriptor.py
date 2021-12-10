@@ -141,6 +141,18 @@ class MayaObjDescriptor():
                 attrName = attrList[0].attrName()
                 self.addInput(inputNode, attrName)
 
+    # ADD ATTRIBUTE -----------------------------------------------------------
+
+    def addAttribute(self, name, type, defaultValue, _class=None):
+        objTransform = self.objTransform
+        if not objTransform.hasAttr(name):
+            objTransform.addAttr(
+                name,
+                attributeType=type,
+                hidden=True,
+                keyable=True)
+        self._addTransformProperty(name, _class=_class)
+        setattr(self, name, defaultValue)
 
 class InputDescriptor():
 
