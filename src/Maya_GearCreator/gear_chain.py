@@ -2,13 +2,11 @@ import importlib
 import logging
 
 from Maya_GearCreator.gears import gear_basic
-from Maya_GearCreator.gears import gear
 from Maya_GearCreator import consts
 from Maya_GearCreator.misc import maya_helpers
 from Maya_GearCreator.maya_wrapper import maya_obj_descriptor
 
 importlib.reload(gear_basic)
-importlib.reload(gear)
 importlib.reload(consts)
 importlib.reload(maya_helpers)
 importlib.reload(maya_obj_descriptor)

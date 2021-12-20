@@ -4,7 +4,7 @@ import json
 import logging
 import importlib
 
-CUSTOM_PATH = ""
+CUSTOM_PATH = "D:/dev/Maya_GearCreator/src/"
 
 def addToPyPath(path):
     if not os.path.exists(path):
