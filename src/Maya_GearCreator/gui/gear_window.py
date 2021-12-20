@@ -57,6 +57,7 @@ class GearWidget(QtWidgets.QWidget):
 
         self.resizeMode = QtWidgets.QCheckBox("resize neighbours")
         self.layout.addWidget(self.resizeMode, 2, 2)
+        self.resizeMode.setVisible(False)
 
     def populate(self, gear):
 
@@ -92,6 +93,13 @@ class GearWidget(QtWidgets.QWidget):
         # self.addGearBtn.clicked.connect(partial(GearWidget.addGear, self))
         self.addRodBtn.clicked.connect(lambda: self.addRod())
 
+        # self.resizeSlider.setMinimum(0.4)
+        # self.resizeSlider.setMaximum(100)
+
+        try : self.resizeMode.stateChanged.disconnect()
+        except Exception: pass
+        self.resizeMode.stateChanged.connect(self.resizeNeighbourActivated)
+
         # Internal Radius -----------------------------------------------------
         self.internalRadiusSlider = base_widgets.EnhancedSlider(
             "internal radius",
@@ -120,9 +128,9 @@ class GearWidget(QtWidgets.QWidget):
             widget = base_widgets.MoveAlongWidget(self.gear, neighbour,
                                                   colorRGB)
             self.layout.addWidget(widget, i, 0, 1, 2)
-            #i = i + 1
-            self.layout.addWidget(
-                OrientationWidget(self.gear, neighbour), i, 2)
+            orientationWidget = OrientationWidget(self.gear, neighbour)
+            self.layout.addWidget(orientationWidget, i, 2)
+            orientationWidget.setVisible(False) # NOT WORKING YET...
             i = i + 1
 
     def changeRadiusCallback(value, gearWidget=None):
@@ -133,6 +141,13 @@ class GearWidget(QtWidgets.QWidget):
                            base_widgets.EnhancedSlider):
             for widget in gearWidget.findChildren(widgetType):
                 widget.populate()
+
+    def resizeNeighbourActivated(self, value):
+        if not value:
+            _max = 10 # TODO: not to calculate from current radius.
+        else:
+            _max = self.gear.getReziseSliderMaxSize()
+        #self.resizeSlider.setMaximum(_max)
 
     def addGear(gearWidget=None):
 
@@ -216,6 +231,8 @@ class OrientationWidget(QtWidgets.QWidget):
         self.comboBox.setCurrentText("0")
 
     def populate(self):
+        text = str(self.gear.getOrientation(self.gearNeighbour))
+        self.comboBox.setCurrentText(text)
         self.comboBox.currentTextChanged.connect(
             lambda text: self.gear.changeOrientation(
                 int(text),

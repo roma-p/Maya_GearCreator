@@ -57,15 +57,16 @@ class GearBasic(gear_abstract.GearAbstract):
             objExists=gearExists)
 
     def changeRadius(self, radius, resizeNeighbour=False):
+
+        delta = radius - self.gear.radius
         adjustedRadius = self.calculateAdjustedRadius(radius)
-        self.gear.radius = adjustedRadius
-        self.gear.sides = GearBasic.calculateTNumber(
-            self.tWidth,
-            adjustedRadius)
+        self._changeRadius_basic(adjustedRadius)
 
         if resizeNeighbour:
-            pass
-            # TODO : NOT IMPLEMENTED.
+            for neighbour in self.listNeigbours():
+                neighbour._changeRadius_basic(neighbour.gear.radius - delta)
+                self._adjustConstraintCircles(neighbour)
+
         else:
             move_self = len(self.listNeigbours()) == 1
 
@@ -78,12 +79,7 @@ class GearBasic(gear_abstract.GearAbstract):
 
                 arg[0].lockChain(rootObj=arg[1], lock=True)
 
-                # neighbour.lockChain(rootObj=self, lock=True)
-                new_radius = GearBasic.calculateConstraintRadius(
-                    self, neighbour)
-
-                neighbour.getRelatedConstraintCircle(self).circle.radius = new_radius
-                self.getRelatedConstraintCircle(neighbour).circle.radius = new_radius
+                self._adjustConstraintCircles(neighbour)
 
                 # if only one neighbour, more handy to move current gear.
                 # if multiple neighbours, not possible.

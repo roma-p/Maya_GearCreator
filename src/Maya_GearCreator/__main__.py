@@ -4,7 +4,7 @@ import json
 import logging
 import importlib
 
-CUSTOM_PATH = "D:/dev/Maya_GearCreator/src/"
+CUSTOM_PATH = ""
 
 def addToPyPath(path):
     if not os.path.exists(path):
@@ -68,4 +68,22 @@ find the one closer to "A", "B"
 
 - BUTTON "ADJUST ROD": make the rod the smaller possible given the linked gears.
 - WHEN changing radius up: adjusting internal radius too? 
+
+- REFACTO "MOVEALONG":
+    - activate mode along:
+        create a null object at center of root gear, whith gear as child
+    - during move along:
+        this nul rotate (so we can use the slider as angles)
+        we rotate the gear so it is always ajusted (and we count rotate the other neigbour gears)
+
+    - desactivate mode along:
+        we restore previous archi
+    therefore:
+        - snapping on 90° degres (or already used degres on X / Y ) is easy.
+        - we use the "ajust teeth" method once: at gear creation.
+
+
+AIM CONSTRAINT: TO CONSTRAINT CIRCLE AND NOT THE GEAR ITSELF, WILL WORK
+MORE CASE THAT I EXPECTED.
+
 """
