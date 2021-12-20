@@ -4,7 +4,7 @@ import json
 import logging
 import importlib
 
-CUSTOM_PATH = None
+CUSTOM_PATH = ""
 
 def addToPyPath(path):
     if not os.path.exists(path):
@@ -49,12 +49,41 @@ TODO LIST:
 * resize:
     - resize neigbours fix.
 *!! multi forme. -> différentes formes de gear possibles
-
+- mayaObjDescriptor -> not 'addInput', just 'addRef' (no need for it to be an input?).
 prio list:
 - Comment fr un bon parser automatique? 
 
 !!
 * calculate min/max for ihm either from fix values or from function... 
 * On exit: change back colors... maybe on del? 
+
+adjust gear: iteration :
+
+1) current gear -> get all teeth left point 
+find the one closer to the center of parent gear -> "A"
+2) parent gear -> get all hole right point
+find the one closer to "A", "B"
+3) by iretation -> rotate current gear until 
+
+
+- BUTTON "ADJUST ROD": make the rod the smaller possible given the linked gears.
+- WHEN changing radius up: adjusting internal radius too? 
+
+- REFACTO "MOVEALONG":
+    - activate mode along:
+        create a null object at center of root gear, whith gear as child
+    - during move along:
+        this nul rotate (so we can use the slider as angles)
+        we rotate the gear so it is always ajusted (and we count rotate the other neigbour gears)
+
+    - desactivate mode along:
+        we restore previous archi
+    therefore:
+        - snapping on 90° degres (or already used degres on X / Y ) is easy.
+        - we use the "ajust teeth" method once: at gear creation.
+
+
+AIM CONSTRAINT: TO CONSTRAINT CIRCLE AND NOT THE GEAR ITSELF, WILL WORK
+MORE CASE THAT I EXPECTED.
 
 """

@@ -1,3 +1,4 @@
+from maya.api.OpenMaya import MVector, MMatrix, MPoint
 import pymel.core as pm
 
 
@@ -94,3 +95,21 @@ def select(transformName, meshType, *args, **kargs):
         if i:
             kargs["add"] = True
         pm.select(_tmp[i], **kargs)
+
+
+def world_matrix(obj):
+    """'
+    convenience method to get the world matrix of <obj> as a matrix object
+    """
+    return MMatrix(pm.xform(obj, q=True, matrix=True, ws=True))
+
+
+def world_pos(obj):
+    """'
+    convenience method to get the world position of <obj> as an MPoint
+    """
+    return MPoint(pm.xform(obj, q=True, t=True, ws=True))
+
+
+def getPositionInOtherObjectSpace(object, referenceObject):
+    return world_pos(object) * world_matrix(referenceObject).inverse()

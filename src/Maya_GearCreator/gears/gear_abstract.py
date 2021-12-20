@@ -5,11 +5,13 @@ import importlib
 
 from Maya_GearCreator import consts
 from Maya_GearCreator import gear_chain
+from Maya_GearCreator.misc import maya_helpers
 from Maya_GearCreator.maya_wrapper import connections_manager
 from Maya_GearCreator.maya_wrapper import maya_obj_descriptor as mob
 
 importlib.reload(consts)
 importlib.reload(gear_chain)
+importlib.reload(maya_helpers)
 importlib.reload(connections_manager)
 importlib.reload(mob)
 
@@ -60,14 +62,6 @@ class GearAbstract(mob.MayaObjDescriptor):
         if not objExists:
             self.addInput(gear_construct, "gear")
 
-        # TODO : NOT objExists????
-
-        # super().__init__(
-        #     gear_shape,
-        #     gear_construct,
-        #     _class,
-        #     name)
-
         self.shader_bk = None
 
         # ADJUSTING SHAPE -----------------------------------------------------
@@ -83,17 +77,31 @@ class GearAbstract(mob.MayaObjDescriptor):
         self.cCirclesChildrenManager = self.createChildrenM(
             tag=consts.TAG_CONSTRAINTS_C)
 
+        self.gearChain = gearChain
+        self.tWidth = tWidth
+
+        self.rotatedGears = self.addNodeRefHandler("rotatedGears")
+
+        self.addAttribute("orientation", "char", "x", _class=GearAbstract)
+
         if linkedGear:
             self.addNeighbour(linkedGear)
+
+            self.setParrallelAtInit(linkedGear)
             self.adjustGearToCircleConstraint(linkedGear)
 
         if linkedRod:
             self.translate = linkedRod.translate
 
-        self.gearChain = gearChain
-        self.tWidth = tWidth
-
         self.lockTransform(True)
+
+    @transform
+    def setParrallelAtInit(self, linkedGear):
+
+        if linkedGear.orientation == "y":
+            self.rotate = [linkedGear.rotate[0], 0, 90]
+            self.translate = linkedGear.translate
+            self.orientation = "y"
 
     def instantiateGear():
         # pm.polyPipe func buggy : accept no arg and return nothing
@@ -122,9 +130,13 @@ class GearAbstract(mob.MayaObjDescriptor):
 
     # CALCULATION -------------------------------------------------------------
 
-    def calculateConstraintRadius(parentGear, childGear):
-        return parentGear.gear.radius + (parentGear.gear.gearOffset / 2) \
-            + childGear.gear.radius + (childGear.gear.gearOffset / 2)
+    def calculateConstraintRadius(parentGear, childGear, orientation=0):
+        if not orientation:
+            return parentGear.gear.radius + (parentGear.gear.gearOffset / 2) \
+                + childGear.gear.radius + (childGear.gear.gearOffset / 2)
+        else:
+            return parentGear.gear.radius + (parentGear.gear.gearOffset / 2) \
+                + childGear.gear.height / 2
 
     def calculateAdjustedRadius(self, radius):
         radius = radius or self.gear.radius
@@ -139,6 +151,16 @@ class GearAbstract(mob.MayaObjDescriptor):
         delta = self.gear.height / 2
         center = self.translate[1]
         return center - delta, center + delta
+
+    def getReziseSliderMaxSize(self):
+        neighboursGears = self.listNeigbours()
+        if not neighboursGears: 
+            return 10 # TODO : Calculate value from current radius.
+        smaller_neighbour = min(neighboursGears, key=lambda n: n.gear.radius)
+        max_delta = smaller_neighbour.gear.radius\
+                    - smaller_neighbour.gear.internalRadius\
+                    - consts.ROD_GEAR_OFFSET
+        return self.gear.radius + max_delta
 
     # MANAGE NEIGHBOURS -------------------------------------------------------
     def listNeigbours(self):
@@ -168,12 +190,36 @@ class GearAbstract(mob.MayaObjDescriptor):
 
     # MODIFY ------------------------------------------------------------------
 
+    # Height / TWidth --
+
     def changeTWidth(self, tWidth):
         self.gear.sides = GearAbstract.calculateTNumber(tWidth,
                                                         self.gear.radius)
 
+    @transform
+    def changeHeight(self, height):
+        x, y, z = self.translate
+        self.translate = (x, height, z)
+        # TODO : to change when multiple orientaion.
+
+    # Radius an internal radius --
+
     def changeRadius(self, radius):
         raise NotImplementedError()
+
+    def _changeRadius_basic(self, radius):
+        adjustedRadius = self.calculateAdjustedRadius(radius)
+        self.gear.radius = adjustedRadius
+        self.gear.sides = GearAbstract.calculateTNumber(
+            self.tWidth,
+            adjustedRadius)
+
+    def _adjustConstraintCircles(self, neighbour):
+        new_radius = GearAbstract.calculateConstraintRadius(
+            self, neighbour)
+        neighbour.getRelatedConstraintCircle(self).circle.radius = new_radius
+        self.getRelatedConstraintCircle(neighbour).circle.radius = new_radius
+
 
     def changeInternalRadius(self, radius):
         raise NotImplementedError()
@@ -199,6 +245,8 @@ class GearAbstract(mob.MayaObjDescriptor):
     def getInternalRadius(self):
         raise NotImplementedError()
 
+    # Move along other gears --
+
     def activateMoveMode(self, rootGear):
         # 1 define constraint to move along root gear
         self.moveMode = rootGear
@@ -211,12 +259,17 @@ class GearAbstract(mob.MayaObjDescriptor):
         # MEMORIZE BASE POS.
         # self.basePos = .... get transform.
         # ds move along -> calculer la soustraction.
+
         self.basePos = self.translate[2]
         self.currentPos = self.basePos
 
     def desactivateMoveMode(self):
         if not self.moveMode: return
         self.desactivateCircleConstraint(self.moveMode)
+        # self.lockTransform(False)
+        # self.rotate = self.moveMode.rotate
+        # self.lockTransform(True)
+        self.moveMode = None
         self.lockChain(rootObj=self, lock=False)
         # self.lockChain(*[g for g in self.listNeigbours() if g != self], lock=False)
         self.lockTransform()
@@ -245,11 +298,220 @@ class GearAbstract(mob.MayaObjDescriptor):
         pm.move(self.objTransform, [0, 0, distance],
                 os=True, r=True, wd=True)
 
+    def _shiftCircleConstr(gear1, gear2, parrallel=True, positive=False):
+        c = gear1.getRelatedConstraintCircle(gear2)
+        if parrallel:
+            orientation = 0
+        else:
+            orientation = 1
+        c.circle.radius = GearAbstract.calculateConstraintRadius(gear2, gear1,
+                                                                 orientation)
+        if not positive:
+            pm.move(
+                c.objTransform,
+                [
+                    0,
+                    - gear1.gear.radius - gear2.gear.height / 2,
+                    0
+                ],
+                os=True, r=True, wd=True)
+        else:
+            pm.move(
+                c.objTransform,
+                [
+                    0,
+                    + gear1.gear.radius + gear2.gear.height / 2,
+                    0
+                ],
+                os=True, r=True, wd=True)
+
+    # BUG FROM -1 TO 1!!!
+
     @transform
-    def changeHeight(self, height):
-        x, y, z = self.translate
-        self.translate = (x, height, z)
-        # TODO : to change when multiple orientaion.
+    def changeOrientation(self, orientation, neighbourGear):
+
+        orientation = - orientation
+
+        if self.isParrallel(neighbourGear):
+            self.orienGear(neighbourGear)
+        self.lockChain(neighbourGear, lock=True)
+        #self.orienGear(neighbourGear)
+        self._setParrallel(neighbourGear)
+        if orientation == 0:
+            self.lockChain(neighbourGear, lock=False)
+            return
+
+
+        pm.rotate(
+            self.objTransform,
+            [0, 0, orientation * 90],
+            os=True, r=True)
+        pm.move(
+            self.objTransform,
+            [
+                - (self.gear.radius + neighbourGear.gear.height / 2),
+                - orientation * (self.gear.radius - neighbourGear.gear.gearOffset),
+                0
+            ],
+            os=True, r=True, wd=True)
+
+        self.lockChain(neighbourGear, lock=False)
+
+        #if orientation == -1:
+        #    self.flipPartOfChain180(neighbourGear)
+
+        if orientation == - 1:
+            positive = True
+        else:
+            positive = False
+
+        GearAbstract._shiftCircleConstr(self, neighbourGear,
+                                        parrallel=False,
+                                        positive=positive)
+        GearAbstract._shiftCircleConstr(neighbourGear, self,
+                                        parrallel=False,
+                                        positive=False)
+
+        if neighbourGear.orientation == "x":
+            self.orientation = "y"
+        else:
+            self.orientation = "x"
+
+        #neighbourGear.rotatedGears.add(self)
+
+    # def _setParrallel(self, neighbourGear):
+    #     GearAbstract._shiftCircleConstr(self, neighbourGear, parrallel=True)
+    #     GearAbstract._shiftCircleConstr(neighbourGear, self, parrallel=True)
+    #     orientation = self.getOrientation(neighbourGear)
+    #     if orientation == 0:
+    #         return
+    #     if orientation == 1:
+    #         pm.rotate(self.objTransform, [0, 0, -90], os=True, r=True)
+    #         pm.move(
+    #             self.objTransform,
+    #             [
+    #                 1 * (self.gear.radius - neighbourGear.gear.gearOffset),
+    #                 1 * (self.gear.radius + neighbourGear.gear.height / 2),
+    #                 0
+    #             ],
+    #             os=True, r=True, wd=True)
+    #     # TODO: !!! DOES SHIFT CHILDREN GEARS BY 90°
+    #     elif orientation == -1:
+    #         self.lockChain(neighbourGear, lock=False)
+    #         # self.flipPartOfChain180(neighbourGear, negative=True)
+    #         self.lockChain(neighbourGear, lock=True)
+    #         pm.rotate(self.objTransform, [0, 0, 90], os=True, r=True)
+    #         pm.move(
+    #             self.objTransform,
+    #             [
+    #                 1 * (self.gear.radius - neighbourGear.gear.gearOffset),
+    #                 - 1 * (self.gear.radius + neighbourGear.gear.height / 2),
+    #                 0
+    #             ],
+    #             os=True, r=True, wd=True)
+    #     self.orientation = neighbourGear.orientation
+
+
+    # TODO : BON, IL FAUT RETENIR LE PARAM "HAS ROTATED"
+
+
+    def _setParrallel(self, neighbourGear):
+        GearAbstract._shiftCircleConstr(self, neighbourGear, parrallel=True)
+        GearAbstract._shiftCircleConstr(neighbourGear, self, parrallel=True)
+        orientation = self.getOrientation(neighbourGear)
+        # angle = 0
+        # if orientation == 0:
+        #     return
+        # elif orientation == 1:
+        #     angle = 90
+        #     #if neighbourGear not in self.rotatedGears:
+        #     #    #self.rotatedGears.discard(neighbourGear)
+        #     #    angle = -90
+        #     #else:
+        #     #    angle = 90
+        # else:
+        #     angle = 90
+        #pm.rotate(self.objTransform, [0, 0, angle], os=True, r=True)
+        self.adjustGearToCircleConstraint(neighbourGear)
+        self.orientation = neighbourGear.orientation
+
+
+    def _old_setParrallel(self, neighbourGear):
+        GearAbstract._shiftCircleConstr(self, neighbourGear, parrallel=True)
+        GearAbstract._shiftCircleConstr(neighbourGear, self, parrallel=True)
+        orientation = self.getOrientation(neighbourGear)
+
+        def A():
+            pm.rotate(self.objTransform, [0, 0, -90], os=True, r=True)
+            pm.move(
+                self.objTransform,
+                [
+                    1 * (self.gear.radius - neighbourGear.gear.gearOffset),
+                    1 * (self.gear.radius + neighbourGear.gear.height / 2),
+                    0
+                ],
+                os=True, r=True, wd=True)
+
+        def B():
+            self.lockChain(neighbourGear, lock=False)
+            #self.flipPartOfChain180(neighbourGear, negative=True)
+            self.lockChain(neighbourGear, lock=True)
+            pm.rotate(self.objTransform, [0, 0, 90], os=True, r=True)
+            pm.move(
+                self.objTransform,
+                [
+                    1 * (self.gear.radius - neighbourGear.gear.gearOffset),
+                    - 1 * (self.gear.radius + neighbourGear.gear.height / 2),
+                    0
+                ],
+                os=True, r=True, wd=True)
+
+        def C():
+            pm.rotate(self.objTransform, [0, 0, 90], os=True, r=True)
+            pm.move(
+                self.objTransform,
+                [
+                    - 1 * (self.gear.radius - neighbourGear.gear.gearOffset),
+                    - 1 * (self.gear.radius + neighbourGear.gear.height / 2 + self.gear.gearOffset / 2),
+                    0
+                ],
+                os=True, r=True, wd=True)
+
+        if orientation == 0:
+            return
+        if orientation == 1:
+            if neighbourGear not in self.rotatedGears:
+                A()
+            else:
+                C()
+        # TODO: !!! DOES SHIFT CHILDREN GEARS BY 90°
+        elif orientation == -1:
+            B()
+        self.orientation = neighbourGear.orientation
+        if neighbourGear in self.rotatedGears:
+            self.rotatedGears.discard(neighbourGear)
+
+    def isParrallel(self, neighbourGear):
+        return neighbourGear.orientation == self.orientation
+
+    def getOrientation(self, neighbourGear):
+        if self.isParrallel(neighbourGear):
+            orientation = 0
+        else:
+            relative_pos = maya_helpers.getPositionInOtherObjectSpace(
+                self.objTransform,
+                neighbourGear.objTransform)
+
+            if relative_pos[1] > 0:
+                orientation = 1
+            else:
+                orientation = -1
+
+        return orientation
+
+    @transform
+    def setParrallel(self, neighbourGear):
+        self._setParrallel(neighbourGear)
 
     # CONSTRAINTS -------------------------------------------------------------
 
@@ -273,7 +535,11 @@ class GearAbstract(mob.MayaObjDescriptor):
             pm.geometryConstraint(
                 constraintsCircle.objTransform,
                 self.objTransform),
-            pm.aimConstraint(neighbourGear.objTransform, self.objTransform)
+            pm.aimConstraint(
+                neighbourGear.objTransform,
+                self.objTransform,
+                wut="objectrotation",
+                wuo=neighbourGear.objTransform)
         ]
         constraintsCircle.visibility = True
 
@@ -328,6 +594,15 @@ class GearAbstract(mob.MayaObjDescriptor):
             ret_rod = None
         return ret_gears, ret_rod
 
+    def orienGear(self, neighbourGear):
+        constraint = pm.aimConstraint(
+            neighbourGear.objTransform,
+            self.objTransform,
+            wut="objectrotation",
+            wuo=neighbourGear.objTransform)#,
+            #sk=("y", "z"))
+        pm.delete(constraint)
+
     # SHADER ------------------------------------------------------------------
 
     def setTmpShader(self, sg):
@@ -347,3 +622,28 @@ class GearAbstract(mob.MayaObjDescriptor):
         shadeEng = pm.listConnections(self.objTransform.getShape(),
                                       type="shadingEngine")
         return shadeEng
+
+    # MISC --------------------------------------------------------------------
+
+    def flipPartOfChain180(self, rootObj, negative=False):
+        if negative:
+            factor = -1
+        else:
+            factor = 1
+        pm.rotate(self.objTransform, [factor * 180, 0, 0], os=True, r=True)
+        gears, r = self._find_children(rootObj)
+        self._flipPartOfChain180_recc(factor, *gears, rod=r)
+
+    def _flipPartOfChain180_recc(self, factor, *neighboursGear, rod=None):
+        allObj = list(neighboursGear)
+        if rod:
+            allObj.append(rod)
+        for obj in allObj:
+            obj.lockTransform(False)
+            pm.rotate(obj.objTransform, [factor * 180, 0, 0], os=True, r=True)
+            obj.lockTransform(True)
+        for g in neighboursGear:
+            new_gears, new_rod = g._find_children(self)
+            g._flipPartOfChain180_recc(factor, *new_gears, rod=new_rod)
+        if rod:
+            rod._flipPartOfChain180_recc(self, factor)

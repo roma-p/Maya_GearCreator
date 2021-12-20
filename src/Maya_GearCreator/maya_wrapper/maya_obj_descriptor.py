@@ -141,6 +141,22 @@ class MayaObjDescriptor():
                 attrName = attrList[0].attrName()
                 self.addInput(inputNode, attrName)
 
+    # ADD REFS SET ------------------------------------------------------------
+    def addNodeRefHandler(self, refTag):
+        return RefHandler(self, refTag)
+
+    # ADD ATTRIBUTE -----------------------------------------------------------
+
+    def addAttribute(self, name, type, defaultValue, _class=None):
+        objTransform = self.objTransform
+        if not objTransform.hasAttr(name):
+            objTransform.addAttr(
+                name,
+                attributeType=type,
+                hidden=True,
+                keyable=True)
+        self._addTransformProperty(name, _class=_class)
+        setattr(self, name, defaultValue)
 
 class InputDescriptor():
 
@@ -175,3 +191,52 @@ class InputDescriptor():
         def setter(self, value):
             self.inputNode.setAttr(attrName, value)
         setattr(_class, attrName, property(getter, setter))
+
+class RefHandler():
+
+    def __init__(self, parentObj, name):
+        self.name = name
+        self.parentObj = parentObj
+        self.transformToDescr = {}
+        maya_helpers.addTag(parentObj.objTransform, name)
+
+    def __len__(self):
+        return len(self._listRefs())
+
+    def __contains__(self, obj):
+        return obj in self._listRefs()
+
+    def __iter__(self):
+        for item in self._listRefs():
+            yield item
+
+    def add(self, obj):
+        maya_helpers.addTag(obj.objTransform, self.name)
+        pm.connectAttr(self._formatConnection(self.parentObj),
+                       self._formatConnection(obj))
+        self.transformToDescr[obj.objTransform] = obj
+
+    def discard(self, obj):
+        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        print("alors?")
+        print(self._listRefs())
+        print(obj)
+        print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        if obj in self._listRefs():
+            print("bah oui?")
+            pm.disconnectAttr(self._formatConnection(self.parentObj),
+                              self._formatConnection(obj))
+            self.transformToDescr.pop(obj.objTransform)
+
+    def _listRefs(self):
+        connectedTransform = pm.listConnections(
+            self._formatConnection(self.parentObj),
+            source=False)
+        print('yyyyyyyyyyyyyyyyyyyyyyyy')
+        print(connectedTransform)
+        print('yyyyyyyyyyyyyyyyyyyyyyyy')
+        return [self.transformToDescr[c] for c in connectedTransform]
+
+    def _formatConnection(self, objDescriptor):
+        return "{}.{}".format(str(objDescriptor.objTransform),
+                              self.name)
