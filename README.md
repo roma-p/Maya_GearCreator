@@ -55,6 +55,10 @@ Some of the parameter are not configurable for individual gear but for the overa
 You can quit the plugin, the scene and maya safely! All gear creator infos are stored inside the scene, so you can edit your networks later using the plugin.
 (at least you should)
 
+![Alt text](etc/1.gif?raw=true "gif1")
+![Alt text](etc/2.gif?raw=true "gif2")
+![Alt text](etc/3.gif?raw=true "gif3")
+
 ## Next!
 
 (by criticity)
